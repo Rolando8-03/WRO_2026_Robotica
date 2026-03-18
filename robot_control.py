@@ -56,86 +56,20 @@ class Base:
         print("IMU listo, heading:", self.Hub.imu.heading())
 
     # ---------- MOVIMIENTO RECTILÍNEO CON GIROSCOPIO (CORREGIDO) ----------
-    def mover(self, velocidad, distancia_cm):
-        """
-        Avanza o retrocede en línea recta con compensación mecánica feedforward.
-        - velocidad: rapidez (0-1000), siempre positiva.
-        - distancia_cm: >0 adelante, <0 atrás.
-        """
-        self.reset_imu()
-        self.motor_izquierdo.reset_angle(0)
-        self.motor_derecho.reset_angle(0)
+    def mover(self, distancia_cm, velocidad=None):
+        # Convertir cm a mm (DriveBase trabaja en mm)
+        distancia_mm = distancia_cm * 10
 
-        direccion = 1 if distancia_cm > 0 else -1
-        distancia_abs = abs(distancia_cm)
+        # Si se especifica velocidad, la convertimos a velocidad lineal en mm/s
+        if velocidad is not None:
+            vel_lineal_mm_s = velocidad * 0.5
+            self.drive_base.settings(straight_speed=vel_lineal_mm_s, turn_rate=200)
 
-        circunferencia = self.diametro_rueda * self.pi
-        grados_totales = (distancia_abs * 10 / circunferencia) * 360 * self.factor_calibracion
+        # Ejecutar movimiento
+        self.drive_base.straight(distancia_mm)
 
-        vel_objetivo = abs(velocidad)
-        vel_actual = 0
-        incremento = 100
-
-        # Parámetros independientes para avance y retroceso
-        if direccion == 1:  # Avance
-            kp = 1.0
-            ki = 0.0
-            kd = 0.2
-            ff_factor = -0.125      # Ajustado para avance
-            offset_manual = 0        # Si aún se desvía, prueba valores pequeños (+/-)
-        else:  # Retroceso
-            kp = 1.5                 # Un poco más de proporcional
-            ki = 0.1                  # Integral para eliminar error sistemático
-            kd = 0.3
-            ff_factor = -0.21          # Más negativo porque la desviación era a la izquierda
-            offset_manual = -10       # Offset adicional (negativo = corrige izquierda)
-
-        last_error = 0
-        integral = 0
-        dt = 10
-        integral_max = 50
-
-        while True:
-            angulo_prom = (self.motor_izquierdo.angle() + self.motor_derecho.angle()) / 2
-            if abs(angulo_prom) >= grados_totales:
-                break
-
-            if vel_actual < vel_objetivo:
-                vel_actual += incremento
-                if vel_actual > vel_objetivo:
-                    vel_actual = vel_objetivo
-
-            error = self.Hub.imu.heading()
-
-            # PID con integral
-            integral += error * dt * 0.001
-            integral = max(-integral_max, min(integral_max, integral))
-            derivada = (error - last_error) / (dt / 1000) if dt > 0 else 0
-
-            # Feedforward + offset
-            feedforward = ff_factor * vel_actual
-            correccion_total = (error * kp) + (integral * ki) + (derivada * kd) + feedforward + offset_manual
-
-            # Ajuste por dirección: multiplicamos por la dirección para que la corrección actúe igual en ambos sentidos
-            correccion_ajustada = correccion_total * direccion
-
-            potencia_base = vel_actual * direccion
-            potencia_izq = potencia_base - correccion_ajustada
-            potencia_der = potencia_base + correccion_ajustada
-
-            potencia_izq = max(-1000, min(1000, potencia_izq))
-            potencia_der = max(-1000, min(1000, potencia_der))
-
-            self.motor_izquierdo.run(potencia_izq)
-            self.motor_derecho.run(potencia_der)
-
-            last_error = error
-            wait(dt)
-
-        self.motor_izquierdo.brake()
-        self.motor_derecho.brake()
-        wait(50)
-        print("Desviación final:", self.Hub.imu.heading())
+        # Frenar (opcional, straight ya frena al final)
+        self.frenar()
 
     # ---------- GIROS MANUALES (SIN GIROSCOPIO) ----------
     def girar(self, velocidad, angulo_grados):
@@ -334,7 +268,6 @@ class Base:
             self.motor_derecho.run(potencia_der)
 
             last_error = error
-            wait(dt)
 
         self.frenar()
 
