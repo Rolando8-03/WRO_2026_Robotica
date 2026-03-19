@@ -7,7 +7,7 @@ from pybricks.tools import wait, StopWatch
 class Base:
     def __init__(self):
         self.Hub = PrimeHub()
-        
+
         # --- ÚNICA COSA AGREGADA: Calibración profunda del giroscopio ---
         self.calibrar_giroscopio()
         # ----------------------------------------------------------------
@@ -21,7 +21,9 @@ class Base:
         self.motor_garra     = Motor(Port.A)
 
         # Sensores
-        self.seguidor = ColorSensor(Port.E)
+        self.seguidor      = ColorSensor(Port.E) #Sensor del seguidor
+        self.sensor_matriz = ColorSensor(Port.D) #Sensor de identificador
+
 
         # DriveBase necesario para algunas funciones (como reset de distancia)
         self.drive_base = DriveBase(
@@ -54,10 +56,6 @@ class Base:
 
         # No activamos el giroscopio en DriveBase para tener control manual
 
-    # ---------- UTILIDADES ----------
-    def esperar(self, ms):
-        wait(ms)
-
     def frenar_rolando(self):
         self.motor_derecho.brake()
         self.motor_izquierdo.brake()
@@ -74,6 +72,32 @@ class Base:
                 self.Hub.imu.reset_heading(0)
             wait(100)
         print("IMU listo, heading:", self.Hub.imu.heading())
+    
+    def codificar_color(self, c):
+        #Convierte Color a código numérico.
+        if c == Color.YELLOW:
+            return 1
+        elif c == Color.BLUE:
+            return 2
+        elif c == Color.GREEN:
+            return 3
+        else:
+            return 4  # blanco/otro
+    
+    self.claves_matrices = {
+    (1, 2): "Matriz A",
+    (2, 3): "Matriz B",
+    (3, 1): "Matriz C",
+    (4, 4): "Matriz D"}
+
+    #Lista donde se guardan los colores recien leídos por el sensor
+    lista_L = []
+
+    #funcion de lectura y clasificacion de colores
+    def iden_matriz(self):
+        c = self.sensor_matriz.color() #obtener el color que se leyó
+        codigo = self.codificar_color(c) #codificar a numero el color obtenido
+        self.lista_L.append(codigo) #agregar a la lista el codigo del color
 
     # ---------- MOVIMIENTO RECTILÍNEO CON GIROSCOPIO (CORREGIDO) ----------
     def mover(self, distancia_cm, velocidad=None):
@@ -364,6 +388,8 @@ class Base:
     # ------------------------------------------------------------
 
     # ------------- FUNCIONES DE UTILIDAD ----------------
+    def esperar(self, ms):
+        wait(ms)
 
     def frenar(self):
         # hacemos que ambos motores frenen y esperamos un momento

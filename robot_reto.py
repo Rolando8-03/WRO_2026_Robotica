@@ -103,8 +103,29 @@ robot.reset_imu_y_base()
 robot.movimiento_giroscopio(600, -17) #Movimiento de retroceso para clasificar la matriz
 robot.mover_torque(250, 140) #Movimiento del torque para bajar el sensor
 robot.esperar(1000)
-#Aqui va a ir la funcion de detectar
+# -------- DETECCIÓN DE MATRIZ --------
+robot.lista_L = []  # limpiar lista antes de leer
 
+# Leer primer cuadro
+robot.avanzar(-200)  # ajusta distancia real
+robot.iden_matriz()
+
+robot.esperar(200)
+
+# Leer segundo cuadro
+robot.avanzar(-200)  # ajusta distancia real
+robot.iden_matriz()
+
+# Convertir a clave
+clave = tuple(robot.lista_L)
+
+# Buscar en diccionario
+matriz_id = robot.claves_matrices.get(clave)
+
+if matriz_id is not None:
+    print(f"Matriz detectada: {matriz_id} | firma={clave}")
+else:
+    print(f"Matriz no identificada | firma leída={clave}")
 
 #seccion 9: Ir por los cementos amarillos
 robot.mover_torque(250, -140)
