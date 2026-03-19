@@ -3,6 +3,7 @@ from pybricks.pupdevices import Motor, ColorSensor
 from pybricks.parameters import Color, Direction, Port, Side, Stop
 from pybricks.robotics import DriveBase
 from pybricks.tools import wait, StopWatch
+from robot_control import Base
 
 # ----------------- EJECUCIÓN PRINCIPAL -----------------
 robot = Base()
