@@ -34,6 +34,8 @@ class Base:
             axle_track=170       # distancia entre ruedas mm (usando valor del código 2)
         )
 
+        self.lista_L = []  # lista como atributo de la clase
+
         self.drive_base.use_gyro(True)
 
         # Ajustes de movimiento (usando valores del código 2)
@@ -104,6 +106,23 @@ class Base:
 
     def girar(self, angulo_deg):
         self.drive_base.turn(angulo_deg)
+    
+    # Función para convertir color a número
+    def codificar_color(self, c):
+        if c == Color.YELLOW:
+            return 1
+        elif c == Color.BLUE:
+            return 2
+        elif c == Color.GREEN:
+            return 3
+        else:
+            return 4  # blanco u otro
+
+    # Función para leer y guardar color
+    def iden_matriz(self):
+        c = self.sensor_matriz.color()   # leer color
+        codigo = self.codificar_color(c) # convertir a número
+        self.lista_L.append(codigo)      # guardar en lista
 
     # ----------------- FUNCIONES DEL GIROSCOPIO (de tu código) -----------------
     def movimiento_giroscopio(self, velocidad, distancia_cm, kp=4.5, kd=2.0):
