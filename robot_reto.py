@@ -5,7 +5,7 @@ robot = Base()
 print(robot.Hub.battery.voltage())
 
 # ===================== SECCIÓN 1 =====================
-
+'''
 robot.giro_izquierda(45, 620)
 robot.mover_recto(12, 900)
 robot.giro_izquierda(45, 620)
@@ -82,6 +82,28 @@ robot.mover_torque(-70,100)
 robot.mover_recto(10, 800)
 robot.esperar(10)
 robot.seguir_linea(robot.seguidor, 100, 35)
+
+'''
+# ----- SECCION DE CEMENTOS AMARILLOS -------
+robot.mover_torque(-120,150)
+robot.mover_recto(8,900)
+robot.seguir_linea(robot.seguidor, 100, 45)
+robot.giro_derecha(-90,450)
+robot.mover_recto(10,900)
+robot.giro_derecha(-89,450)
+robot.avanzar_con_torque(-30,120,700,100) #Aqui ya agarró los cementos amarillos
+#Camino a dejar los cementos amarillos
+robot.mover_recto(8,900)
+robot.seguir_linea(robot.seguidor, 100, 14)
+robot.giro_derecha(-89,450)
+robot.mover_recto(54,900)
+#robot.seguir_linea(robot.seguidor, 100, 47)
+robot.giro_izquierda(91,450)
+robot.mover_recto(60,900)
+robot.girar(-90,450)
+robot.retroceder_recto(19,700)
+robot.mover_torque(-120,150)
+
 
 '''
 #-----------------------------
