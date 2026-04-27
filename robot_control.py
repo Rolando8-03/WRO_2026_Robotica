@@ -19,6 +19,8 @@ class Base:
         self.seguidor = ColorSensor(Port.C)
         self.sensor_matriz = ColorSensor(Port.D)
 
+        self.lista_colores = []
+
         self.diametro_rueda = 56
         self.circunferencia = self.diametro_rueda * 3.14159
         self.grados_por_mm = 360 / self.circunferencia
@@ -52,6 +54,12 @@ class Base:
         self.motor_izquierdo.brake()
         self.motor_derecho.brake()
         wait(30)
+    
+    
+    def matriz(self):
+        color = self.sensor_matriz.color()
+        self.lista_colores.append(color)
+    
 
     def distancia_promedio_grados(self):
         return (abs(self.motor_izquierdo.angle()) + abs(self.motor_derecho.angle())) / 2
@@ -116,8 +124,66 @@ class Base:
 
         self.frenar()
 
-    def retroceder_recto(self, distancia_cm, velocidad=700, kp=2.5, kd=4.0, velocidad_min=220):
-        self.mover_recto(-abs(distancia_cm), velocidad=velocidad, kp=kp, kd=kd, velocidad_min=velocidad_min)
+    def retroceder_recto(self, distancia_cm, velocidad=700):
+        if distancia_cm == 0:
+            return
+
+        self.reset_motores()
+        self.reset_imu()
+
+        distancia_mm = abs(distancia_cm) * 10
+        grados_objetivo = distancia_mm * self.grados_por_mm
+
+        error_anterior = 0
+        reloj = StopWatch()
+        reloj.reset()
+
+        # Valores fijos que funcionan bien (puedes ajustarlos si quieres)
+        kp = 2.5
+        kd = 4.0
+        velocidad_min = 220
+
+        velocidad_actual = velocidad_min
+        rampa = 25
+
+        while abs(self.distancia_promedio_grados()) < grados_objetivo:
+            recorrido_abs = abs(self.distancia_promedio_grados())
+            restante = grados_objetivo - recorrido_abs
+
+            if velocidad_actual < velocidad:
+                velocidad_actual += rampa
+                if velocidad_actual > velocidad:
+                    velocidad_actual = velocidad
+
+            if restante < 220:
+                velocidad_actual = max(velocidad_min, int(velocidad * restante / 220))
+
+            dt = reloj.time() / 1000
+            if dt <= 0:
+                dt = 0.001
+
+            error = self.Hub.imu.heading()
+            derivada = (error - error_anterior) / dt
+            correccion = error * kp + derivada * kd
+            correccion = max(-180, min(180, correccion))
+
+            # Velocidad negativa para retroceder
+            base = -velocidad_actual
+
+            pot_izq = int((base - correccion) * self.bias_izq)
+            pot_der = int((base + correccion) * self.bias_der)
+
+            pot_izq = max(-1000, min(1000, pot_izq))
+            pot_der = max(-1000, min(1000, pot_der))
+
+            self.motor_izquierdo.run(pot_izq)
+            self.motor_derecho.run(pot_der)
+
+            error_anterior = error
+            reloj.reset()
+            wait(5)
+
+        self.frenar()
 
 
     def seguir_linea(

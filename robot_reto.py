@@ -1,21 +1,25 @@
 from robot_control import Base
+from pybricks.parameters import Color, Direction, Port, Stop
 
 # ----------------- EJECUCIÓN PRINCIPAL -----------------
 robot = Base()
 print(robot.Hub.battery.voltage())
 
-# ===================== SECCIÓN 1 (Tomar cemento y ubicar pala) =====================
+
+# ===================== SECCIÓN 1 (TOMAR CEMENTO Y UBICAR PALA) =====================
 #SECCION 1.1 -> SALIDA Y AVANZAR HASTA EL BALDE DE CEMENTO
 robot.giro_izquierda(45, 620) 
 robot.mover_recto(12, 900) 
 robot.giro_izquierda(45, 620) 
 robot.esperar(10)
 robot.seguir_linea(robot.seguidor, 100, 65) 
+
 #SECCION 1.2 -> AGARRAR EL BALDE DE CEMENTO
-robot.girar(-91, 450) #giro hacia el cemento
+robot.girar(-91, 450) 
 robot.esperar(10)
-robot.avanzar_con_torque(-19, 160, 700, 140) #tomar el cemento
+robot.avanzar_con_torque(-19, 160, 700, 140) 
 robot.esperar(10)
+
 #SECCION 1.3 -> DEJAR LA PALA DE ALBAÑILERIA
 robot.mover_recto(1,500) 
 robot.girar(80)
@@ -26,7 +30,7 @@ robot.retroceder_recto(40, 650)
 robot.mover_recto(30.5, 900)
 robot.esperar(100)
 robot.girar(-18, 500)
-robot.mover_recto(9,800)
+robot.mover_recto(10,800)
 robot.girar(24, 500)
 robot.esperar(120)
 robot.seguir_linea(robot.seguidor, 100, 38)
@@ -34,46 +38,58 @@ robot.seguir_linea(robot.seguidor, 100, 38)
 # SECCION 2.2 -> PONER EL CEMENTO EN EL ESTACIONAMIENTO
 robot.esperar(10)
 robot.girar(91, 500)
-robot.mover_torque(-70, 1000)
+robot.mover_torque(-100, 1000)
 robot.retroceder_recto(10, 650) 
 
 # ===================== SECCIÓN #3 (IR POR LOS CEMENTOS BLANCOS) =====================
+# SECCION 3.1 -> POSICIONARSE ENFRENTE DE LA LÍNEA DEL SEGUIDOR
 robot.mover_recto(10, 900)
 robot.giro_derecha(-85, 450)
 robot.esperar(100)
 
+#SECCION 3.2 -> AGARRAR LOS CEMENTOS BLANCOS
 robot.mover_recto(5, 800)
-robot.seguir_linea(robot.seguidor, 100, 10) #SEGUIR LINEA HASTA LOS CEMENTOS
+robot.seguir_linea(robot.seguidor, 100, 10) 
 robot.girar(-175, 500)
-robot.avanzar_con_torque(-24, 165, 750, 300)
-#Aqui agarra los cementos blancos
+robot.avanzar_con_torque(-24, 170, 750, 300)
 
 # ===================== SECCION #4 (DEJAR LOS CEMENTOS) =====================
+#SECCION 4.1 -> POSICIONARSE EN LA LÍNEA FRENTE A LA MATRIZ
 robot.mover_recto(10, 850)
 robot.girar(77, 450)
-robot.mover_recto(47) #MOVER RECTO HASTA SEGUIR LA LINEA A LA MATRIZ
-robot.girar(-64, 500) 
+robot.mover_recto(47) 
+robot.girar(-68, 500) 
 robot.esperar(100)
 
-robot.seguir_linea(robot.seguidor, 60, 26) #SEGUIR LINEA PARA IR A LA MATRIZ
+#SECCION 4.2 -> DEJAR LOS CEMENTOS BLANCOS CON GIRO
+robot.seguir_linea(robot.seguidor, 60, 26) 
 robot.esperar(100)
-robot.girar(-182, 500) #giro completo antes de entrar a la matriz
+robot.girar(-182, 500) 
 robot.retroceder_recto(10, 900)
 robot.girar(38, 500)
-robot.avanzar_con_torque(-26, -150, 700, 180)  # DEJAR LOS CEMENTOS BLANCOS
+robot.avanzar_con_torque(-26, -150, 700, 180)  
 
-#==============================SECCION #4 (Escanear la matriz)==========================================
-robot.mover_recto(19, 900) #Salida de la matriz
+#==============================SECCION #4 (ESCANEO DE MATRIZ)==========================================
+#SECCION 4.1 -> SE POSICIONA PARA ESCANEAR LA MATRIZ
+robot.mover_recto(20, 900) #Salida de la matriz
 robot.girar(-45, 450) 
 robot.esperar(100)
-
 robot.seguir_linea(robot.seguidor, 60, 7)
+
+#SECCION 4.2 -> ESCANEA LA MATRIZ CON RETROCESO
 robot.retroceder_recto(20, 700) 
 robot.mover_torque(70, 100) 
-robot.esperar(1000)
-robot.retroceder_recto(2, 700)
-robot.mover_torque(-70,100) #subir la celda
-robot.esperar(10)
+robot.matriz()
+robot.esperar(500)
+'''
+if robot.matriz = [Color.GREEN]:
+    robot.retroceder_recto(2, 700)
+    robot.matriz()
+    robot.esperar(500)
+'''
+print(robot.lista_colores)
+robot.mover_torque(-70,100) 
+
 
 #==================================SECCION #5 (IR POR LOS CEMENTOS AMARILLOS) ==============================
 robot.mover_torque(-120,150)
