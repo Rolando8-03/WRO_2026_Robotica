@@ -185,7 +185,6 @@ class Base:
 
         self.frenar()
 
-
     def seguir_linea(
         self,
         sensor_color,
@@ -326,6 +325,8 @@ class Base:
         
     def avanzar_con_torque(self, distancia_cm, grados_torque, velocidad_robot=700, velocidad_torque=150):
         self.motor_torque.run_angle(velocidad_torque, grados_torque, then=Stop.HOLD, wait=False)
+        if distancia_cm < 0:
+            self.retroceder_recto(abs(distancia_cm), velocidad_robot)
         self.mover_recto(distancia_cm, velocidad=velocidad_robot)
 
     def mover_garra(self, velocidad, grados):
