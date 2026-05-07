@@ -14,7 +14,7 @@ robot.esperar(10)
 robot.seguir_linea(
     robot.seguidor,
     velocidad_max=100,
-    distancia_cm=80,
+    distancia_cm=82,
     kp=0.48,
     kd=1.70,
     k_freno=0.52,
@@ -42,7 +42,7 @@ robot.esperar(120)
 robot.seguir_linea(
     robot.seguidor,
     velocidad_max=100,
-    distancia_cm=37,
+    distancia_cm=38,
     kp=0.48,
     kd=1.70,
     k_freno=0.52,
@@ -77,13 +77,13 @@ robot.avanzar_con_torque(-20, -176, 850, 200)
 #SECCION 4.1 -> POSICIONARSE EN LA LÍNEA FRENTE A LA MATRIZ
 robot.mover_recto(10, 850)
 robot.girar(70, 450)
-robot.mover_recto(52.5) 
+robot.mover_recto(50.5) 
 robot.girar(-70, 500) 
 robot.esperar(100)
 
 robot.seguir_linea(
     robot.seguidor,
-    velocidad_max=100,
+    velocidad_max=80,
     distancia_cm=38,
     lado="izquierda",
     kp=0.48,
@@ -94,8 +94,8 @@ robot.seguir_linea(
 
 #SECCION 4.2 -> DEJAR LOS CEMENTOS BLANCOS CON GIRO
 robot.esperar(100)
-robot.mover_recto(25, 800) #entrar en la matriz
-robot.retroceder_recto(40, 800)
+robot.mover_recto(24, 700) #entrar en la matriz
+robot.retroceder_recto(36, 800)
 robot.girar(180, 500) 
 robot.retroceder_recto(14, 900)
 robot.girar(44, 500)
@@ -147,8 +147,8 @@ robot.avanzar_con_torque(-7, 175, 900, 160)
 
 robot.mover_recto(10, 900)
 robot.girar(-40, 500)
-robot.mover_recto(34, 900)
-robot.girar(40, 500)
+robot.mover_recto(33, 900)
+robot.girar(39, 500)
 robot.seguir_linea(
     robot.seguidor,
     velocidad_max=100,
@@ -158,8 +158,8 @@ robot.seguir_linea(
     k_freno=0.52,
     tiempo_acomodo_ms=400
 )
-robot.girar(-180, 500)
-robot.avanzar_con_torque(-10, -170, 900, 160) 
+robot.girar(-180, 400)
+robot.avanzar_con_torque(-14, -170, 900, 160) 
 
 
 robot.mover_recto(10, 900)
