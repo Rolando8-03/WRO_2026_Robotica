@@ -83,7 +83,7 @@ robot.esperar(100)
 
 robot.seguir_linea(
     robot.seguidor,
-    velocidad_max=80,
+    velocidad_max=100,
     distancia_cm=38,
     lado="izquierda",
     kp=0.48,
@@ -94,16 +94,16 @@ robot.seguir_linea(
 
 #SECCION 4.2 -> DEJAR LOS CEMENTOS BLANCOS CON GIRO
 robot.esperar(100)
-robot.mover_recto(24, 700) #entrar en la matriz
-robot.retroceder_recto(36, 800)
+robot.mover_recto(24.5, 700) #entrar en la matriz
+robot.retroceder_recto(38, 800)
 robot.girar(180, 500) 
 robot.retroceder_recto(14, 900)
-robot.girar(44, 500)
-robot.avanzar_con_torque(-12, 145, 700, 180)
+robot.girar(48, 500)
+robot.avanzar_con_torque(-10, 145, 700, 180) #DEJAR LOS CEMENTOS BLANCOS
 robot.esperar(100)
 
 #==============================SECCION #4 (ESCANEO DE MATRIZ)==========================================
-robot.mover_recto(22,900)
+robot.mover_recto(18,900)
 robot.girar(-44, 500)
 
 '''
@@ -143,12 +143,12 @@ robot.seguir_linea(
 )
 
 robot.girar(-180, 500)
-robot.avanzar_con_torque(-7, 175, 900, 160) 
+robot.avanzar_con_torque(-8, 175, 900, 160) #AQUI DEJA LOS VERDES
 
 robot.mover_recto(10, 900)
-robot.girar(-40, 500)
-robot.mover_recto(33, 900)
-robot.girar(39, 500)
+robot.girar(-43, 500)
+robot.mover_recto(34, 900)
+robot.girar(44, 500)
 robot.seguir_linea(
     robot.seguidor,
     velocidad_max=100,
@@ -159,17 +159,17 @@ robot.seguir_linea(
     tiempo_acomodo_ms=400
 )
 robot.girar(-180, 400)
-robot.avanzar_con_torque(-14, -170, 900, 160) 
+robot.avanzar_con_torque(-14, -170, 900, 160) #TOMAR LOS CEMENTOS AMARILLOS
 
 
 robot.mover_recto(10, 900)
-robot.girar(-70, 500)
-robot.mover_recto(72.5, 900)
-robot.girar(71, 500)
+robot.girar(-75, 500)
+robot.mover_recto(68.5, 900) #IR PARA SEGUIR LA LINEA AL LUGAR DE LOS AMARILLOS
+robot.girar(76, 500)
 robot.seguir_linea(
     robot.seguidor,
     velocidad_max=100,
-    distancia_cm=54,
+    distancia_cm=57,
     lado="izquierda",
     kp=0.48,
     kd=1.70,
@@ -184,25 +184,26 @@ robot.girar(-90, 500)
 robot.seguir_linea(
     robot.seguidor,
     velocidad_max=100,
-    distancia_cm=54,
+    distancia_cm=55,
     kp=0.48,
     kd=1.70,
     k_freno=0.52,
     tiempo_acomodo_ms=400
 )
-robot.girar(155, 500)
-robot.avanzar_con_torque(-40, -175, 900, 150)
+robot.girar(149, 500)
+robot.avanzar_con_torque(-40, -175, 900, 150) #TOMAR LOS CEMENTOS AZULES
 
 
 robot.mover_recto(10, 900)
-robot.girar(-30, 500)
-robot.mover_recto(45, 900)
-robot.mover_garra(150, -120)
-robot.mover_garra_delantera(300, 250)
-robot.mover_garra(150, 130)
+robot.girar(-29, 500)
+robot.mover_recto(44.5, 900)
+robot.mover_garra(150, -50) #abrir la garra
+robot.mover_garra_delantera(300, 270) #velocidad, grados
+robot.mover_garra(150, 54)
+
 
 robot.retroceder_recto(10, 600)
-robot.giro_derecha(28, 450)
+robot.giro_derecha(25, 450)
 
 robot.seguir_linea(
     robot.seguidor,
@@ -216,96 +217,3 @@ robot.seguir_linea(
 )
 robot.mover_garra(150, -120)
 
-
-
-
-'''
-robot.seguir_linea(
-    robot.seguidor,
-    velocidad_max=100,
-    distancia_cm=40,
-    kp=0.48,
-    kd=1.70,
-    k_freno=0.52,
-    tiempo_acomodo_ms=400
-)
-robot.girar(180, 500) 
-robot.avanzar_con_torque(-12, 145, 700, 180)
-
-robot.seguir_linea(
-    robot.seguidor,
-    velocidad_max=100,
-    distancia_cm=45,
-    kp=0.48,
-    kd=1.70,
-    k_freno=0.52,
-    tiempo_acomodo_ms=400
-)
-robot.giro_derecha(-90,450)
-robot.mover_recto(10,900)
-robot.giro_derecha(-89,450)
-robot.avanzar_con_torque(-30,120,700,100)
-#====================================SECCION #6 (DEJAR LOS CEMENTOS AMARILLOS)==================================
-robot.mover_recto(8,900)
-robot.seguir_linea(
-    robot.seguidor,
-    velocidad_max=100,
-    distancia_cm=14,
-    kp=0.48,
-    kd=1.70,
-    k_freno=0.52,
-    tiempo_acomodo_ms=400
-)
-robot.giro_derecha(-88,450)
-robot.mover_recto(54,900)
-
-robot.giro_izquierda(92,450)
-robot.mover_recto(60,900)
-robot.girar(-90,450)
-robot.retroceder_recto(22,700)
-robot.mover_torque(-120,150) #AQUI YA DEJO LOS CEMENTOS AMARILLOS EN SU LUGAR
-
-#=================================SECCION #7 (IR POR LOS AZULES) ========================================
-robot.mover_recto(16, 800)
-robot.girar(-89, 450) #GIRO PARA TOMAR LA PALA
-robot.mover_recto(40, 800)
-robot.girar(-90, 450)
-robot.retroceder_recto(5,700)
-robot.mover_torque(70, 150) #AQUI TOMA LA PALA
-robot.girar(45, 450)
-robot.mover_recto(32.5, 800)
-robot.mover_torque(-120, 150) #aqui deja la pala en el camino
-robot.girar(44, 500)
-
-robot.seguir_linea(robot.seguidor, 100, 9)
-robot.girar(-175, 450)
-robot.retroceder_recto(10,700)
-robot.mover_torque(120, 150) #Aqui toma los cementos azules
-
-#========================SECCION #8 (DEJAR LOS CEMENTOS AZULES) ==========================
-robot.retroceder_recto(10,700)
-robot.mover_recto(25, 800)
-robot.mover_garra(500, 110) #abrir la garra para llevar la pala
-
-robot.girar(-45)
-robot.mover_garra(500, -20)
-robot.mover_recto(20, 700)
-robot.girar(45)
-robot.seguir_linea(
-    robot.seguidor,
-    velocidad_max=120,
-    distancia_cm=130,
-    kp=0.48,
-    kd=1.70,
-    k_freno=0.52,
-    tiempo_acomodo_ms=400
-) #seguir la linea hasta el inicio
-
-robot.mover_torque()
-robot.mover_garra(500, 110) #AQUI YA DEJO LA PALA EN SU LUGAR
-robot.girar(-45)
-robot.girar(45)
-robot.retroceder_recto(15, 700)
-robot.girar(90)
-robot.mover_torque(-120, 150) #AQUI DEJA LOS AZULES A UN LADO
-'''

@@ -331,10 +331,14 @@ class Base:
 
     def mover_garra(self, velocidad, grados):
         self.motor_garra.run_angle(velocidad, grados, then=Stop.HOLD, wait=True)
-
-
-    def mover_garra(self, velocidad, grados):
-        self.motor_garra.run_angle(velocidad, grados, then=Stop.HOLD, wait=True)
+        
+    def mover_garra_delantera(self, velocidad, grados):
+        self.motor_garra_delantera.run_angle(
+            velocidad,
+            grados,
+            then=Stop.HOLD,
+            wait=True
+        )
 
     def salir_de_giro(self, pausa_brake=80, pausa_stop=40):
         # Frena ambos motores para cortar la inercia
