@@ -164,7 +164,7 @@ robot.avanzar_con_torque(-14, -170, 900, 160) #TOMAR LOS CEMENTOS AMARILLOS
 
 robot.mover_recto(10, 900)
 robot.girar(-75, 500)
-robot.mover_recto(68.5, 900) #IR PARA SEGUIR LA LINEA AL LUGAR DE LOS AMARILLOS
+robot.mover_recto(70, 900) #IR PARA SEGUIR LA LINEA AL LUGAR DE LOS AMARILLOS
 robot.girar(76, 500)
 robot.seguir_linea(
     robot.seguidor,
@@ -197,12 +197,12 @@ robot.avanzar_con_torque(-40, -175, 900, 150) #TOMAR LOS CEMENTOS AZULES
 robot.mover_recto(10, 900)
 robot.girar(-29, 500)
 robot.mover_recto(44.5, 900)
-robot.mover_garra(150, -50) #abrir la garra
+robot.mover_garra(150, -61) #abrir la garra
 robot.mover_garra_delantera(300, 270) #velocidad, grados
-robot.mover_garra(150, 54)
+robot.mover_garra(150, 61)
 
 
-robot.retroceder_recto(10, 600)
+robot.retroceder_recto(8.5, 600)
 robot.giro_derecha(25, 450)
 
 robot.seguir_linea(
@@ -216,4 +216,7 @@ robot.seguir_linea(
     tiempo_acomodo_ms=400
 )
 robot.mover_garra(150, -120)
+
+
+
 
