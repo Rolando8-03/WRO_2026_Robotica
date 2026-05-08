@@ -11,13 +11,14 @@ class Base:
         self.calibrar_giroscopio()
         wait(1500)
 
-        self.motor_derecho = Motor(Port.B, Direction.CLOCKWISE)
-        self.motor_izquierdo = Motor(Port.F, Direction.COUNTERCLOCKWISE)
-        self.motor_torque = Motor(Port.E)
-        self.motor_garra = Motor(Port.A)
+        self.motor_derecho = Motor(Port.A, Direction.CLOCKWISE)
+        self.motor_izquierdo = Motor(Port.E, Direction.COUNTERCLOCKWISE)
+        self.motor_torque = Motor(Port.D)
+        self.motor_garra = Motor(Port.F)
+        self.motor_garra_delantera = Motor(Port.B)
 
         self.seguidor = ColorSensor(Port.C)
-        self.sensor_matriz = ColorSensor(Port.D)
+        
 
         self.lista_colores = []
 
@@ -124,54 +125,116 @@ class Base:
 
         self.frenar()
 
-    def retroceder_recto(self, distancia_cm, velocidad=700):
+    def retroceder_recto(self, distancia_cm, velocidad=600):
         if distancia_cm == 0:
             return
 
+        # Limpieza antes de iniciar
+        self.motor_izquierdo.stop()
+        self.motor_derecho.stop()
+        wait(100)
+
         self.reset_motores()
         self.reset_imu()
+        wait(100)
 
         distancia_mm = abs(distancia_cm) * 10
         grados_objetivo = distancia_mm * self.grados_por_mm
 
-        error_anterior = 0
-        reloj = StopWatch()
-        reloj.reset()
+        # Control por giroscopio
+        kp_gyro = 2.4
+        kd_gyro = 3.0
 
-        # Valores fijos que funcionan bien (puedes ajustarlos si quieres)
-        kp = 2.5
-        kd = 4.0
-        velocidad_min = 220
+        # Control por encoders
+        kp_encoder = 0.42
 
+        # Detector de roce / desbalance
+        umbral_roce = 38
+        refuerzo_roce = 1.35
+
+        correccion_max_normal = 125
+        correccion_max_roce = 170
+
+        velocidad_min = 170
         velocidad_actual = velocidad_min
-        rampa = 25
+        rampa = 10
 
-        while abs(self.distancia_promedio_grados()) < grados_objetivo:
-            recorrido_abs = abs(self.distancia_promedio_grados())
-            restante = grados_objetivo - recorrido_abs
+        error_anterior = 0
+        derivada_filtrada = 0
 
+        recorrido_anterior = 0
+        ciclos_roce = 0
+
+        while self.distancia_promedio_grados() < grados_objetivo:
+            recorrido = self.distancia_promedio_grados()
+            restante = grados_objetivo - recorrido
+
+            # Rampa suave
             if velocidad_actual < velocidad:
                 velocidad_actual += rampa
                 if velocidad_actual > velocidad:
                     velocidad_actual = velocidad
 
-            if restante < 220:
-                velocidad_actual = max(velocidad_min, int(velocidad * restante / 220))
+            # Frenado progresivo al final
+            if restante < 260:
+                velocidad_actual = max(velocidad_min, int(velocidad * restante / 260))
 
-            dt = reloj.time() / 1000
-            if dt <= 0:
-                dt = 0.001
+            # =========================
+            # 1. CORRECCIÓN POR GIROSCOPIO
+            # =========================
+            error_gyro = self.Hub.imu.heading()
 
-            error = self.Hub.imu.heading()
-            derivada = (error - error_anterior) / dt
-            correccion = error * kp + derivada * kd
-            correccion = max(-180, min(180, correccion))
+            if abs(error_gyro) < 0.6:
+                error_gyro = 0
 
-            # Velocidad negativa para retroceder
+            derivada_cruda = error_gyro - error_anterior
+            derivada_filtrada = (0.35 * derivada_cruda) + (0.65 * derivada_filtrada)
+
+            correccion_gyro = (error_gyro * kp_gyro) + (derivada_filtrada * kd_gyro)
+
+            # =========================
+            # 2. CORRECCIÓN POR ENCODERS
+            # =========================
+            ang_izq = abs(self.motor_izquierdo.angle())
+            ang_der = abs(self.motor_derecho.angle())
+
+            error_encoder = ang_izq - ang_der
+            correccion_encoder = error_encoder * kp_encoder
+
+            # =========================
+            # 3. VALIDACIÓN DE ROCE / DESBALANCE
+            # =========================
+            avance_ciclo = recorrido - recorrido_anterior
+
+            hay_desbalance = abs(error_encoder) > umbral_roce
+            hay_poco_avance = avance_ciclo < 1.2 and velocidad_actual > 300
+
+            if hay_desbalance or hay_poco_avance:
+                ciclos_roce += 1
+            else:
+                ciclos_roce = 0
+
+            if ciclos_roce >= 3:
+                # Si detecta roce/desbalance, baja un poco la agresividad de avance
+                velocidad_actual = max(velocidad_min, int(velocidad_actual * 0.92))
+
+                # Refuerza la corrección por encoder
+                correccion_encoder = correccion_encoder * refuerzo_roce
+
+                correccion_max = correccion_max_roce
+            else:
+                correccion_max = correccion_max_normal
+
+            # =========================
+            # 4. CORRECCIÓN TOTAL SUAVIZADA
+            # =========================
+            correccion = correccion_gyro + correccion_encoder
+            correccion = max(-correccion_max, min(correccion_max, correccion))
+
             base = -velocidad_actual
 
-            pot_izq = int((base - correccion) * self.bias_izq)
-            pot_der = int((base + correccion) * self.bias_der)
+            pot_izq = int(base - correccion)
+            pot_der = int(base + correccion)
 
             pot_izq = max(-1000, min(1000, pot_izq))
             pot_der = max(-1000, min(1000, pot_der))
@@ -179,11 +242,20 @@ class Base:
             self.motor_izquierdo.run(pot_izq)
             self.motor_derecho.run(pot_der)
 
-            error_anterior = error
-            reloj.reset()
+            error_anterior = error_gyro
+            recorrido_anterior = recorrido
+
             wait(5)
 
         self.frenar()
+
+    def mover_garra_delantera(self, velocidad, grados):
+        self.motor_garra_delantera.run_angle(
+            velocidad,
+            grados,
+            then=Stop.HOLD,
+            wait=True
+        )
 
     def seguir_linea(
         self,
@@ -215,8 +287,16 @@ class Base:
         last_correction = 0
         error_filtrado = 0
 
-        objetivo_reflexion = 35
-        multiplicador_lado = 1 if lado == "derecha" else -1
+        objetivo_reflexion = 27
+
+        # derecha = borde derecho de la línea
+        # izquierda = borde izquierdo de la línea
+        if lado == "derecha":
+            multiplicador_lado = 1
+        elif lado == "izquierda":
+            multiplicador_lado = -1
+        else:
+            multiplicador_lado = 1
 
         umbral_fino = 4
         correccion_max = 34
@@ -240,7 +320,6 @@ class Base:
             else:
                 velocidad_actual = velocidad_max
 
-            # --------- FILTRADO CORTO DEL SENSOR ---------
             lectura_1 = sensor_color.reflection()
             lectura_2 = sensor_color.reflection()
             lectura_3 = sensor_color.reflection()
@@ -248,14 +327,12 @@ class Base:
 
             error_crudo = current_reflection - objetivo_reflexion
 
-            # Suaviza el error, pero no demasiado
             error_filtrado = (0.55 * error_crudo) + (0.45 * error_filtrado)
             error = error_filtrado
 
             derivative_raw = error - last_error
             derivative = (0.35 * derivative_raw) + (0.65 * last_derivative)
 
-            # --------- DOS MODOS DE CORRECCIÓN ---------
             if abs(error) <= umbral_fino:
                 kp_actual = 0.26
                 kd_actual = 0.28
@@ -267,9 +344,7 @@ class Base:
 
             correction_raw = ((error * kp_actual) + (derivative * kd_actual)) * multiplicador_lado
 
-            # Suavizado moderado: evita ondulación, pero sin perder reacción
             correction = (0.35 * correction_raw) + (0.65 * last_correction)
-
             correction = max(-correccion_max, min(correccion_max, correction))
 
             velocidad_base = velocidad_actual - (abs(error) * k_freno_actual)
@@ -331,14 +406,7 @@ class Base:
 
     def mover_garra(self, velocidad, grados):
         self.motor_garra.run_angle(velocidad, grados, then=Stop.HOLD, wait=True)
-        
-    def mover_garra_delantera(self, velocidad, grados):
-        self.motor_garra_delantera.run_angle(
-            velocidad,
-            grados,
-            then=Stop.HOLD,
-            wait=True
-        )
+
 
     def salir_de_giro(self, pausa_brake=80, pausa_stop=40):
         # Frena ambos motores para cortar la inercia
