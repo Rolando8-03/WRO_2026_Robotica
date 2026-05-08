@@ -41,3 +41,33 @@ robot.seguir_linea(robot.seguidor,100,19)
 robot.girar(90,500)
 robot.mover_recto(12,900)
 
+#CODIGO PARA LA PRIMERA MATRIZ
+robot.seguir_linea(
+    robot.seguidor,
+    velocidad_max=100,
+    distancia_cm=30.5,
+    kp=0.48,
+    kd=1.70,
+    k_freno=0.52,
+    tiempo_acomodo_ms=400
+)
+robot.girar(-89, 500)
+robot.mover_recto(15.5, 850)
+robot.mover_garra(150, -130) #abrir la garra
+robot.mover_garra_delantera(300, 286) #velocidad, grados
+
+robot.retroceder_recto(25, 600)
+robot.girar(90, 500)
+robot.retroceder_recto(14.5, 600)
+robot.girar(-89, 500)
+
+robot.mover_garra_delantera(300, -286) #velocidad, grados
+robot.mover_recto(24.5, 850)
+robot.mover_garra_delantera(300, 286) #velocidad, grados
+robot.retroceder_recto(14.5, 600)
+robot.girar(89, 500)
+robot.mover_recto(10, 800)
+robot.girar(-89, 500)
+robot.mover_recto(10, 900)
+
+
