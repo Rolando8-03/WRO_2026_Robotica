@@ -5,7 +5,6 @@ from pybricks.parameters import Color, Direction, Port, Stop
 robot = Base()
 print(robot.Hub.battery.voltage())
 
-
 # ===================== SECCIÓN 1 (TOMAR CEMENTO Y UBICAR PALA) =====================
 #SECCION 1.1 -> SALIDA Y AVANZAR HASTA EL BALDE DE CEMENTO
 robot.mover_recto(10, 800)
@@ -57,7 +56,7 @@ robot.avanzar_con_torque(-5, 170, 900, 160)
 # ===================== SECCIÓN #3 (IR POR LOS CEMENTOS BLANCOS) =====================
 # SECCION 3.1 -> POSICIONARSE ENFRENTE DE LA LÍNEA DEL SEGUIDOR
 robot.mover_recto(7, 900)
-robot.giro_derecha(-90, 450)
+robot.giro_derecha(-90, 550)
 robot.esperar(100)
 
 #SECCION 3.2 -> AGARRAR LOS CEMENTOS BLANCOS
@@ -71,7 +70,7 @@ robot.seguir_linea(
     tiempo_acomodo_ms=400
 )
 robot.girar(-180, 500)
-robot.avanzar_con_torque(-20, -176, 850, 200)
+robot.avanzar_con_torque(-20, -176, 900, 200)
 
 # ===================== SECCION #4 (DEJAR LOS CEMENTOS) =====================
 #SECCION 4.1 -> POSICIONARSE EN LA LÍNEA FRENTE A LA MATRIZ
@@ -99,7 +98,7 @@ robot.retroceder_recto(38, 800)
 robot.girar(180, 500) 
 robot.retroceder_recto(14, 900)
 robot.girar(48, 500)
-robot.avanzar_con_torque(-10, 145, 700, 180) #DEJAR LOS CEMENTOS BLANCOS
+robot.avanzar_con_torque(-10, 145, 800, 180) #DEJAR LOS CEMENTOS BLANCOS
 robot.esperar(100)
 
 #==============================SECCION #4 (ESCANEO DE MATRIZ)==========================================
