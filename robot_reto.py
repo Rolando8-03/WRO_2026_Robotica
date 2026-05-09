@@ -94,6 +94,9 @@ robot.seguir_linea(
 #SECCION 4.2 -> DEJAR LOS CEMENTOS BLANCOS CON GIRO
 robot.esperar(100)
 robot.mover_recto(24.5, 700) #entrar en la matriz
+matriz_detectada = robot.escanear_matriz()
+print("Matriz guardada:", matriz_detectada)
+
 robot.retroceder_recto(38, 800)
 robot.girar(180, 500) 
 robot.retroceder_recto(14, 900)
@@ -101,20 +104,10 @@ robot.girar(48, 500)
 robot.avanzar_con_torque(-10, 145, 850, 180) #DEJAR LOS CEMENTOS BLANCOS
 robot.esperar(100)
 
-#==============================SECCION #5 (ESCANEO DE MATRIZ)==========================================
+#==============================SECCION #5 (Avance para buscar la linea )==========================================
 robot.mover_recto(18,900)
 robot.girar(-44, 550)
 
-'''
-#Condicional del color verde
-if Color.GREEN in robot.lista_colores:
-    robot.retroceder_recto(2, 700)
-    robot.matriz()
-    robot.esperar(500)
-
-print(robot.lista_colores)
-robot.esperar(500)
-'''
 
 #==================================SECCION #6 (IR POR LOS CEMENTOS AMARILLOS) ==============================
 
@@ -230,7 +223,7 @@ robot.giro_derecha(-90, 500)
 robot.girar(90, 500)
 robot.mover_torque(-176, 500)
 
-
+ejecutar_matriz(robot, matriz_detectada)
 
 
 
