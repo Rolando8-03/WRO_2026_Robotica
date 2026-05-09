@@ -451,23 +451,19 @@ class Base:
         self.motor_torque.hold()
         
     def avanzar_con_torque(self, distancia_cm, grados_torque, velocidad_robot=700, velocidad_torque=150):
-         self.motor_torque.run_angle(
+    self.motor_torque.run_angle(
         velocidad_torque,
         grados_torque,
         then=Stop.HOLD,
         wait=False
     )
 
-    # Si la distancia es negativa, retrocede UNA sola vez.
     if distancia_cm < 0:
         self.retroceder_recto(abs(distancia_cm), velocidad_robot)
 
-    # Si la distancia es positiva, avanza UNA sola vez.
     elif distancia_cm > 0:
         self.mover_recto(distancia_cm, velocidad=velocidad_robot)
-    # Si distancia_cm es 0, no mueve el robot.
-    # Solo se ejecuta el motor de torque.
-
+        
     def mover_garra(self, velocidad, grados):
         self.motor_garra.run_angle(velocidad, grados, then=Stop.HOLD, wait=True)
 
