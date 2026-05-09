@@ -60,8 +60,60 @@ class Base:
     def matriz(self):
         color = self.sensor_matriz.color()
         self.lista_colores.append(color)
-    
 
+    def escanear_matriz(self):
+    """
+    Escanea la matriz usando el sensor de color del robot.
+
+    Retorna:
+        1 si detecta verde
+        2 si detecta amarillo
+        3 si detecta azul
+        4 si detecta rojo
+        None si no reconoce ningún color válido
+    """
+
+    colores_detectados = []
+
+    # Lee varias veces para evitar errores por una sola lectura falsa
+    for i in range(5):
+        color = self.seguidor.color()
+        colores_detectados.append(color)
+        wait(80)
+
+    print("Colores detectados en matriz:", colores_detectados)
+
+    verdes = colores_detectados.count(Color.GREEN)
+    amarillos = colores_detectados.count(Color.YELLOW)
+    azules = colores_detectados.count(Color.BLUE)
+    rojos = colores_detectados.count(Color.RED)
+    blancos = colores_detectados.count(Color.WHITE)
+
+    # Puedes cambiar esta equivalencia según tu reto
+    if verdes >= 2:
+        print("Matriz detectada: 1")
+        return 1
+
+    elif amarillos >= 2:
+        print("Matriz detectada: 2")
+        return 2
+
+    elif azules >= 2:
+        print("Matriz detectada: 3")
+        return 3
+
+    elif rojos >= 2:
+        print("Matriz detectada: 4")
+        return 4
+
+    elif blancos >= 2:
+        print("Matriz detectada: 5")
+        return 4
+
+    else:
+        print("No se detectó matriz válida")
+        return None
+    
     def distancia_promedio_grados(self):
         return (abs(self.motor_izquierdo.angle()) + abs(self.motor_derecho.angle())) / 2
 
