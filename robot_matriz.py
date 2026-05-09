@@ -18,6 +18,9 @@ def ejecutar_matriz(robot, matriz_detectada):
     elif matriz_detectada == 4:
         ejecutar_matriz_4(robot)
 
+    elif matriz_detectada == 5:
+        ejecutar_matriz_5(robot)
+
     else:
         print("No se detectó una matriz válida. No se ejecuta recorrido de matriz.")
 
@@ -33,7 +36,11 @@ def ejecutar_matriz_1(robot):
 def ejecutar_matriz_2(robot):
     print("Ejecutando recorrido de matriz 2")
 
-    # Aquí pones el recorrido real de la matriz 2.
+      # Segunda matriz
+    robot.girar(-91, 500)
+    robot.mover_garra(150, 130)
+    robot.mover_recto(40, 900)
+    robot.mover_garra_delantera(300, 286)
     pass
 
 
@@ -98,8 +105,10 @@ def ejecutar_matriz_4(robot):
     robot.retroceder_recto(13, 600)
     robot.mover_garra_delantera(300, -286)
 
-    # Segunda matriz
-    robot.girar(-91, 500)
-    robot.mover_garra(150, 130)
-    robot.mover_recto(40, 900)
-    robot.mover_garra_delantera(300, 286)
+  
+
+def ejecutar_matriz_5(robot):
+    print("Ejecutando recorrido de matriz 5")
+
+    # Aquí pones el recorrido real de la matriz 3.
+    pass
