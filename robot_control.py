@@ -62,58 +62,48 @@ class Base:
         self.lista_colores.append(color)
 
     def escanear_matriz(self):
-    """
-    Escanea la matriz usando el sensor de color del robot.
+ 
+        colores_detectados = []
 
-    Retorna:
-        1 si detecta verde
-        2 si detecta amarillo
-        3 si detecta azul
-        4 si detecta rojo
-        None si no reconoce ningún color válido
-    """
+        # Lee varias veces para evitar errores por una sola lectura falsa
+        for i in range(5):
+            color = self.seguidor.color()
+            colores_detectados.append(color)
+            wait(80)
 
-    colores_detectados = []
+        print("Colores detectados en matriz:", colores_detectados)
 
-    # Lee varias veces para evitar errores por una sola lectura falsa
-    for i in range(5):
-        color = self.seguidor.color()
-        colores_detectados.append(color)
-        wait(80)
+        verdes = colores_detectados.count(Color.GREEN)
+        amarillos = colores_detectados.count(Color.YELLOW)
+        azules = colores_detectados.count(Color.BLUE)
+        rojos = colores_detectados.count(Color.RED)
+        blancos = colores_detectados.count(Color.WHITE)
 
-    print("Colores detectados en matriz:", colores_detectados)
+        # Puedes cambiar esta equivalencia según tu reto
+        if verdes >= 2:
+            print("Matriz detectada: 1")
+            return 1
 
-    verdes = colores_detectados.count(Color.GREEN)
-    amarillos = colores_detectados.count(Color.YELLOW)
-    azules = colores_detectados.count(Color.BLUE)
-    rojos = colores_detectados.count(Color.RED)
-    blancos = colores_detectados.count(Color.WHITE)
+        elif amarillos >= 2:
+            print("Matriz detectada: 2")
+            return 2
 
-    # Puedes cambiar esta equivalencia según tu reto
-    if verdes >= 2:
-        print("Matriz detectada: 1")
-        return 1
+        elif azules >= 2:
+            print("Matriz detectada: 3")
+            return 3
 
-    elif amarillos >= 2:
-        print("Matriz detectada: 2")
-        return 2
+        elif rojos >= 2:
+            print("Matriz detectada: 4")
+            return 4
 
-    elif azules >= 2:
-        print("Matriz detectada: 3")
-        return 3
+        elif blancos >= 2:
+            print("Matriz detectada: 5")
+            return 4
 
-    elif rojos >= 2:
-        print("Matriz detectada: 4")
-        return 4
-
-    elif blancos >= 2:
-        print("Matriz detectada: 5")
-        return 4
-
-    else:
-        print("No se detectó matriz válida")
-        return None
-    
+        else:
+            print("No se detectó matriz válida")
+            return None
+        
     def distancia_promedio_grados(self):
         return (abs(self.motor_izquierdo.angle()) + abs(self.motor_derecho.angle())) / 2
 
@@ -451,19 +441,19 @@ class Base:
         self.motor_torque.hold()
         
     def avanzar_con_torque(self, distancia_cm, grados_torque, velocidad_robot=700, velocidad_torque=150):
-    self.motor_torque.run_angle(
-        velocidad_torque,
-        grados_torque,
-        then=Stop.HOLD,
-        wait=False
-    )
+        self.motor_torque.run_angle(
+            velocidad_torque,
+            grados_torque,
+            then=Stop.HOLD,
+            wait=False
+        )
 
-    if distancia_cm < 0:
-        self.retroceder_recto(abs(distancia_cm), velocidad_robot)
+        if distancia_cm < 0:
+            self.retroceder_recto(abs(distancia_cm), velocidad_robot)
 
-    elif distancia_cm > 0:
-        self.mover_recto(distancia_cm, velocidad=velocidad_robot)
-        
+        elif distancia_cm > 0:
+            self.mover_recto(distancia_cm, velocidad=velocidad_robot)
+            
     def mover_garra(self, velocidad, grados):
         self.motor_garra.run_angle(velocidad, grados, then=Stop.HOLD, wait=True)
 
