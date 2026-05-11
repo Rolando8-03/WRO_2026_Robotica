@@ -15,7 +15,6 @@ class Base:
         self.motor_garra_delantera = Motor(Port.B)
 
         self.seguidor = ColorSensor(Port.C)
-        
 
         self.lista_colores = []
 
@@ -29,14 +28,20 @@ class Base:
 
         self._last_derivative = 0
 
+    # =========================================================
+    # UTILIDADES BÁSICAS
+    # =========================================================
+
     def calibrar_giroscopio(self):
         print("Calibrando giroscopio... NO MOVER")
         self.Hub.light.on(Color.RED)
         self.Hub.imu.reset_heading(0)
         wait(500)
+
         for _ in range(10):
             _ = self.Hub.imu.heading()
             wait(100)
+
         self.Hub.imu.reset_heading(0)
         self.Hub.light.on(Color.GREEN)
         wait(300)
@@ -52,14 +57,28 @@ class Base:
         self.motor_izquierdo.brake()
         self.motor_derecho.brake()
         wait(30)
-    
-    
+
+    def distancia_promedio_grados(self):
+        return (
+            abs(self.motor_izquierdo.angle()) +
+            abs(self.motor_derecho.angle())
+        ) / 2
+
+    def reset_motores(self):
+        self.motor_izquierdo.reset_angle(0)
+        self.motor_derecho.reset_angle(0)
+
+    # =========================================================
+    # MATRIZ
+    # =========================================================
+
     def matriz(self):
-        color = self.sensor_matriz.color()
+        # Dejé tu lógica, pero corregí el sensor.
+        # Antes decía self.sensor_matriz, pero ese atributo no existe.
+        color = self.seguidor.color()
         self.lista_colores.append(color)
 
     def escanear_matriz(self):
-
         colores_detectados = []
 
         # Asegura que el robot esté quieto antes de leer
@@ -77,52 +96,49 @@ class Base:
             wait(40)
 
             print("Colores detectados en matriz:", colores_detectados)
-        
+
             verdes = colores_detectados.count(Color.GREEN)
             amarillos = colores_detectados.count(Color.YELLOW)
             azules = colores_detectados.count(Color.BLUE)
             rojos = colores_detectados.count(Color.RED)
             blancos = colores_detectados.count(Color.WHITE)
-        
+
             print("Verdes:", verdes)
             print("Amarillos:", amarillos)
             print("Azules:", azules)
             print("Rojos:", rojos)
             print("Blancos:", blancos)
-        
+
             mayor = max(verdes, amarillos, azules, rojos, blancos)
-        
+
             # Si ninguna lectura aparece varias veces, la detección no es confiable
             if mayor < 3:
                 print("Detección débil. No se detectó matriz válida.")
                 return None
-        
+
             if mayor == verdes:
                 print("Matriz detectada: 1")
                 return 1
-        
+
             elif mayor == amarillos:
                 print("Matriz detectada: 2")
                 return 2
-        
+
             elif mayor == azules:
                 print("Matriz detectada: 3")
                 return 3
-        
+
             elif mayor == rojos:
                 print("Matriz detectada: 4")
                 return 4
-        
+
             elif mayor == blancos:
                 print("Matriz detectada: 5")
                 return 5
-        
-    def distancia_promedio_grados(self):
-        return (abs(self.motor_izquierdo.angle()) + abs(self.motor_derecho.angle())) / 2
 
-    def reset_motores(self):
-        self.motor_izquierdo.reset_angle(0)
-        self.motor_derecho.reset_angle(0)
+    # =========================================================
+    # MOVIMIENTOS RÁPIDOS
+    # =========================================================
 
     def mover_recto_rapido(
         self,
@@ -130,7 +146,10 @@ class Base:
         velocidad=1200,
         kp=2.2,
         kd=3.5,
-        velocidad_min=350
+        velocidad_min=350,
+        torque_grados=None,
+        torque_velocidad=150,
+        torque_despues_cm=0
     ):
         if distancia_cm == 0:
             return
@@ -149,18 +168,40 @@ class Base:
         velocidad_actual = velocidad_min
         rampa = 45
 
+        # NUEVO:
+        # Permite lanzar el torque después de cierta distancia
+        # sin perder la velocidad rápida original.
+        torque_lanzado = False
+        grados_para_torque = abs(torque_despues_cm) * 10 * self.grados_por_mm
+
         while self.distancia_promedio_grados() < grados_objetivo:
 
             recorrido = self.distancia_promedio_grados()
             restante = grados_objetivo - recorrido
 
+            # =========================
+            # TORQUE RETRASADO
+            # =========================
+            if torque_grados is not None and not torque_lanzado:
+                if recorrido >= grados_para_torque:
+                    self.motor_torque.run_angle(
+                        torque_velocidad,
+                        torque_grados,
+                        then=Stop.HOLD,
+                        wait=False
+                    )
+                    torque_lanzado = True
+
+            # =========================
+            # ACELERACIÓN RÁPIDA ORIGINAL
+            # =========================
             if velocidad_actual < velocidad:
                 velocidad_actual += rampa
 
                 if velocidad_actual > velocidad:
                     velocidad_actual = velocidad
 
-            # Frenado más tardío
+            # Frenado más tardío original
             if restante < 140:
                 velocidad_actual = max(
                     velocidad_min,
@@ -173,11 +214,9 @@ class Base:
                 dt = 0.001
 
             error = self.Hub.imu.heading()
-
             derivada = (error - error_anterior) / dt
 
             correccion = error * kp + derivada * kd
-
             correccion = max(-260, min(260, correccion))
 
             base = velocidad_actual * signo
@@ -192,15 +231,20 @@ class Base:
             self.motor_derecho.run(pot_der)
 
             error_anterior = error
-
             reloj.reset()
 
             wait(3)
 
         self.frenar()
 
-
-    def retroceder_recto_rapido(self, distancia_cm, velocidad=750):
+    def retroceder_recto_rapido(
+        self,
+        distancia_cm,
+        velocidad=750,
+        torque_grados=None,
+        torque_velocidad=150,
+        torque_despues_cm=0
+    ):
         if distancia_cm == 0:
             return
 
@@ -236,34 +280,78 @@ class Base:
         recorrido_anterior = 0
         ciclos_roce = 0
 
+        # NUEVO:
+        # Control para lanzar el torque durante el retroceso,
+        # sin iniciar el torque al mismo tiempo que el movimiento.
+        torque_lanzado = False
+        grados_para_torque = abs(torque_despues_cm) * 10 * self.grados_por_mm
+
         while self.distancia_promedio_grados() < grados_objetivo:
             recorrido = self.distancia_promedio_grados()
             restante = grados_objetivo - recorrido
 
+            # =========================
+            # TORQUE RETRASADO
+            # =========================
+            if torque_grados is not None and not torque_lanzado:
+                if recorrido >= grados_para_torque:
+                    self.motor_torque.run_angle(
+                        torque_velocidad,
+                        torque_grados,
+                        then=Stop.HOLD,
+                        wait=False
+                    )
+                    torque_lanzado = True
+
+            # =========================
+            # RAMPA RÁPIDA ORIGINAL
+            # =========================
             if velocidad_actual < velocidad:
                 velocidad_actual += rampa
+
                 if velocidad_actual > velocidad:
                     velocidad_actual = velocidad
 
+            # Frenado más tardío original
             if restante < 170:
-                velocidad_actual = max(velocidad_min, int(velocidad * restante / 170))
+                velocidad_actual = max(
+                    velocidad_min,
+                    int(velocidad * restante / 170)
+                )
 
+            # =========================
+            # CORRECCIÓN POR GIROSCOPIO
+            # =========================
             error_gyro = self.Hub.imu.heading()
 
             if abs(error_gyro) < 0.6:
                 error_gyro = 0
 
             derivada_cruda = error_gyro - error_anterior
-            derivada_filtrada = (0.35 * derivada_cruda) + (0.65 * derivada_filtrada)
+            derivada_filtrada = (
+                0.35 * derivada_cruda
+            ) + (
+                0.65 * derivada_filtrada
+            )
 
-            correccion_gyro = (error_gyro * kp_gyro) + (derivada_filtrada * kd_gyro)
+            correccion_gyro = (
+                error_gyro * kp_gyro
+            ) + (
+                derivada_filtrada * kd_gyro
+            )
 
+            # =========================
+            # CORRECCIÓN POR ENCODERS
+            # =========================
             ang_izq = abs(self.motor_izquierdo.angle())
             ang_der = abs(self.motor_derecho.angle())
 
             error_encoder = ang_izq - ang_der
             correccion_encoder = error_encoder * kp_encoder
 
+            # =========================
+            # DETECCIÓN DE ROCE / DESBALANCE
+            # =========================
             avance_ciclo = recorrido - recorrido_anterior
 
             hay_desbalance = abs(error_encoder) > umbral_roce
@@ -275,12 +363,19 @@ class Base:
                 ciclos_roce = 0
 
             if ciclos_roce >= 3:
-                velocidad_actual = max(velocidad_min, int(velocidad_actual * 0.92))
+                velocidad_actual = max(
+                    velocidad_min,
+                    int(velocidad_actual * 0.92)
+                )
+
                 correccion_encoder = correccion_encoder * refuerzo_roce
                 correccion_max = correccion_max_roce
             else:
                 correccion_max = correccion_max_normal
 
+            # =========================
+            # CORRECCIÓN TOTAL
+            # =========================
             correccion = correccion_gyro + correccion_encoder
             correccion = max(-correccion_max, min(correccion_max, correccion))
 
@@ -302,6 +397,10 @@ class Base:
 
         self.frenar()
 
+    # =========================================================
+    # GARRAS Y TORQUE
+    # =========================================================
+
     def mover_garra_delantera(self, velocidad, grados):
         self.motor_garra_delantera.run_angle(
             velocidad,
@@ -309,6 +408,98 @@ class Base:
             then=Stop.HOLD,
             wait=True
         )
+
+    def mover_torque(self, grados_torque, velocidad_torque=150):
+        KP = 1.2
+        TOLERANCIA = 2
+
+        pos_inicial = self.motor_torque.angle()
+        pos_objetivo = pos_inicial + grados_torque
+
+        cronometro = StopWatch()
+
+        while True:
+            error = pos_objetivo - self.motor_torque.angle()
+
+            if abs(error) <= TOLERANCIA:
+                self.motor_torque.stop()
+                break
+
+            potencia = KP * error
+            potencia = max(-velocidad_torque, min(velocidad_torque, potencia))
+
+            self.motor_torque.dc(potencia)
+
+            if cronometro.time() > 1000:
+                self.motor_torque.stop()
+                print("Tiempo máximo excedido")
+                break
+
+            wait(10)
+
+        self.motor_torque.hold()
+
+    def avanzar_con_torque(
+        self,
+        distancia_cm,
+        grados_torque,
+        velocidad_robot=700,
+        velocidad_torque=150,
+        torque_despues_cm=3
+    ):
+        """
+        Mueve rápido y activa el torque después de cierta distancia.
+
+        distancia_cm:
+            Negativo = retrocede.
+            Positivo = avanza.
+
+        grados_torque:
+            Positivo o negativo según quieras subir o bajar.
+
+        torque_despues_cm:
+            Cuántos centímetros debe avanzar/retroceder antes de activar el torque.
+
+        IMPORTANTE:
+            Se conservan tus funciones rápidas:
+            - retroceder_recto_rapido()
+            - mover_recto_rapido()
+        """
+
+        if distancia_cm < 0:
+            self.retroceder_recto_rapido(
+                abs(distancia_cm),
+                velocidad=velocidad_robot,
+                torque_grados=grados_torque,
+                torque_velocidad=velocidad_torque,
+                torque_despues_cm=torque_despues_cm
+            )
+
+        elif distancia_cm > 0:
+            self.mover_recto_rapido(
+                distancia_cm,
+                velocidad=velocidad_robot,
+                torque_grados=grados_torque,
+                torque_velocidad=velocidad_torque,
+                torque_despues_cm=torque_despues_cm
+            )
+
+        # Mantiene tu lógica original:
+        # si el torque no terminó al acabar el recorrido, espera.
+        while self.motor_torque.control.done() == False:
+            wait(5)
+
+    def mover_garra(self, velocidad, grados):
+        self.motor_garra.run_angle(
+            velocidad,
+            grados,
+            then=Stop.HOLD,
+            wait=True
+        )
+
+    # =========================================================
+    # SEGUIDOR DE LÍNEA EXTREMO
+    # =========================================================
 
     def seguir_linea_extremo(
         self,
@@ -413,67 +604,9 @@ class Base:
         self.motor_derecho.stop()
         cronometro.pause()
 
-    def mover_torque(self, grados_torque, velocidad_torque=150):
-        KP = 1.2
-        TOLERANCIA = 2
-        
-        pos_inicial = self.motor_torque.angle()
-        pos_objetivo = pos_inicial + grados_torque
-        
-        cronometro = StopWatch()
-        
-        while True:
-            error = pos_objetivo - self.motor_torque.angle()
-            
-            if abs(error) <= TOLERANCIA:
-                self.motor_torque.stop()
-                break
-            
-            potencia = KP * error
-            potencia = max(-velocidad_torque, min(velocidad_torque, potencia))
-            self.motor_torque.dc(potencia)
-            
-            if cronometro.time() > 1000:
-                self.motor_torque.stop()
-                print("Tiempo máximo excedido")
-                break
-            
-            wait(10)  # Pequeña pausa de 10 ms para el control
-        
-        self.motor_torque.hold()
-        
-    def avanzar_con_torque(
-        self,
-        distancia_cm,
-        grados_torque,
-        velocidad_robot=700,
-        velocidad_torque=150
-    ):
-        self.motor_torque.run_angle(
-            velocidad_torque,
-            grados_torque,
-            then=Stop.HOLD,
-            wait=False
-        )
-
-        if distancia_cm < 0:
-            self.retroceder_recto_rapido(
-                abs(distancia_cm),
-                velocidad_robot
-            )
-
-        elif distancia_cm > 0:
-            self.mover_recto_rapido(
-                distancia_cm,
-                velocidad=velocidad_robot
-            )
-
-        # Espera a que el torque realmente termine
-        while self.motor_torque.control.done() == False:
-            wait(5)
-            
-    def mover_garra(self, velocidad, grados):
-        self.motor_garra.run_angle(velocidad, grados, then=Stop.HOLD, wait=True)
+    # =========================================================
+    # GIROS
+    # =========================================================
 
     def salir_de_giro(self, pausa_brake=80, pausa_stop=40):
         # Frena ambos motores para cortar la inercia
@@ -485,8 +618,14 @@ class Base:
         self.motor_izquierdo.stop()
         self.motor_derecho.stop()
         wait(pausa_stop)
-        
-    def girar_rapido_preciso(self, angulo_deg, velocidad=700, velocidad_min=160, anticipacion=8):
+
+    def girar_rapido_preciso(
+        self,
+        angulo_deg,
+        velocidad=700,
+        velocidad_min=160,
+        anticipacion=8
+    ):
         if angulo_deg == 0:
             return
 
@@ -509,7 +648,10 @@ class Base:
             if restante > 18:
                 vel = velocidad
             else:
-                vel = max(velocidad_min, int(velocidad * restante / 18))
+                vel = max(
+                    velocidad_min,
+                    int(velocidad * restante / 18)
+                )
 
             self.motor_izquierdo.run(vel * signo)
             self.motor_derecho.run(-vel * signo)
@@ -536,12 +678,12 @@ class Base:
         objetivo = abs(angulo_deg)
         signo = 1 if angulo_deg > 0 else -1
 
-        # Antes usabas hold(); ahora mejor brake para no dejar tensión tan agresiva
         self.motor_derecho.brake()
         wait(10)
 
         while True:
             actual = abs(self.Hub.imu.heading())
+
             if actual >= objetivo:
                 break
 
@@ -550,7 +692,10 @@ class Base:
             if restante > 20:
                 vel = velocidad
             else:
-                vel = max(velocidad_min, int(velocidad * restante / 20))
+                vel = max(
+                    velocidad_min,
+                    int(velocidad * restante / 20)
+                )
 
             pot_izq = vel * signo
             pot_izq = max(-1000, min(1000, pot_izq))
@@ -558,7 +703,6 @@ class Base:
             self.motor_izquierdo.run(pot_izq)
             wait(5)
 
-        # Soltar limpio ambos motores al terminar
         self.salir_de_giro()
 
     def giro_derecha(self, angulo_deg, velocidad=450, velocidad_min=120):
@@ -571,12 +715,12 @@ class Base:
         objetivo = abs(angulo_deg)
         signo = -1 if angulo_deg > 0 else 1
 
-        # Antes usabas hold(); ahora mejor brake para evitar que quede trabado
         self.motor_izquierdo.brake()
         wait(10)
 
         while True:
             actual = abs(self.Hub.imu.heading())
+
             if actual >= objetivo:
                 break
 
@@ -585,7 +729,10 @@ class Base:
             if restante > 20:
                 vel = velocidad
             else:
-                vel = max(velocidad_min, int(velocidad * restante / 20))
+                vel = max(
+                    velocidad_min,
+                    int(velocidad * restante / 20)
+                )
 
             pot_der = vel * signo
             pot_der = max(-1000, min(1000, pot_der))
@@ -593,7 +740,6 @@ class Base:
             self.motor_derecho.run(pot_der)
             wait(5)
 
-        # Soltar limpio ambos motores al terminar
         self.salir_de_giro()
 
     def giro_arco_dc(
