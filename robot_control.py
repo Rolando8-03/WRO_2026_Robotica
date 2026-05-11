@@ -98,7 +98,7 @@ class Base:
 
         elif blancos >= 2:
             print("Matriz detectada: 5")
-            return 4
+            return 5
 
         else:
             print("No se detectó matriz válida")
