@@ -595,3 +595,63 @@ class Base:
 
         # Soltar limpio ambos motores al terminar
         self.salir_de_giro()
+
+    def giro_arco_dc(
+        self,
+        radio_cm,
+        angulo_deg,
+        potencia=80,
+        lado="derecha",
+        distancia_ruedas_cm=12
+    ):
+        if angulo_deg == 0:
+            return
+
+        pi = 3.1416
+
+        radio_interno = radio_cm - (distancia_ruedas_cm / 2)
+        radio_externo = radio_cm + (distancia_ruedas_cm / 2)
+
+        if radio_interno <= 0:
+            print("Radio muy pequeño para hacer arco.")
+            return
+
+        distancia_interna = (
+            2 * pi * radio_interno * (abs(angulo_deg) / 360)
+        )
+
+        distancia_externa = (
+            2 * pi * radio_externo * (abs(angulo_deg) / 360)
+        )
+
+        relacion = distancia_interna / distancia_externa
+
+        potencia_externa = potencia
+        potencia_interna = potencia * relacion
+
+        potencia_externa = max(-100, min(100, potencia_externa))
+        potencia_interna = max(-100, min(100, potencia_interna))
+
+        self.reset_motores()
+
+        grados_objetivo_externo = (
+            distancia_externa * 10 * self.grados_por_mm
+        )
+
+        signo = 1 if angulo_deg > 0 else -1
+
+        if lado == "derecha":
+            pot_izq = potencia_externa * signo
+            pot_der = potencia_interna * signo
+            motor_externo = self.motor_izquierdo
+        else:
+            pot_izq = potencia_interna * signo
+            pot_der = potencia_externa * signo
+            motor_externo = self.motor_derecho
+
+        while abs(motor_externo.angle()) < grados_objetivo_externo:
+            self.motor_izquierdo.dc(pot_izq)
+            self.motor_derecho.dc(pot_der)
+            wait(5)
+
+        self.frenar()
