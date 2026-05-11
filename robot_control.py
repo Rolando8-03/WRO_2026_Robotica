@@ -62,47 +62,74 @@ class Base:
         self.lista_colores.append(color)
 
     def escanear_matriz(self):
- 
-        colores_detectados = []
+    """
+    Escanea la matriz de forma más estable.
 
-        # Lee varias veces para evitar errores por una sola lectura falsa
-        for i in range(5):
-            color = self.seguidor.color()
+    Retorna:
+        1 = verde
+        2 = amarillo
+        3 = azul
+        4 = rojo
+        5 = blanco
+        None = no detectado
+    """
+
+    colores_detectados = []
+
+    # Asegura que el robot esté quieto antes de leer
+    self.frenar()
+    wait(250)
+
+    # Toma más lecturas para evitar fallos por una lectura falsa
+    for i in range(25):
+        color = self.seguidor.color()
+
+        # Ignora lecturas vacías
+        if color is not None:
             colores_detectados.append(color)
-            wait(80)
+
+        wait(40)
 
         print("Colores detectados en matriz:", colores_detectados)
-
+    
         verdes = colores_detectados.count(Color.GREEN)
         amarillos = colores_detectados.count(Color.YELLOW)
         azules = colores_detectados.count(Color.BLUE)
         rojos = colores_detectados.count(Color.RED)
         blancos = colores_detectados.count(Color.WHITE)
-
-        # Puedes cambiar esta equivalencia según tu reto
-        if verdes >= 2:
+    
+        print("Verdes:", verdes)
+        print("Amarillos:", amarillos)
+        print("Azules:", azules)
+        print("Rojos:", rojos)
+        print("Blancos:", blancos)
+    
+        mayor = max(verdes, amarillos, azules, rojos, blancos)
+    
+        # Si ninguna lectura aparece varias veces, la detección no es confiable
+        if mayor < 3:
+            print("Detección débil. No se detectó matriz válida.")
+            return None
+    
+        if mayor == verdes:
             print("Matriz detectada: 1")
             return 1
-
-        elif amarillos >= 2:
+    
+        elif mayor == amarillos:
             print("Matriz detectada: 2")
             return 2
-
-        elif azules >= 2:
+    
+        elif mayor == azules:
             print("Matriz detectada: 3")
             return 3
-
-        elif rojos >= 2:
+    
+        elif mayor == rojos:
             print("Matriz detectada: 4")
             return 4
-
-        elif blancos >= 2:
+    
+        elif mayor == blancos:
             print("Matriz detectada: 5")
             return 5
-
-        else:
-            print("No se detectó matriz válida")
-            return None
         
     def distancia_promedio_grados(self):
         return (abs(self.motor_izquierdo.angle()) + abs(self.motor_derecho.angle())) / 2
