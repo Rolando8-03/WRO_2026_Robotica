@@ -40,7 +40,7 @@ def ejecutar_matriz_1(robot):
 
     robot.girar(-89, 500)
     robot.mover_recto(15.5, 850)
-    robot.mover_garra(150, -130)  # abrir la garra
+    robot.mover_garra(150, -130)
     robot.mover_garra_delantera(300, 286)
 
     robot.retroceder_recto(25, 600)
@@ -78,18 +78,14 @@ def ejecutar_matriz_1(robot):
     robot.retroceder_recto(13, 600)
     robot.mover_garra_delantera(300, -286)
 
-    pass
-
 
 def ejecutar_matriz_2(robot):
     print("Ejecutando recorrido de matriz 2")
 
-      # Segunda matriz
     robot.girar(-91, 500)
     robot.mover_garra(150, 130)
     robot.mover_recto(40, 900)
     robot.mover_garra_delantera(300, 286)
-    pass
 
 
 def ejecutar_matriz_3(robot):
@@ -102,12 +98,12 @@ def ejecutar_matriz_3(robot):
 def ejecutar_matriz_4(robot):
     print("Ejecutando recorrido de matriz 4")
 
-    # CODIGO PARA LA PRIMERA MATRIZ
-    
-  
+    # Aquí pones el recorrido real de la matriz 4.
+    pass
+
 
 def ejecutar_matriz_5(robot):
     print("Ejecutando recorrido de matriz 5")
 
-    # Aquí pones el recorrido real de la matriz 3.
+    # Aquí pones el recorrido real de la matriz 5.
     pass
