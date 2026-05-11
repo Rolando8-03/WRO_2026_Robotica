@@ -9,12 +9,16 @@ matriz_detectada = None
 
 # ===================== SECCIÓN 1 (TOMAR CEMENTO Y UBICAR PALA) =====================
 #SECCION 1.1 -> SALIDA Y AVANZAR HASTA EL BALDE DE CEMENTO
-robot.mover_recto_rapido(distancia_cm=5, velocidad=1200)
-robot.girar_rapido_preciso(90, velocidad=950, velocidad_min=160, anticipacion=8)
+robot.giro_arco_dc(
+    radio_cm=9.6,
+    angulo_deg=140,
+    potencia=100,
+    lado="derecha"
+)
 robot.seguir_linea_extremo(
     sensor_color=robot.seguidor,
     velocidad_max=100,
-    distancia_cm=77,
+    distancia_cm=65,
     lado="derecha",
     tiempo_acomodo_ms=80,
     kp=1.15,
@@ -26,24 +30,33 @@ robot.girar_rapido_preciso(-90, velocidad=950, velocidad_min=160, anticipacion=8
 '''
 robot.retroceder_recto_rapido(9, 950)
 '''
-robot.avanzar_con_torque(-17.2, -168, 1200, 200) 
-robot.mover_recto_rapido(0.4, 1000)
+robot.avanzar_con_torque(-17.5, -168, 1200, 200) 
+robot.mover_recto_rapido(0.5, 1000)
 
 #SECCION 1.3 -> DEJAR LA PALA DE ALBAÑILERIA
-robot.girar_rapido_preciso(85, velocidad=950, velocidad_min=160, anticipacion=8)
-robot.retroceder_recto_rapido( distancia_cm=42, velocidad=950)
+robot.girar_rapido_preciso(80, velocidad=950, velocidad_min=160, anticipacion=8)
+robot.retroceder_recto_rapido(distancia_cm=42, velocidad=950)
+robot.mover_recto_rapido(distancia_cm=31, velocidad=1200)
+robot.giro_arco_dc(
+    radio_cm=9,
+    angulo_deg=45,
+    potencia=80,
+    lado="izquierda"
+)
 
+robot.giro_arco_dc(
+    radio_cm=10,
+    angulo_deg=50,
+    potencia=80,
+    lado="derecha"
+)
 #===========================SECCION#2 (DEJAR EL CEMENTO)==============================
 #SECCION 2.1 -> AVANZAR HASTA DEJAR EL CEMENTO
-robot.mover_recto_rapido(distancia_cm=31, velocidad=1200)
-robot.girar_rapido_preciso(-20, velocidad=950, velocidad_min=160, anticipacion=8)
-robot.mover_recto_rapido(distancia_cm=9.2, velocidad=1200)
-robot.girar_rapido_preciso(27, velocidad=950, velocidad_min=160, anticipacion=8)
 robot.esperar(120)
 robot.seguir_linea_extremo(
     sensor_color=robot.seguidor,
     velocidad_max=100,
-    distancia_cm=20,
+    distancia_cm=31,
     lado="derecha",
     tiempo_acomodo_ms=80,
     kp=1.15,
