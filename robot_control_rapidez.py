@@ -783,13 +783,18 @@ class Base:
     # DETECTOR DE LÍNEA NEGRA
     # =========================
 
-    def avanzar_hasta_linea_negra(
-        self,
-        velocidad=500,
-        umbral_negro=20,
-        lineas_a_ignorar=0,
-        perfil="seguro"
+    def avanzar_hasta_n_lineas_negras(
+    self,
+    cantidad_lineas,
+    velocidad=500,
+    umbral_negro=20,
+    umbral_salida=28,
+    perfil="seguro"
     ):
+ 
+        if cantidad_lineas <= 0:
+            return
+
         self.preparar_movimiento(
             reset_motores=True,
             reset_gyro=False,
@@ -799,17 +804,18 @@ class Base:
         contador_lineas = 0
         en_negro = False
 
-        while True:
+        while contador_lineas < cantidad_lineas:
             lectura = self.seguidor.reflection()
 
+            # Detecta entrada a una línea negra
             if lectura <= umbral_negro and not en_negro:
-                en_negro = True
                 contador_lineas += 1
+                en_negro = True
 
-                if contador_lineas > lineas_a_ignorar:
-                    break
+                print("Línea negra detectada:", contador_lineas)
 
-            elif lectura > umbral_negro:
+            # Detecta que ya salió de la línea negra
+            elif lectura >= umbral_salida:
                 en_negro = False
 
             self.motor_izquierdo.run(velocidad)
@@ -821,7 +827,6 @@ class Base:
             perfil=perfil,
             modo="brake"
         )
-
     def mover_hasta_linea(
         self,
         distancia_cm_max,
