@@ -305,10 +305,98 @@ robot.avanzar_con_torque(distancia_cm=-17, grados_torque=168, velocidad_robot=12
  esperar_torque=False, perfil_entrada="encadenado", perfil_salida="encadenado")
 
 '''
+
 robot.seguir_linea_extremo(
     sensor_color=robot.seguidor,
     velocidad_max=100,
-    distancia_cm=10,
+    distancia_cm=10.5,
+    lado="izquierda",
+
+    tiempo_acomodo_ms=140,
+    tiempo_aceleracion_ms=140,
+
+    kp=1.25,
+    kd=2.7,
+    k_freno=0.16,
+    correccion_max=100,
+
+    objetivo_reflexion=27,
+    captura_inicial=True,
+    tiempo_captura_ms=280,
+    potencia_captura=60,
+    kp_captura=2.5,
+    perfil_salida="encadenado"
+)
+robot.esperar(300)
+robot.girar(-65, velocidad=1200, velocidad_min=160, anticipacion=0, perfil="encadenado")
+
+robot.seguir_linea_extremo(
+    sensor_color=robot.seguidor,
+    velocidad_max=100,
+    distancia_cm=55,
+    lado="derecha",
+
+    tiempo_acomodo_ms=140,
+    tiempo_aceleracion_ms=140,
+
+    kp=1.25,
+    kd=2.7,
+    k_freno=0.16,
+    correccion_max=100,
+
+    objetivo_reflexion=27,
+    captura_inicial=True,
+    tiempo_captura_ms=280,
+    potencia_captura=60,
+    kp_captura=2.5,
+    perfil_salida="encadenado"
+)
+
+robot.esperar(300)
+robot.girar(140, velocidad=1200, velocidad_min=160, anticipacion=0, perfil="encadenado")
+'''
+robot.retroceder(distancia_cm=30, velocidad=870, perfil="seguro", invertir_correccion=False, pausa_gyro=25)  # Retrocede 42 cm usando giroscopio para mantenerse recto.
+'''
+robot.avanzar_con_torque(distancia_cm=-50, grados_torque=-168, velocidad_robot=1200, velocidad_torque=500, torque_despues_cm=15,
+ esperar_torque=False, perfil_entrada="encadenado", perfil_salida="encadenado")
+
+robot.seguir_linea_extremo(
+    sensor_color=robot.seguidor,
+    velocidad_max=100,
+    distancia_cm=20,
+    lado="derecha",
+
+    tiempo_acomodo_ms=140,
+    tiempo_aceleracion_ms=140,
+
+    kp=1.25,
+    kd=2.7,
+    k_freno=0.16,
+    correccion_max=100,
+
+    objetivo_reflexion=27,
+    captura_inicial=True,
+    tiempo_captura_ms=280,
+    potencia_captura=60,
+    kp_captura=2.5,
+    perfil_salida="encadenado"
+)
+
+robot.girar(-45, velocidad=1200, velocidad_min=160, anticipacion=0, perfil="encadenado")
+
+robot.mover_garra_delantera(300, 250)
+robot.mover_garra(300, -75)
+robot.mover_recto( distancia_cm=20, velocidad=1000, perfil="encadenado")  # Avanza 1 cm para acomodar el mecanismo o liberar presión.
+robot.mover_garra(300, 70)
+
+robot.retroceder(distancia_cm=0.8, velocidad=870, perfil="seguro", invertir_correccion=False, pausa_gyro=25)
+robot.girar(40, velocidad=1200, velocidad_min=160, anticipacion=0, perfil="encadenado")
+
+
+robot.seguir_linea_extremo(
+    sensor_color=robot.seguidor,
+    velocidad_max=100,
+    distancia_cm=125,
     lado="izquierda",
 
     tiempo_acomodo_ms=140,
@@ -327,7 +415,4 @@ robot.seguir_linea_extremo(
 
     perfil_salida="encadenado"
 )
-robot.esperar(300)
-robot.girar(-65, velocidad=1200, velocidad_min=160, anticipacion=0, perfil="encadenado")
-
-
+robot.mover_garra(300, -100)
