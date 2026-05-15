@@ -1087,20 +1087,31 @@ class Base:
         velocidad_max=100,
         distancia_cm=70,
         lado="derecha",
-        tiempo_acomodo_ms=180,
-        tiempo_aceleracion_ms=70,
-        kp=0.82,
-        kd=1.85,
-        k_freno=0.01,
+        tiempo_acomodo_ms=140,
+        tiempo_aceleracion_ms=120,
+        kp=1.15,
+        kd=2.6,
+        k_freno=0.15,
         objetivo_reflexion=27,
-        correccion_max=95,
+        correccion_max=100,
         margen_cm=0,
-        perfil_salida="encadenado"
+        perfil_salida="encadenado",
+
+        # NUEVO: fase de búsqueda/captura antes de correr rápido
+        captura_inicial=True,
+        tiempo_captura_ms=260,
+        potencia_captura=55,
+        kp_captura=2.4,
+        margen_captura=5,
+        lecturas_estables_captura=2
     ):
         """
-        Seguidor de línea usando dc().
-        IMPORTANTE:
-        velocidad_max aquí va de 0 a 100, no es igual a 950 de run().
+        Seguidor de línea por borde usando dc().
+
+        Mejoras:
+        - Hace una captura inicial fuerte del borde.
+        - No entra a velocidad máxima si aún no está bien ubicado.
+        - Baja un poco la base cuando el error es grande.
         """
 
         if sensor_color is None:
@@ -1118,20 +1129,77 @@ class Base:
 
         grados_objetivo_real = max(0, grados_objetivo - grados_margen)
 
-        self.reset_motores()
-
-        cronometro = StopWatch()
-        cronometro.reset()
-
-        velocidad_minima = 45
-
-        last_error = 0
-        last_derivative = 0
-
         if lado == "derecha":
             multiplicador_lado = 1
         else:
             multiplicador_lado = -1
+
+        self.reset_motores()
+
+        # =====================================================
+        # FASE 1: CAPTURA INICIAL DEL BORDE
+        # =====================================================
+        if captura_inicial:
+            reloj_captura = StopWatch()
+            reloj_captura.reset()
+
+            estables = 0
+
+            while reloj_captura.time() < tiempo_captura_ms:
+                lectura = sensor_color.reflection()
+                error = lectura - objetivo_reflexion
+
+                # Si ya está cerca del borde, cuenta lecturas estables.
+                if abs(error) <= margen_captura:
+                    estables += 1
+
+                    if estables >= lecturas_estables_captura:
+                        break
+                else:
+                    estables = 0
+
+                # Corrección más fuerte que la del seguimiento normal.
+                correction = error * kp_captura * multiplicador_lado
+                correction = self.limitar(
+                    correction,
+                    -correccion_max,
+                    correccion_max
+                )
+
+                # Si está muy lejos del borde, baja la base para que gire/busque más.
+                if abs(error) > 22:
+                    velocidad_base = 28
+                else:
+                    velocidad_base = potencia_captura
+
+                potencia_izq = velocidad_base - correction
+                potencia_der = velocidad_base + correction
+
+                potencia_izq = self.limitar(potencia_izq, -100, 100)
+                potencia_der = self.limitar(potencia_der, -100, 100)
+
+                self.motor_izquierdo.dc(potencia_izq)
+                self.motor_derecho.dc(potencia_der)
+
+                wait(2)
+
+            # Microfreno para no entrar amarrado al seguimiento rápido.
+            self.motor_izquierdo.brake()
+            self.motor_derecho.brake()
+            wait(8)
+
+            self.reset_motores()
+
+        # =====================================================
+        # FASE 2: SEGUIMIENTO RÁPIDO
+        # =====================================================
+        cronometro = StopWatch()
+        cronometro.reset()
+
+        velocidad_minima = 55
+
+        last_error = 0
+        last_derivative = 0
 
         while True:
             grados_actuales = self.distancia_promedio_grados()
@@ -1177,7 +1245,12 @@ class Base:
                 correccion_max
             )
 
+            # Antes tenías k_freno=0.0 muchas veces.
+            # Esto ayuda a que si se aleja mucho del borde, no siga corriendo ciego.
             velocidad_base = velocidad_actual - (abs(error) * k_freno)
+
+            if velocidad_base < 38:
+                velocidad_base = 38
 
             potencia_izq = velocidad_base - correction
             potencia_der = velocidad_base + correction
