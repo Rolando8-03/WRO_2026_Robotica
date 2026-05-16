@@ -7,7 +7,7 @@ robot = Base()  # Crea el objeto robot usando la clase Base.
 print(robot.Hub.battery.voltage())  # Muestra el voltaje actual de la batería.
 matriz_detectada = None  # Variable donde se guardará la matriz cuando sea escaneada.
 
-'''
+
 # ===================== SECCIÓN 1 (TOMAR CEMENTO Y UBICAR PALA) =====================
 
 # SECCIÓN 1.1 -> SALIDA Y AVANZAR HASTA EL BALDE DE CEMENTO
@@ -52,7 +52,7 @@ robot.esperar(80)  # Espera 80 ms para estabilizar el robot después del giro.
 
 robot.retroceder(distancia_cm=41, velocidad=870, perfil="seguro", invertir_correccion=False, pausa_gyro=25)  # Retrocede 42 cm usando giroscopio para mantenerse recto.
 
-robot.mover_recto( distancia_cm=38.5, velocidad=1000, perfil="encadenado")  # Avanza 42 cm después de dejar o acomodar la pala.
+robot.mover_recto( distancia_cm=40, velocidad=1000, perfil="encadenado")  # Avanza 42 cm después de dejar o acomodar la pala.
 
 robot.giro_arco_dc( radio_cm=13, angulo_deg=19, potencia=80, lado="derecha")  # Hace un arco pequeño hacia la derecha para ajustar la dirección.
 
@@ -139,31 +139,30 @@ robot.girar( -50, velocidad=1200, velocidad_min=160, anticipacion=0, perfil="enc
 
 robot.seguir_linea_extremo(
     sensor_color=robot.seguidor,
-    velocidad_max=100,
-    distancia_cm=20,
+    velocidad_max=92,
+    distancia_cm=30,
     lado="derecha",
 
-    tiempo_acomodo_ms=140,
-    tiempo_aceleracion_ms=140,
+    tiempo_acomodo_ms=110,
+    tiempo_aceleracion_ms=100,
 
-    kp=1.25,
-    kd=2.7,
-    k_freno=0.16,
+    kp=1.35,
+    kd=3.0,
+    k_freno=0.22,
     correccion_max=100,
 
     objetivo_reflexion=27,
     captura_inicial=True,
-    tiempo_captura_ms=280,
-    potencia_captura=60,
-    kp_captura=2.5,
+    tiempo_captura_ms=330,
+    potencia_captura=52,
+    kp_captura=3.1,
+    margen_captura=4,
+    lecturas_estables_captura=1,
 
     perfil_salida="encadenado"
 )
 
-robot.mover_recto( distancia_cm=40, velocidad=1000, perfil="encadenado")  # Avanza 40 cm para acercarse a la matriz.
-
-# SECCIÓN 4.2 -> ENTRAR EN LA MATRIZ Y ESCANEAR
-robot.mover_recto( distancia_cm=8, velocidad=700, perfil="seguro")  # Entra 19.5 cm en la matriz con velocidad más controlada.
+robot.mover_recto( distancia_cm=30, velocidad=750, perfil="encadenado")  # Avanza 40 cm para acercarse a la matriz.
 
 robot.esperar(500)  # Espera 500 ms antes de escanear para que el robot esté quieto.
 
@@ -171,13 +170,15 @@ matriz_detectada = robot.escanear_matriz()  # Escanea la matriz y guarda el resu
 print("Matriz guardada:", matriz_detectada)  # Muestra en pantalla la matriz detectada.
 
 
-robot.retroceder(distancia_cm=40, velocidad=870, perfil="seguro", invertir_correccion=False, pausa_gyro=25)  # Retrocede 42 cm usando giroscopio para mantenerse recto.
+robot.retroceder(distancia_cm=40, velocidad=750, perfil="seguro", invertir_correccion=False, pausa_gyro=25)  # Retrocede 42 cm usando giroscopio para mantenerse recto.
 robot.esperar(280)
 robot.girar(160, velocidad=1200, velocidad_min=160, anticipacion=0, perfil="encadenado")  # Gira 60 grados en sentido negativo para alinearse con la línea.
-robot.retroceder(distancia_cm=18, velocidad=870, perfil="seguro", invertir_correccion=False, pausa_gyro=25)
+robot.retroceder(distancia_cm=17.3, velocidad=750, perfil="seguro", invertir_correccion=False, pausa_gyro=25)
 robot.esperar(300)
-robot.girar(41, velocidad=1200, velocidad_min=160, anticipacion=0, perfil="encadenado")
-robot.avanzar_con_torque(distancia_cm=-16, grados_torque=168, velocidad_robot=1200, velocidad_torque=500, torque_despues_cm=1,
+#giro para entrar en los cementos blancos y dejarlos
+robot.girar(43, velocidad=1200, velocidad_min=160, anticipacion=0, perfil="encadenado")
+#agarrar los cementos verdes
+robot.avanzar_con_torque(distancia_cm=-16, grados_torque=150, velocidad_robot=1200, velocidad_torque=500, torque_despues_cm=1,
  esperar_torque=False, perfil_entrada="encadenado", perfil_salida="encadenado")
 
 robot.mover_recto( distancia_cm=11, velocidad=1000, perfil="encadenado")
@@ -208,13 +209,14 @@ robot.seguir_linea_extremo(
 
 robot.esperar(250)
 robot.girar(-165, velocidad=1200, velocidad_min=160, anticipacion=0, perfil="encadenado")
-robot.avanzar_con_torque(distancia_cm=-20, grados_torque=-168, velocidad_robot=1200, velocidad_torque=500, torque_despues_cm=1,
+robot.avanzar_con_torque(distancia_cm=-20, grados_torque=168, velocidad_robot=1200, velocidad_torque=500, torque_despues_cm=1,
  esperar_torque=False, perfil_entrada="encadenado", perfil_salida="encadenado")
 
+#seguidor para tomar cementos amarillos
 robot.seguir_linea_extremo(
     sensor_color=robot.seguidor,
     velocidad_max=100,
-    distancia_cm=44,
+    distancia_cm=42,
     lado="izquierda",
 
     tiempo_acomodo_ms=140,
@@ -235,9 +237,8 @@ robot.seguir_linea_extremo(
 )
 robot.esperar(300)
 robot.girar(-167, velocidad=1200, velocidad_min=160, anticipacion=0, perfil="encadenado")
-robot.avanzar_con_torque(distancia_cm=-20.8, grados_torque=168, velocidad_robot=1200, velocidad_torque=500, torque_despues_cm=10,
+robot.avanzar_con_torque( distancia_cm=-23, grados_torque=-170, velocidad_robot=1200, velocidad_torque=350, torque_despues_cm=1,
  esperar_torque=False, perfil_entrada="encadenado", perfil_salida="encadenado")
-
 
 robot.mover_recto( distancia_cm=10, velocidad=1000, perfil="encadenado")
 robot.girar(-45, velocidad=1200, velocidad_min=160, anticipacion=0, perfil="encadenado")
@@ -304,7 +305,6 @@ robot.girar(-80, velocidad=1200, velocidad_min=160, anticipacion=0, perfil="enca
 robot.avanzar_con_torque(distancia_cm=-17, grados_torque=168, velocidad_robot=1200, velocidad_torque=500, torque_despues_cm=1,
  esperar_torque=False, perfil_entrada="encadenado", perfil_salida="encadenado")
 
-'''
 
 robot.seguir_linea_extremo(
     sensor_color=robot.seguidor,
