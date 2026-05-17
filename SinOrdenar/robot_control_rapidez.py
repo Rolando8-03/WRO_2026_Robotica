@@ -764,7 +764,7 @@ class Base:
             velocidad,
             grados,
             then=Stop.HOLD,
-            wait=True
+            wait=False
         )
 
     def mover_garra_delantera(
