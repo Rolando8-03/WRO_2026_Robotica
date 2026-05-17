@@ -39,20 +39,20 @@ robot.seguir_linea_extremo(
 # SECCIÓN 1.2 -> AGARRAR EL BALDE DE CEMENTO
 robot.girar(-90, velocidad=1000, velocidad_min=160, anticipacion=8, perfil="encadenado")  # Gira 90 grados en sentido negativo para orientarse al balde.
 
-robot.avanzar_con_torque(distancia_cm=-17.5, grados_torque=-168, velocidad_robot=1200, velocidad_torque=500, torque_despues_cm=1,
+robot.avanzar_con_torque(distancia_cm=-17.5, grados_torque=-169.5, velocidad_robot=1200, velocidad_torque=500, torque_despues_cm=1,
  esperar_torque=False, perfil_entrada="encadenado", perfil_salida="encadenado")  # Retrocede 17.5 cm y activa el torque después de 1 cm para agarrar el balde.
 
-robot.mover_recto( distancia_cm=1.2, velocidad=1000, perfil="encadenado")  # Avanza 1 cm para acomodar el mecanismo o liberar presión.
+robot.mover_recto( distancia_cm=2.5, velocidad=1000, perfil="encadenado")  # Avanza 1 cm para acomodar el mecanismo o liberar presión.
 
 # SECCIÓN 1.3 -> DEJAR LA PALA DE ALBAÑILERÍA
-robot.girar( 67, velocidad=1000, velocidad_min=160, anticipacion=8, perfil="encadenado"
+robot.girar(67.2, velocidad=1000, velocidad_min=160, anticipacion=8, perfil="encadenado"
 )  # Gira 68.5 grados para orientarse hacia la zona de la pala.
 
 robot.esperar(80)  # Espera 80 ms para estabilizar el robot después del giro.
 
-robot.retroceder(distancia_cm=41, velocidad=870, perfil="seguro", invertir_correccion=False, pausa_gyro=25)  # Retrocede 42 cm usando giroscopio para mantenerse recto.
+robot.retroceder(distancia_cm=46, velocidad=870, perfil="seguro", invertir_correccion=False, pausa_gyro=25)  # Retrocede 42 cm usando giroscopio para mantenerse recto.
 
-robot.mover_recto( distancia_cm=40, velocidad=1000, perfil="encadenado")  # Avanza 42 cm después de dejar o acomodar la pala.
+robot.mover_recto( distancia_cm=36.8, velocidad=1000, perfil="encadenado")  # Avanza 42 cm después de dejar o acomodar la pala.
 
 robot.giro_arco_dc( radio_cm=13, angulo_deg=19, potencia=80, lado="derecha")  # Hace un arco pequeño hacia la derecha para ajustar la dirección.
 
@@ -62,7 +62,7 @@ robot.giro_arco_dc( radio_cm=13, angulo_deg=19, potencia=80, lado="derecha")  # 
 robot.seguir_linea_extremo(
     sensor_color=robot.seguidor,
     velocidad_max=100,
-    distancia_cm=32.5,
+    distancia_cm=37,
     lado="derecha",
 
     tiempo_acomodo_ms=140,
@@ -123,7 +123,8 @@ robot.esperar(300)  # Espera 300 ms antes del giro grande. 300
 
 robot.girar( -170, velocidad=1200, velocidad_min=160, anticipacion=0, perfil="encadenado")  # Gira 170 grados en sentido negativo sin anticipación.
 
-robot.avanzar_con_torque( distancia_cm=-20, grados_torque=-170, velocidad_robot=1200, velocidad_torque=350, torque_despues_cm=1,
+#AGARRAR LOS CEMENTOS BLANCOS
+robot.avanzar_con_torque( distancia_cm=-24, grados_torque=-171, velocidad_robot=1200, velocidad_torque=350, torque_despues_cm=1,
  esperar_torque=False, perfil_entrada="encadenado", perfil_salida="encadenado")  # Retrocede 20 cm y activa el torque para tomar los cementos blancos.
 
 # ===================== SECCIÓN 4 (DEJAR LOS CEMENTOS BLANCOS) =====================
@@ -136,11 +137,11 @@ robot.mover_recto( distancia_cm=51, velocidad=1000, perfil="encadenado")  # Avan
 robot.esperar(300)
 robot.girar( -50, velocidad=1200, velocidad_min=160, anticipacion=0, perfil="encadenado")  # Gira 60 grados en sentido negativo para alinearse con la línea.
 
-
+#SEGUIR LINEA HASTA LA MATRIZ
 robot.seguir_linea_extremo(
     sensor_color=robot.seguidor,
     velocidad_max=92,
-    distancia_cm=30,
+    distancia_cm=28,
     lado="derecha",
 
     tiempo_acomodo_ms=110,
@@ -162,9 +163,10 @@ robot.seguir_linea_extremo(
     perfil_salida="encadenado"
 )
 
-robot.mover_recto( distancia_cm=30, velocidad=750, perfil="encadenado")  # Avanza 40 cm para acercarse a la matriz.
+robot.esperar(100)
+robot.mover_recto( distancia_cm=30.5, velocidad=700, perfil="encadenado")  # Avanza 40 cm para acercarse a la matriz.
 
-robot.esperar(500)  # Espera 500 ms antes de escanear para que el robot esté quieto.
+robot.esperar(400)  # Espera 500 ms antes de escanear para que el robot esté quieto.
 
 matriz_detectada = robot.escanear_matriz()  # Escanea la matriz y guarda el resultado en la variable.
 print("Matriz guardada:", matriz_detectada)  # Muestra en pantalla la matriz detectada.
@@ -173,21 +175,21 @@ print("Matriz guardada:", matriz_detectada)  # Muestra en pantalla la matriz det
 robot.retroceder(distancia_cm=40, velocidad=750, perfil="seguro", invertir_correccion=False, pausa_gyro=25)  # Retrocede 42 cm usando giroscopio para mantenerse recto.
 robot.esperar(280)
 robot.girar(160, velocidad=1200, velocidad_min=160, anticipacion=0, perfil="encadenado")  # Gira 60 grados en sentido negativo para alinearse con la línea.
-robot.retroceder(distancia_cm=17.3, velocidad=750, perfil="seguro", invertir_correccion=False, pausa_gyro=25)
+robot.retroceder(distancia_cm=15.5, velocidad=750, perfil="seguro", invertir_correccion=False, pausa_gyro=25)
 robot.esperar(300)
 #giro para entrar en los cementos blancos y dejarlos
-robot.girar(43, velocidad=1200, velocidad_min=160, anticipacion=0, perfil="encadenado")
-#agarrar los cementos verdes
-robot.avanzar_con_torque(distancia_cm=-16, grados_torque=150, velocidad_robot=1200, velocidad_torque=500, torque_despues_cm=1,
+robot.girar(42, velocidad=1200, velocidad_min=160, anticipacion=0, perfil="encadenado")
+#dejar los cementos blancos
+robot.avanzar_con_torque(distancia_cm=-17.5, grados_torque=150, velocidad_robot=1200, velocidad_torque=500, torque_despues_cm=1,
  esperar_torque=False, perfil_entrada="encadenado", perfil_salida="encadenado")
 
-robot.mover_recto( distancia_cm=11, velocidad=1000, perfil="encadenado")
+robot.mover_recto( distancia_cm=12.5, velocidad=1000, perfil="encadenado")
 robot.girar(-41, velocidad=1200, velocidad_min=160, anticipacion=0, perfil="encadenado")
 
 robot.seguir_linea_extremo(
     sensor_color=robot.seguidor,
     velocidad_max=100,
-    distancia_cm=42,
+    distancia_cm=39,
     lado="derecha",
 
     tiempo_acomodo_ms=140,
@@ -209,10 +211,12 @@ robot.seguir_linea_extremo(
 
 robot.esperar(250)
 robot.girar(-165, velocidad=1200, velocidad_min=160, anticipacion=0, perfil="encadenado")
-robot.avanzar_con_torque(distancia_cm=-20, grados_torque=168, velocidad_robot=1200, velocidad_torque=500, torque_despues_cm=1,
+
+#AGARRAR LOS CEMENTOS VERDES
+robot.avanzar_con_torque( distancia_cm=-19.5, grados_torque=-145, velocidad_robot=1200, velocidad_torque=350, torque_despues_cm=1,
  esperar_torque=False, perfil_entrada="encadenado", perfil_salida="encadenado")
 
-#seguidor para tomar cementos amarillos
+
 robot.seguir_linea_extremo(
     sensor_color=robot.seguidor,
     velocidad_max=100,
@@ -237,18 +241,22 @@ robot.seguir_linea_extremo(
 )
 robot.esperar(300)
 robot.girar(-167, velocidad=1200, velocidad_min=160, anticipacion=0, perfil="encadenado")
-robot.avanzar_con_torque( distancia_cm=-23, grados_torque=-170, velocidad_robot=1200, velocidad_torque=350, torque_despues_cm=1,
+
+#DEJAR LOS CEMENTOS VERDES
+robot.avanzar_con_torque( distancia_cm=-23, grados_torque=170, velocidad_robot=1200, velocidad_torque=350, torque_despues_cm=1,
  esperar_torque=False, perfil_entrada="encadenado", perfil_salida="encadenado")
 
 robot.mover_recto( distancia_cm=10, velocidad=1000, perfil="encadenado")
-robot.girar(-45, velocidad=1200, velocidad_min=160, anticipacion=0, perfil="encadenado")
+robot.girar(-49, velocidad=1200, velocidad_min=160, anticipacion=0, perfil="encadenado")
 robot.mover_recto( distancia_cm=29, velocidad=1000, perfil="encadenado")
 robot.esperar(300)
-robot.girar(44, velocidad=1200, velocidad_min=160, anticipacion=0, perfil="encadenado")
+robot.girar(47, velocidad=1200, velocidad_min=160, anticipacion=0, perfil="encadenado")
+
+#SEGUIR LINEA HASTA LOS CEMENTOS AMARILLOS
 robot.seguir_linea_extremo(
     sensor_color=robot.seguidor,
     velocidad_max=100,
-    distancia_cm=12,
+    distancia_cm=10,
     lado="derecha",
 
     tiempo_acomodo_ms=140,
@@ -268,20 +276,23 @@ robot.seguir_linea_extremo(
     perfil_salida="encadenado"
 )
 robot.esperar(300)
-robot.girar(-168, velocidad=1200, velocidad_min=160, anticipacion=0, perfil="encadenado")
-robot.avanzar_con_torque(distancia_cm=-20, grados_torque=-68, velocidad_robot=1200, velocidad_torque=500, torque_despues_cm=1,
+robot.girar(-167, velocidad=1200, velocidad_min=160, anticipacion=0, perfil="encadenado")
+#agarrar los cementos amarillos
+robot.avanzar_con_torque( distancia_cm=-21, grados_torque=-169.8, velocidad_robot=1200, velocidad_torque=500, torque_despues_cm=1,
  esperar_torque=False, perfil_entrada="encadenado", perfil_salida="encadenado")
 
 
 robot.mover_recto( distancia_cm=10, velocidad=1000, perfil="encadenado")
 robot.esperar(300)
 robot.girar(-70, velocidad=1200, velocidad_min=160, anticipacion=0, perfil="encadenado")
-robot.mover_recto( distancia_cm=55, velocidad=1000, perfil="encadenado") #avanzar a la linea para ir a los amarillos
+
+#avanzar a la linea para ir a los amarillos
+robot.mover_recto( distancia_cm=56.5, velocidad=1000, perfil="encadenado") 
 robot.girar(60, velocidad=1200, velocidad_min=160, anticipacion=0, perfil="encadenado")
 robot.seguir_linea_extremo(
     sensor_color=robot.seguidor,
     velocidad_max=100,
-    distancia_cm=66,
+    distancia_cm=62.8,
     lado="izquierda",
 
     tiempo_acomodo_ms=140,
@@ -302,14 +313,16 @@ robot.seguir_linea_extremo(
 )
 robot.esperar(300)
 robot.girar(-80, velocidad=1200, velocidad_min=160, anticipacion=0, perfil="encadenado")
-robot.avanzar_con_torque(distancia_cm=-17, grados_torque=168, velocidad_robot=1200, velocidad_torque=500, torque_despues_cm=1,
+
+#DEJAR LOS CEMENTOS AMARILLOS
+robot.avanzar_con_torque( distancia_cm=-18.5, grados_torque=160, velocidad_robot=1200, velocidad_torque=350, torque_despues_cm=1,
  esperar_torque=False, perfil_entrada="encadenado", perfil_salida="encadenado")
 
-
+#salir de la seccion amarilla
 robot.seguir_linea_extremo(
     sensor_color=robot.seguidor,
     velocidad_max=100,
-    distancia_cm=10.5,
+    distancia_cm=9.5,
     lado="izquierda",
 
     tiempo_acomodo_ms=140,
@@ -330,10 +343,11 @@ robot.seguir_linea_extremo(
 robot.esperar(300)
 robot.girar(-65, velocidad=1200, velocidad_min=160, anticipacion=0, perfil="encadenado")
 
+#seguir linea para ir a los azules
 robot.seguir_linea_extremo(
     sensor_color=robot.seguidor,
     velocidad_max=100,
-    distancia_cm=55,
+    distancia_cm=46,
     lado="derecha",
 
     tiempo_acomodo_ms=140,
@@ -353,17 +367,20 @@ robot.seguir_linea_extremo(
 )
 
 robot.esperar(300)
-robot.girar(140, velocidad=1200, velocidad_min=160, anticipacion=0, perfil="encadenado")
-'''
-robot.retroceder(distancia_cm=30, velocidad=870, perfil="seguro", invertir_correccion=False, pausa_gyro=25)  # Retrocede 42 cm usando giroscopio para mantenerse recto.
-'''
-robot.avanzar_con_torque(distancia_cm=-50, grados_torque=-168, velocidad_robot=1200, velocidad_torque=500, torque_despues_cm=15,
+
+#Giro para ir a los azules
+robot.girar(129, velocidad=1200, velocidad_min=160, anticipacion=0, perfil="encadenado")
+robot.retroceder(distancia_cm=34, velocidad=800, perfil="seguro", invertir_correccion=False, pausa_gyro=25)
+robot.giro_derecha(28, 1000, velocidad_min=260, anticipacion=0, zona_freno=28, perfil="seguro")
+
+#AGARRAR LOS CEMENTOS AZULES
+robot.avanzar_con_torque(distancia_cm=-20, grados_torque=-168, velocidad_robot=1200, velocidad_torque=600, torque_despues_cm=0,
  esperar_torque=False, perfil_entrada="encadenado", perfil_salida="encadenado")
 
 robot.seguir_linea_extremo(
     sensor_color=robot.seguidor,
     velocidad_max=100,
-    distancia_cm=20,
+    distancia_cm=15,
     lado="derecha",
 
     tiempo_acomodo_ms=140,
@@ -382,21 +399,24 @@ robot.seguir_linea_extremo(
     perfil_salida="encadenado"
 )
 
-robot.girar(-45, velocidad=1200, velocidad_min=160, anticipacion=0, perfil="encadenado")
+#giro para ir por los cementos azules
+robot.esperar(300)
+robot.girar(-28, velocidad=1200, velocidad_min=160, anticipacion=0, perfil="encadenado")
 
-robot.mover_garra_delantera(300, 250)
-robot.mover_garra(300, -75)
-robot.mover_recto( distancia_cm=20, velocidad=1000, perfil="encadenado")  # Avanza 1 cm para acomodar el mecanismo o liberar presión.
-robot.mover_garra(300, 70)
+robot.mover_garra(300, -95)
+robot.mover_garra_delantera(800, 250)
+robot.mover_recto( distancia_cm=41, velocidad=1000, perfil="encadenado")  # Avanza 1 cm para acomodar el mecanismo o liberar presión.
+robot.mover_garra(300, 90)
 
-robot.retroceder(distancia_cm=0.8, velocidad=870, perfil="seguro", invertir_correccion=False, pausa_gyro=25)
-robot.girar(40, velocidad=1200, velocidad_min=160, anticipacion=0, perfil="encadenado")
+
+robot.retroceder(distancia_cm=6.5, velocidad=870, perfil="seguro", invertir_correccion=False, pausa_gyro=25)
+robot.girar(28, velocidad=1200, velocidad_min=160, anticipacion=0, perfil="encadenado")
 
 
 robot.seguir_linea_extremo(
     sensor_color=robot.seguidor,
     velocidad_max=100,
-    distancia_cm=125,
+    distancia_cm=137,
     lado="izquierda",
 
     tiempo_acomodo_ms=140,
