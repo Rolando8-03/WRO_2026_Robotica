@@ -1,18 +1,15 @@
-from robot_control_rapidez import Base  # Importa la clase Base, donde están todas las funciones del robot.
-from pybricks.parameters import Color, Direction, Port, Stop  # Importa parámetros de Pybricks para colores, puertos, direcciones y frenado.
-from matriz import ejecutar_matriz  # Importa la función para ejecutar acciones según la matriz detectada.
+from robot_control_rapidez import Base  
+from pybricks.parameters import Color, Direction, Port, Stop 
+from matriz import ejecutar_matriz 
 
-# ----------------- EJECUCIÓN PRINCIPAL -----------------
-robot = Base()  # Crea el objeto robot usando la clase Base.
-print(robot.Hub.battery.voltage())  # Muestra el voltaje actual de la batería.
-matriz_detectada = None  # Variable donde se guardará la matriz cuando sea escaneada.
+robot = Base() 
+print(robot.Hub.battery.voltage()) 
+matriz_detectada = None 
 
 
-# ===================== SECCIÓN 1 (TOMAR CEMENTO Y UBICAR PALA) =====================
-
-# SECCIÓN 1.1 -> SALIDA Y AVANZAR HASTA EL BALDE DE CEMENTO
-robot.giro_arco_dc(radio_cm=9.6, angulo_deg=140, potencia=100, lado="derecha")  # Sale haciendo un arco hacia la derecha con radio 9.6 cm y giro de 140 grados.
-
+#SECCION 1: =================================================================================
+#giro de salida y seguidor hasta el cemento
+robot.giro_arco_dc(radio_cm=9.6, angulo_deg=140, potencia=100, lado="derecha") 
 robot.seguir_linea_extremo(
     sensor_color=robot.seguidor,
     velocidad_max=100,
@@ -36,29 +33,26 @@ robot.seguir_linea_extremo(
     perfil_salida="encadenado"
 )
 
-# SECCIÓN 1.2 -> AGARRAR EL BALDE DE CEMENTO
-robot.girar(-90, velocidad=1000, velocidad_min=160, anticipacion=8, perfil="encadenado")  # Gira 90 grados en sentido negativo para orientarse al balde.
-
+#giro para posicionarse frente al cemento y movimeinto torque para tomarlo
+robot.girar(-90, velocidad=1000, velocidad_min=160, anticipacion=8, perfil="encadenado")
 robot.avanzar_con_torque(distancia_cm=-17.5, grados_torque=-169.5, velocidad_robot=1200, velocidad_torque=500, torque_despues_cm=1,
  esperar_torque=False, perfil_entrada="encadenado", perfil_salida="encadenado")  # Retrocede 17.5 cm y activa el torque después de 1 cm para agarrar el balde.
 
-robot.mover_recto( distancia_cm=2.5, velocidad=1000, perfil="encadenado")  # Avanza 1 cm para acomodar el mecanismo o liberar presión.
+#pequeño avance despues de tomar el cemento y giro en direccion a la llana
+robot.mover_recto( distancia_cm=2.5, velocidad=1000, perfil="encadenado")
+robot.girar(67.2, velocidad=1000, velocidad_min=160, anticipacion=8, perfil="encadenado") 
 
-# SECCIÓN 1.3 -> DEJAR LA PALA DE ALBAÑILERÍA
-robot.girar(67.2, velocidad=1000, velocidad_min=160, anticipacion=8, perfil="encadenado"
-)  # Gira 68.5 grados para orientarse hacia la zona de la pala.
+robot.esperar(80)
 
-robot.esperar(80)  # Espera 80 ms para estabilizar el robot después del giro.
-
-robot.retroceder(distancia_cm=46, velocidad=870, perfil="seguro", invertir_correccion=False, pausa_gyro=25)  # Retrocede 42 cm usando giroscopio para mantenerse recto.
-
-robot.mover_recto( distancia_cm=36.8, velocidad=1000, perfil="encadenado")  # Avanza 42 cm después de dejar o acomodar la pala.
-
+#Retroceso para dejar la llana en su lugar y mov.recto para regresar a la linea
+robot.retroceder(distancia_cm=46, velocidad=870, perfil="seguro", invertir_correccion=False, pausa_gyro=25)
+robot.mover_recto( distancia_cm=36.8, velocidad=1000, perfil="encadenado") 
+#giro de arco para posicionarse sobre la linea
 robot.giro_arco_dc( radio_cm=13, angulo_deg=19, potencia=80, lado="derecha")  # Hace un arco pequeño hacia la derecha para ajustar la dirección.
 
-# ===================== SECCIÓN 2 (DEJAR EL CEMENTO) =====================
+#SECCIÓN 2 (DEJAR EL CEMENTO) =================================================================================
 
-# SECCIÓN 2.1 -> AVANZAR HASTA DEJAR EL CEMENTO
+#Seguir linea hasta lugar de cemento. Giro y moviminto toque para dejarlo en su lugar
 robot.seguir_linea_extremo(
     sensor_color=robot.seguidor,
     velocidad_max=100,
@@ -81,21 +75,18 @@ robot.seguir_linea_extremo(
 
     perfil_salida="encadenado"
 )
-
-# SECCIÓN 2.2 -> PONER EL CEMENTO EN EL ESTACIONAMIENTO
-robot.girar( 90, velocidad=850, velocidad_min=160, anticipacion=8, perfil="encadenado")  # Gira 90 grados para apuntar al estacionamiento.
-
-robot.esperar(100)  # Espera 100 ms para estabilizarse antes de soltar el cemento.
-
+robot.girar( 90, velocidad=850, velocidad_min=160, anticipacion=8, perfil="encadenado")
+robot.esperar(100) 
 robot.avanzar_con_torque(distancia_cm=-8, grados_torque=166, velocidad_robot=1200, velocidad_torque=300,
- esperar_torque=False, perfil_entrada="encadenado", perfil_salida="encadenado")  # Retrocede 8 cm y mueve el torque para soltar o colocar el cemento.
+ esperar_torque=False, perfil_entrada="encadenado", perfil_salida="encadenado") 
 
-# ===================== SECCIÓN 3 (IR POR LOS CEMENTOS BLANCOS) =====================
+#SECCIÓN 3 (IR POR LOS CEMENTOS BLANCOS) =======================================================================
 
 # SECCIÓN 3.1 -> POSICIONARSE ENFRENTE DE LA LÍNEA DEL SEGUIDOR
-robot.esperar(150) #NO TOCAR ESA ESPERA
-robot.giro_derecha(-90, velocidad=1200, velocidad_min=160, anticipacion=10, perfil="encadenado")  # Gira usando principalmente el motor derecho para reposicionarse.
 
+#Giro derecha para quedar frente a la linea. Seguidor hasta los blkancos y mov.torque para tomarlos
+robot.esperar(150) #NO TOCAR ESA ESPERA
+robot.giro_derecha(-90, velocidad=1200, velocidad_min=160, anticipacion=10, perfil="encadenado")
 robot.seguir_linea_extremo(
     sensor_color=robot.seguidor,
     velocidad_max=100,
@@ -118,9 +109,7 @@ robot.seguir_linea_extremo(
 
     perfil_salida="encadenado"
 )
-
-robot.esperar(300)  # Espera 300 ms antes del giro grande. 300
-
+robot.esperar(300)
 robot.girar( -170, velocidad=1200, velocidad_min=160, anticipacion=0, perfil="encadenado")  # Gira 170 grados en sentido negativo sin anticipación.
 
 #AGARRAR LOS CEMENTOS BLANCOS
@@ -246,9 +235,30 @@ robot.girar(-167, velocidad=1200, velocidad_min=160, anticipacion=0, perfil="enc
 robot.avanzar_con_torque( distancia_cm=-23, grados_torque=170, velocidad_robot=1200, velocidad_torque=350, torque_despues_cm=1,
  esperar_torque=False, perfil_entrada="encadenado", perfil_salida="encadenado")
 
-robot.mover_recto( distancia_cm=10, velocidad=1000, perfil="encadenado")
-robot.girar(-49, velocidad=1200, velocidad_min=160, anticipacion=0, perfil="encadenado")
-robot.mover_recto( distancia_cm=29, velocidad=1000, perfil="encadenado")
+robot.seguir_linea_extremo(
+    sensor_color=robot.seguidor,
+    velocidad_max=100,
+    distancia_cm=10,
+    lado="derecha",
+
+    tiempo_acomodo_ms=140,
+    tiempo_aceleracion_ms=140,
+
+    kp=1.25,
+    kd=2.7,
+    k_freno=0.16,
+    correccion_max=100,
+
+    objetivo_reflexion=27,
+    captura_inicial=True,
+    tiempo_captura_ms=280,
+    potencia_captura=60,
+    kp_captura=2.5,
+
+    perfil_salida="encadenado"
+)
+robot.girar(-55, velocidad=1200, velocidad_min=160, anticipacion=0, perfil="encadenado")
+robot.mover_recto( distancia_cm=20, velocidad=1000, perfil="encadenado")
 robot.esperar(300)
 robot.girar(47, velocidad=1200, velocidad_min=160, anticipacion=0, perfil="encadenado")
 
@@ -404,7 +414,7 @@ robot.esperar(300)
 robot.girar(-28, velocidad=1200, velocidad_min=160, anticipacion=0, perfil="encadenado")
 
 robot.mover_garra(300, -95)
-robot.mover_garra_delantera(800, 250)
+robot.mover_garra_delantera(850, 253)
 robot.mover_recto( distancia_cm=41, velocidad=1000, perfil="encadenado")  # Avanza 1 cm para acomodar el mecanismo o liberar presión.
 robot.mover_garra(300, 90)
 
@@ -436,3 +446,10 @@ robot.seguir_linea_extremo(
     perfil_salida="encadenado"
 )
 robot.mover_garra(300, -100)
+
+#================================================
+
+robot.retroceder(distancia_cm=11.5, velocidad=800, perfil="seguro", invertir_correccion=False, pausa_gyro=25)
+robot.esperar(280)
+robot.girar(85, velocidad=1200, velocidad_min=160, anticipacion=0, perfil="encadenado")
+robot.mover_torque(-170, 800, esperar= False, modo_final= Stop.HOLD)
