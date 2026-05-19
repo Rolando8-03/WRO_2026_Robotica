@@ -65,14 +65,17 @@ robot.esperar(300)
 robot.girar(-95, velocidad=900, velocidad_min=160, anticipacion=8, perfil="encadenado")
 robot.mover_recto( distancia_cm=11, velocidad=1000, perfil="encadenado")
 robot.esperar(300)
-robot.girar(83, velocidad=900, velocidad_min=160, anticipacion=8, perfil="encadenado")
+robot.girar(82.5, velocidad=900, velocidad_min=160, anticipacion=8, perfil="encadenado")
 
 robot.mover_garra_delantera(600, -50)
-robot.mover_garra(300, 50)
-robot.mover_recto( distancia_cm=20, velocidad=1000, perfil="encadenado")
+robot.mover_garra(300,50)
+robot.mover_recto( distancia_cm=9, velocidad=1000, perfil="encadenado")
 
-robot.mover_garra_delantera(600, 49)
-robot.mover_garra(300, 35)
+robot.mover_garra_delantera(600, 70)
+robot.mover_garra(300, 45)
+robot.mover_recto( distancia_cm=1, velocidad=1000, perfil="encadenado")
+robot.mover_garra(300, 50)
+
 
 '''
 robot.retroceder(distancia_cm=20, velocidad=700, perfil="seguro", invertir_correccion=False, pausa_gyro=25)
