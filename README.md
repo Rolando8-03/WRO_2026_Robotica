@@ -1,142 +1,195 @@
 # 🤖 Hexagon Force — WRO 2026 RoboMission Senior
 
-Proyecto oficial del equipo **Hexagon Force** 
-## 🏆 World Robot Olympiad (WRO) 2026 — RoboMission Senior
+Proyecto oficial del equipo **Hexagon Force** para la categoría **WRO RoboMission Senior 2026**.
+
+> **Temporada:** World Robot Olympiad 2026  
+> **Categoría:** RoboMission Senior  
+> **Reto:** Mosaic Masters  
+> **País:** Nicaragua 🇳🇮  
+> **Institución:** Universidad Americana (UAM)  
+> **Tecnología principal:** LEGO SPIKE Prime + Pybricks  
 
 ---
 
-# 👥 Integrantes del equipo
+## 📌 Tabla de contenidos
 
-- Elydariana de León García Espinoza
-- Rolando Enrique Mayorga Mena
-- Lesther Josias Galeano Meza
-
-🎓 Universidad Americana (UAM)  
-📍 Managua, Nicaragua
-
----
-
-# 🧠 Descripción del proyecto
-
-Este proyecto consiste en el desarrollo de un robot autónomo utilizando LEGO SPIKE Prime y Pybricks para resolver el reto oficial de la categoría **WRO RoboMission Senior 2026**.
-
-El robot fue programado para realizar múltiples misiones relacionadas con la construcción inteligente de una ciudad, utilizando:
-
-- Seguimiento de línea
-- Control PID
-- Giros con giroscopio
-- Manipulación de objetos
-- Detección de colores
-- Control de torque
-- Secuencias automatizadas
+- [Descripción general](#-descripción-general)
+- [Integrantes del equipo](#-integrantes-del-equipo)
+- [Contexto del reto](#-contexto-del-reto)
+- [Objetivo del robot](#-objetivo-del-robot)
+- [Misiones principales](#-misiones-principales)
+- [Sistema de puntuación](#-sistema-de-puntuación)
+- [Tecnologías utilizadas](#-tecnologías-utilizadas)
+- [Estructura del proyecto](#-estructura-del-proyecto)
+- [Estrategia de programación](#-estrategia-de-programación)
+- [Estado del proyecto](#-estado-del-proyecto)
+- [Referencia oficial](#-referencia-oficial)
 
 ---
 
-# 🎯 Objetivo del reto
+## 🧠 Descripción general
 
-El robot debe completar distintas tareas dentro de un tiempo límite, obteniendo la mayor cantidad posible de puntos.
+**Hexagon Force — WRO 2026 RoboMission Senior** es un proyecto de robótica autónoma desarrollado para resolver el reto oficial **Mosaic Masters** de la temporada WRO 2026.
 
-Las misiones principales incluyen:
+El robot está construido con **LEGO SPIKE Prime** y programado con **Pybricks**, utilizando Python para controlar movimientos, sensores, mecanismos y secuencias de misión.
 
-## ✅ 1. Proveer herramientas
-
-El robot debe:
-
-- Llevar la pala rectangular al área del patrocinador.
-- Colocar el balde de cemento en el estacionamiento.
-- Regresar la pala de albañilería al área de inicio.
+El proyecto se enfoca en crear un robot capaz de moverse con precisión dentro del campo, transportar herramientas, entregar cementos de distintos colores, detectar patrones de mosaico y manipular piezas dentro de zonas específicas del tablero.
 
 ---
 
-## ✅ 2. Colocar el mosaico
+## 👥 Integrantes del equipo
 
-El robot debe colocar correctamente las piezas de mosaico dentro de su marco correspondiente.
+- **Elydariana de León García Espinoza**
+- **Rolando Enrique Mayorga Mena**
+- **Lesther Josias Galeano Meza**
 
----
-
-## ✅ 3. Entregar cementos
-
-El robot debe transportar cementos de diferentes colores hacia sus zonas correspondientes:
-
-- Cementos blancos
-- Cementos verdes
-- Cementos amarillos
-- Cementos azules
-
-Cada cemento debe quedar completamente dentro de su zona objetivo para obtener la puntuación máxima.
+🎓 **Universidad Americana (UAM)**  
+📍 **Managua, Nicaragua**
 
 ---
 
-## ✅ 4. Bonus por barreras
+## 🌍 Contexto del reto
 
-El robot debe evitar mover o dañar las barreras durante el recorrido.
+El reto **Mosaic Masters** está inspirado en la restauración de murales y mosaicos culturales. En esta temporada, el robot representa una solución tecnológica capaz de apoyar en la preservación de obras dañadas por el tiempo, el clima o desastres naturales.
+
+La misión consiste en transportar herramientas, entregar materiales de construcción y colocar piezas de mosaico de forma precisa dentro del campo de juego.
+
+La precisión es clave, ya que el robot debe completar las tareas sin dañar barreras ni mover objetos fuera de sus zonas permitidas.
+
+---
+
+## 🎯 Objetivo del robot
+
+El objetivo principal del robot es completar la mayor cantidad posible de misiones dentro del tiempo permitido, obteniendo la máxima puntuación posible.
+
+Para lograrlo, el robot debe:
+
+- Seguir líneas con precisión.
+- Realizar giros controlados con giroscopio.
+- Transportar y entregar cementos de colores.
+- Manipular herramientas del campo.
+- Detectar patrones de mosaico mediante sensor de color.
+- Ejecutar rutas automatizadas según la matriz detectada.
+- Evitar dañar o mover barreras del campo.
+
+---
+
+## ✅ Misiones principales
+
+### 1. Proveer herramientas
+
+El robot debe manipular y transportar tres herramientas ubicadas en la parte inferior del campo:
+
+- **Pala rectangular** hacia el área del patrocinador.
+- **Balde de cemento** hacia el estacionamiento.
+- **Pala de albañilería** hacia el área de inicio.
+
+Cada herramienta obtiene mayor puntuación si queda completamente dentro de su zona objetivo.
+
+---
+
+### 2. Colocar el mosaico
+
+El robot debe colocar piezas de mosaico dentro del marco central, respetando el patrón de colores indicado por la matriz.
+
+Las piezas pueden ser de color:
+
+- Amarillo
+- Azul
+- Verde
+- Blanco
+
+La puntuación depende de si la pieza queda correctamente colocada, con el color adecuado y estable sobre el suelo.
+
+---
+
+### 3. Entregar cementos
+
+El robot debe transportar cementos de distintos colores hacia sus zonas correspondientes en el centro del campo.
+
+Los colores de cemento son:
+
+- Blanco
+- Verde
+- Amarillo
+- Azul
+
+Cada cemento debe quedar completamente dentro del área objetivo de su mismo color para sumar puntos.
+
+---
+
+### 4. Bonus por barreras
+
+El campo contiene barreras que no deben ser dañadas ni movidas fuera de su área permitida.
 
 Se considera daño si:
 
-- Se cae una pelota
-- Se cae un bloque
-- La barrera sale del área gris permitida
+- Una pelota cae de la barrera.
+- Un bloque se desprende.
+- La barrera queda fuera del área gris permitida.
+
+Mantener las barreras intactas permite obtener puntos extra.
 
 ---
 
-# 🏆 Sistema de puntuación
+## 🏆 Sistema de puntuación
 
-|        Misión        |    Puntos   |
-|----------------------|-------------|
-| Proveer herramientas |    45 pts   |
-| Colocar mosaicos     |    120 pts  |
-| Entregar cementos    |    40 pts   |
-| Bonus por barreras   |    28 pts   |
-|      **TOTAL**       | **233 pts** |
-
-Información basada en el reglamento oficial WRO 2026 RoboMission Senior:
-https://drive.google.com/file/d/1pa7YLOmh9L7Tba4PrCgpwdBuhMukqLua/view?usp=sharing
+| Misión | Descripción | Puntaje máximo |
+|---|---|---:|
+| Proveer herramientas | Colocar correctamente la pala rectangular, el balde de cemento y la pala de albañilería | 45 pts |
+| Colocar mosaico | Colocar piezas de mosaico en el marco según el patrón indicado | 120 pts |
+| Entregar cementos | Llevar cementos a sus zonas de color correspondiente | 40 pts |
+| Bonus por barreras | No mover ni dañar las barreras | 28 pts |
+| **Total máximo** |  | **233 pts** |
 
 ---
 
-# ⚙️ Tecnologías utilizadas
+## ⚙️ Tecnologías utilizadas
 
-## Hardware
+### Hardware
 
 - LEGO SPIKE Prime
+- Hub SPIKE Prime
 - Motores LEGO Powered Up
 - Sensor de color
 - Giroscopio integrado del Hub
+- Mecanismos personalizados para garra, torque y manipulación de piezas
 
----
-
-## Software
+### Software
 
 - Python
 - Pybricks
 - Visual Studio Code
+- GitHub para control y organización del proyecto
 
 ---
 
-# 🧩 Arquitectura del proyecto
+## 📁 Estructura del proyecto
 
-El proyecto fue organizado utilizando principios de programación modular y programación orientada a objetos (POO).
-
-├── main.py
+```text
+WRO_2026/
 │
 ├── Control/
 │   ├── base.py
-│   ├── movimiento.py
 │   ├── giros.py
 │   ├── linea.py
 │   ├── manipuladores.py
-│   ├── utilidades.py
-│   └── matriz_router.py
+│   ├── movimiento.py
+│   ├── robot_config.py
+│   └── utilidades.py
+│
+├── Matrices/
+│   ├── matriz1.py
+│   ├── matriz2.py
+│   ├── matriz3.py
+│   ├── matriz4.py
+│   ├── matriz5.py
+│   └── matriz6.py
 │
 ├── Misiones/
-│   ├── herramientas.py
 │   ├── cementos.py
-│   ├── inicio.py
-│   └── reto_principal.py
+│   ├── herramientas.py
+│   └── matriz_router.py
 │
-└── Matrices/
-    ├── matriz_1.py
-    ├── matriz_2.py
-    ├── matriz_3.py
-    ├── matriz_4.py
-    └── matriz_5.py
+├── main.py
+└── README.md
