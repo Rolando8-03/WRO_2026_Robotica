@@ -1,5 +1,5 @@
 from pybricks.parameters import Stop
-from Misiones.matriz_router import identificar_matriz
+from matriz_router import identificar_matriz
 
 
 def inicio(robot):

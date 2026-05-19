@@ -1,7 +1,7 @@
 from pybricks.parameters import Stop
 from pybricks.tools import wait, StopWatch
 
-from Control import robot_config as config
+import robot_config as config
 
 
 class Manipuladores:

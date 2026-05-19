@@ -1,12 +1,10 @@
-# Misiones/matriz_router.py
-
 from pybricks.parameters import Color
 
-from Matrices.matriz1 import ejecutar_matriz_1
-from Matrices.matriz2 import ejecutar_matriz_2
-from Matrices.matriz3 import ejecutar_matriz_3
-from Matrices.matriz4 import ejecutar_matriz_4
-from Matrices.matriz5 import ejecutar_matriz_5
+from matriz1 import ejecutar_matriz_1
+from matriz2 import ejecutar_matriz_2
+from matriz3 import ejecutar_matriz_3
+from matriz4 import ejecutar_matriz_4
+from matriz5 import ejecutar_matriz_5
 
 MATRIZ_DEFAULT = 1
 
@@ -29,33 +27,33 @@ RUTAS_MATRIZ = {
 
 
 MATRIZ_1 = [
-    ["", "", "", ""],
-    ["", "", "", ""],
-    ["", "", "", ""],
+    ["Az", "Az", "V", "Az"],
+    ["V", "V", "V", "V"],
+    ["Az", "Az", "V", "Az"],
 ]
 
 MATRIZ_2 = [
-    ["", "", "", ""],
-    ["", "", "", ""],
-    ["", "", "", ""],
+    ["Az", "Am", "Az", "Az"],
+    ["Am", "Am", "Am", "Am"],
+    ["Az", "Am", "Az", "Az"],
 ]
 
 MATRIZ_3 = [
-    ["", "", "", ""],
-    ["", "", "", ""],
-    ["", "", "", ""],
+    ["V", "V", "V", "V"],
+    ["B", "B", "B", "B"],
+    ["Am", "Am", "Am", "Am"],
 ]
 
 MATRIZ_4 = [
-    ["", "", "", ""],
-    ["", "", "", ""],
-    ["", "", "", ""],
+    ["Az", "Am", "Az", "Az"],
+    ["Am", "V", "Am", "V"],
+    ["Az", "Am", "Az", "Az"],
 ]
 
 MATRIZ_5 = [
-    ["", "", "", ""],
-    ["", "", "", ""],
-    ["", "", "", ""],
+    ["Am", "Az", "Am", "Az"],
+    ["Am", "Am", "Am", "Az"],
+    ["Az", "Am", "Az", "Az"],
 ]
 
 

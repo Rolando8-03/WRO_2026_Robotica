@@ -2,7 +2,7 @@ from pybricks.hubs import PrimeHub
 from pybricks.pupdevices import Motor, ColorSensor
 from pybricks.tools import wait
 
-from Control import robot_config as config
+import robot_config as config
 
 
 class BaseRobot:

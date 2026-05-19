@@ -1,6 +1,6 @@
 from robot import Robot
-from Misiones.retos_principales import inicio, dejar_balde_cemento, blancos, verdes, amarillos, azules
-from Misiones.matriz_router import ejecutar_matriz
+from retos_principales import inicio, dejar_balde_cemento, blancos, verdes, amarillos, azules
+from matriz_router import ejecutar_matriz
 
 
 def main():

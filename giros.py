@@ -1,6 +1,6 @@
 from pybricks.tools import wait
 
-from Control import robot_config as config
+import robot_config as config
 
 
 class Giros:
