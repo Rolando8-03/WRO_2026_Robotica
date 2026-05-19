@@ -449,7 +449,9 @@ robot.mover_garra(300, -100)
 
 #================================================
 
-robot.retroceder(distancia_cm=11.5, velocidad=800, perfil="seguro", invertir_correccion=False, pausa_gyro=25)
+robot.retroceder(distancia_cm=15.5, velocidad=800, perfil="seguro", invertir_correccion=False, pausa_gyro=25)
 robot.esperar(280)
-robot.girar(85, velocidad=1200, velocidad_min=160, anticipacion=0, perfil="encadenado")
-robot.mover_torque(-170, 800, esperar= False, modo_final= Stop.HOLD)
+robot.girar(75, velocidad=1200, velocidad_min=160, anticipacion=0, perfil="encadenado")
+robot.mover_torque(175, 800, esperar= False, modo_final= Stop.HOLD)
+
+ejecutar_matriz(robot, matriz_detectada)
