@@ -1,3 +1,14 @@
+def main():
+    #Inicializar clase, matriz y batería
+    robot = Robot()
+    robot.mostrar_bateria()
+    matriz_detectada = None
+
+    ejecutar_matriz1()
+
+if __name__ == "__main__":
+    main()
+    
 def ejecutar_matriz_1(robot):
     print("Ejecutando recorrido de matriz 1")
 
