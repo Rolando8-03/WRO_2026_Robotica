@@ -1,14 +1,3 @@
-def main():
-    #Inicializar clase, matriz y batería
-    robot = Robot()
-    robot.mostrar_bateria()
-    matriz_detectada = None
-
-    ejecutar_matriz1()
-
-if __name__ == "__main__":
-    main()
-    
 def ejecutar_matriz_1(robot):
     print("Ejecutando recorrido de matriz 1")
 
@@ -73,3 +62,17 @@ def ejecutar_matriz_1(robot):
     robot.retroceder(13, 600)
 
     robot.mover_garra_delantera(-286, velocidad=300)
+
+'''
+#Para pruebas solo con la matriz descomentar esta parte
+from robot import Robot
+
+def main():
+    robot = Robot()
+    robot.mostrar_bateria()
+
+    ejecutar_matriz_1(robot)
+
+if __name__ == "__main__":
+    main()
+'''
