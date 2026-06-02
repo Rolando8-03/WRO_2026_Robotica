@@ -17,9 +17,9 @@ def main():
     matriz_detectada = blancos(robot)
     verdes(robot)
     amarillos(robot)
-    azules(robot)
-
+    paleta(robot)
     ejecutar_matriz(robot, matriz_detectada)
+    azules(robot)
 
 
 if __name__ == "__main__":
