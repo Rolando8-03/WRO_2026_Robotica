@@ -123,7 +123,7 @@ def amarillos(robot):
     robot.girar(-65, 1200, 0)
 
 
-def azules(robot):
+def paleta(robot):
     #Después de salir de la zona, se dirige a los azules
     robot.seguir_linea(46, "derecha")
     robot.esperar(300)
@@ -156,3 +156,14 @@ def azules(robot):
     robot.esperar(280)
     robot.girar(75, 1200, 0)
     robot.mover_torque(175,800,esperar=False,modo_final=Stop.HOLD)
+
+
+def azules(robot):
+    robot.retroceder(25,800)
+    robot.girar(90,1000,8)
+    robot.avanzar(26)
+    robot.girar(90,1000,8)
+    robot.avanzar_con_torque(-15,-168,600)
+    #Aqui ya agarro los cementos azules
+
+    robot.avanzar(10)
