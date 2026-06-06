@@ -1,23 +1,37 @@
 def ejecutar_matriz_1(robot):
     print("Ejecutando recorrido de matriz 1")
 
-    robot.seguir_linea(31.5,"derecha",100,tiempo_acomodo_ms=400,kp=0.48,kd=1.70,k_freno=0.52)
+    robot.mover_garra(-130, velocidad=850)
+    robot.seguir_linea(29, "derecha")
+    robot.girar(-92, 1000, 8)
+    robot.avanzar(8.5)
+    robot.mover_garra_delantera(286, velocidad=850)
+    #Aqui ya agarro los primeros dos bloques verdes
 
-    robot.girar(-89, 500)
+    robot.retroceder(10, 800)
+    robot.girar(-90, 1000, 8)
+    robot.seguir_linea(13,"izquierda")
+    robot.esperar(300)
+    robot.girar(80, 1000, 8)
+    robot.esperar(300)
+    robot.mover_garra_delantera(-140, velocidad=850)
+    robot.avanzar(16)
+    robot.mover_garra_delantera(140, velocidad=850)
+    #Aqui ya agarro los dos bloques azules
 
-    robot.avanzar(15.5, 850)
+    robot.retroceder(12, 800)
+    robot.girar(89, 1000,8)
+    robot.avanzar(3)
+    robot.girar(-82, 1000,8)
+    robot.mover_garra(90, velocidad=850)
+    robot.avanzar(15)
+    robot.mover_garra(30, velocidad=850)
+    #Aqui ya agarro los ultimos dos bloques de en medio de la matriz
 
-    robot.mover_garra(-130, velocidad=150)
-    robot.mover_garra_delantera(286, velocidad=300)
-
-    robot.retroceder(25, 600)
-
-    robot.girar(90, 500)
-
-    robot.retroceder(14.5, 600)
-
-    robot.girar(-89, 500)
-
+    robot.retroceder(10)
+    robot.giro_izquierda(-90)
+    robot.mover_garra(-130, velocidad=850)
+    '''
     robot.mover_garra_delantera(-286, velocidad=300)
 
     robot.avanzar(24.5, 850)
@@ -62,9 +76,8 @@ def ejecutar_matriz_1(robot):
     robot.retroceder(13, 600)
 
     robot.mover_garra_delantera(-286, velocidad=300)
+    '''
 
-'''
-#Para pruebas solo con la matriz descomentar esta parte
 from robot import Robot
 
 def main():
@@ -75,4 +88,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-'''
