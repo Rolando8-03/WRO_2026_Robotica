@@ -72,7 +72,7 @@ def ejecutar_matriz_2(robot):
     )
 
     robot.avanzar_recto(
-        distancia_cm=11,
+        distancia_cm=12,
         velocidad_max=900,
         perfil="encadenado"
     )
@@ -82,7 +82,7 @@ def ejecutar_matriz_2(robot):
 
 #Salir del azul
     robot.avanzar_recto(
-        distancia_cm=-20,
+        distancia_cm=-21,
         velocidad_max=700,
         perfil="seguro"
     )
@@ -101,7 +101,7 @@ def ejecutar_matriz_2(robot):
     robot.seguir_linea(
         sensor_color=robot.seguidor,
         velocidad_max=60,
-        distancia_cm=11,
+        distancia_cm=10,
         lado="izquierda",
         tiempo_acomodo_ms=140,
         tiempo_aceleracion_ms=140,
@@ -130,7 +130,6 @@ def ejecutar_matriz_2(robot):
     )
 
     robot.mover_garra_delantera(600, -25)
-    wait(300)
 
     robot.mover_garra_principal(
         300,
@@ -208,8 +207,8 @@ def ejecutar_matriz_2(robot):
 
     robot.seguir_linea(
         sensor_color=robot.seguidor,
-        velocidad_max=80,
-        distancia_cm=13,
+        velocidad_max=70,
+        distancia_cm=12,
         lado="derecha",
         tiempo_acomodo_ms=140,
         tiempo_aceleracion_ms=140,
@@ -244,7 +243,7 @@ def ejecutar_matriz_2(robot):
     robot.seguir_linea(
         sensor_color=robot.seguidor,
         velocidad_max=100,
-        distancia_cm=13,
+        distancia_cm=15,
         lado="derecha",
         tiempo_acomodo_ms=140,
         tiempo_aceleracion_ms=140,
@@ -260,12 +259,7 @@ def ejecutar_matriz_2(robot):
         perfil_salida="encadenado"
     )
 
-    robot.mover_garra_principal(
-        500,
-        -50,
-        esperar=False,
-        potencia_apriete=100
-    )
+    robot.mover_garra_principal(500, -50, esperar=False, potencia_apriete=140)
 
     robot.mover_garra_delantera(600, -150)
 
@@ -281,7 +275,7 @@ def ejecutar_matriz_2(robot):
     robot.girar_corto(-11)
 
     robot.avanzar_recto(
-        distancia_cm=14,
+        distancia_cm=13,
         velocidad_max=650,
         perfil="encadenado"
     )
@@ -295,19 +289,18 @@ def ejecutar_matriz_2(robot):
     )
 
     robot.avanzar_recto(
-        distancia_cm=0.2,
+        distancia_cm=0.4,
         velocidad_max=650,
         zona_rampa_cm=0.1,
         perfil="encadenado"
     )
 
-    robot.mover_garra_delantera(400, 55)
+    robot.mover_garra_delantera(400, 60)
 
     # Sacudida: aquí sí se usa exclusivamente girar_corto().
     for i in range(4):
-        robot.girar_corto(8 ,potencia_max=75, potencia_min=45)
-        robot.girar_corto(-8, potencia_max=75, potencia_min=45)
-
+        robot.girar_corto(8 ,potencia_max=60, potencia_min=45)
+        robot.girar_corto(-8, potencia_max=60, potencia_min=45)
 
     robot.avanzar_recto(
         distancia_cm=-1,
@@ -319,12 +312,196 @@ def ejecutar_matriz_2(robot):
     robot.mover_garra_delantera(400, -120)
 
     robot.avanzar_recto(
-        distancia_cm=-12,
+        distancia_cm=-18,
         velocidad_max=400,
         perfil="seguro"
     )
 
-    
+    robot.girar(
+        180,
+        potencia_max=90,
+        potencia_min=35,
+        kp_base=5.0,
+        tolerancia_fin=1.0,
+        perfil="encadenado"
+    )
+
+    robot.seguir_linea(
+        sensor_color=robot.seguidor,
+        velocidad_max=80,
+        distancia_cm=24,
+        lado="izquierda",
+        tiempo_acomodo_ms=140,
+        tiempo_aceleracion_ms=140,
+        kp=1.25,
+        kd=2.7,
+        k_freno=0.16,
+        correccion_max=100,
+        objetivo_reflexion=27,
+        captura_inicial=True,
+        tiempo_captura_ms=280,
+        potencia_captura=60,
+        kp_captura=2.5,
+        perfil_salida="encadenado"
+    )
+
+    robot.girar(
+        -90,
+        potencia_max=90,
+        potencia_min=35,
+        kp_base=5.0,
+        tolerancia_fin=1.0,
+        perfil="encadenado"
+    )
+
+    robot.avanzar_recto(
+        distancia_cm=4.65,
+        velocidad_max=400,
+        perfil="seguro"
+
+    )
+
+    robot.girar(
+        90,
+        potencia_max=90,
+        potencia_min=35,
+        kp_base=5.0,
+        tolerancia_fin=1.0,
+        perfil="encadenado"
+    )
+
+
+    robot.seguir_linea(
+        sensor_color=robot.seguidor,
+        velocidad_max=80,
+        distancia_cm=9,
+        lado="derecha",
+        tiempo_acomodo_ms=140,
+        tiempo_aceleracion_ms=140,
+        kp=1.25,
+        kd=2.7,
+        k_freno=0.16,
+        correccion_max=100,
+        objetivo_reflexion=27,
+        captura_inicial=True,
+        tiempo_captura_ms=280,
+        potencia_captura=60,
+        kp_captura=2.5,
+        perfil_salida="encadenado"
+    )
+
+    robot.avanzar_recto(
+        distancia_cm=22,
+        velocidad_max=400,
+        perfil="seguro"
+
+    )
+
+    robot.mover_garra_delantera(400, 120)
+
+    robot.avanzar_recto(
+        distancia_cm=-26,
+        velocidad_max=400,
+        perfil="seguro"
+
+    )
+
+    robot.girar(
+        -90,
+        potencia_max=90,
+        potencia_min=35,
+        kp_base=5.0,
+        tolerancia_fin=1.0,
+        perfil="encadenado"
+    )
+
+    robot.seguir_linea(
+        sensor_color=robot.seguidor,
+        velocidad_max=60,
+        distancia_cm=13,
+        lado="izquierda",
+        tiempo_acomodo_ms=140,
+        tiempo_aceleracion_ms=140,
+        kp=1.25,
+        kd=2.7,
+        k_freno=0.16,
+        correccion_max=100,
+        objetivo_reflexion=27,
+        captura_inicial=True,
+        tiempo_captura_ms=280,
+        potencia_captura=60,
+        kp_captura=2.5,
+        perfil_salida="encadenado"
+    )
+
+    wait(200)
+
+    robot.girar(
+        90,
+        potencia_max=90,
+        potencia_min=35,
+        kp_base=5.0,
+        tolerancia_fin=1.0,
+        perfil="encadenado"
+    )
+
+    robot.mover_garra_delantera(600, -25)
+
+    robot.mover_garra_principal(
+        300,
+        -20,
+        esperar=False,
+        apretar=False
+    )
+
+    wait(300)
+
+    robot.avanzar_recto(
+        distancia_cm=14,
+        velocidad_max=750,
+        perfil="encadenado"
+    )
+
+    robot.mover_garra_delantera(600, 15)
+
+    robot.mover_garra_principal(
+        300,
+        -50,
+        esperar=False,
+        potencia_apriete=80,
+        apretar=True
+    )
+
+    robot.mover_garra_delantera(600, -70)
+
+    robot.avanzar_recto(
+        distancia_cm=14,
+        velocidad_max=550,
+        perfil="seguro"
+    )
+
+    robot.mover_garra_delantera(600, 70)
+
+    robot.avanzar_recto(
+        distancia_cm=-40,
+        velocidad_max=550,
+        perfil="seguro"
+    )
+
+    robot.girar(
+        89,
+        potencia_max=90,
+        potencia_min=35,
+        kp_base=5.0,
+        tolerancia_fin=1.0,
+        perfil="encadenado"
+    )
+
+    robot.avanzar_recto(
+        distancia_cm=-15,
+        velocidad_max=550,
+        perfil="seguro"
+    )
 
 
 if __name__ == "__main__":
