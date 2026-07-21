@@ -17,7 +17,6 @@ import deteccion_color
 import actuadores
 import matriz
 
-
 class Base:
     # -------------------------------------------------------------------------
     # __init__
@@ -143,5 +142,8 @@ class Base:
 
     # Realiza giros pequeños y rápidos sin bloquearse al final.
     girar_corto = navegacion.girar_corto
+
+    #Función para dejar los bloques en la matriz.
+    dejar_bloques_matriz = matriz.dejar_bloques_matriz
 
     
