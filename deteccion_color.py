@@ -173,7 +173,8 @@ def avanzar_cruzando_lineas(
     margen_linea_cm=3.5,
     kp_gyro=20.0,
     perfil="seguro",
-    retraso_freno_ms=0
+    retraso_freno_ms=0,
+    distancia_extra_cm=0
 ):
     self.preparar_movimiento(
         reset_motores=False,
@@ -188,7 +189,7 @@ def avanzar_cruzando_lineas(
 
     conteo_cruces = 0
 
-    # Distancia durante la que se ignora el sensor al comienzo.
+    # Distancia durante la que se ignora el sensor al comenzar.
     distancia_desbloqueo_mm = escape_inicial_cm * 10
 
     while True:
@@ -208,9 +209,9 @@ def avanzar_cruzando_lineas(
             error_gyro * kp_gyro
         )
 
-        # Ventana ciega para ignorar una línea inicial o el grosor
-        # de una línea que acaba de ser contada.
+        # Ignora una línea inicial o el grosor de la última línea.
         if distancia_actual_mm < distancia_desbloqueo_mm:
+            wait(2)
             continue
 
         hsv = self.seguidor.hsv()
@@ -225,46 +226,86 @@ def avanzar_cruzando_lineas(
             conteo_cruces += 1
 
             if conteo_cruces >= cruces_objetivo:
-                # Permite avanzar un poco más después de detectar
-                # la última línea antes de frenar.
-                if retraso_freno_ms > 0:
-                    reloj_extra = StopWatch()
-                    reloj_extra.reset()
-
-                    while reloj_extra.time() < retraso_freno_ms:
-                        actual_heading_extra = (
-                            self.Hub.imu.heading()
-                        )
-
-                        error_gyro_extra = self._error_angular(
-                            heading_objetivo,
-                            actual_heading_extra
-                        )
-
-                        self.drive_base.drive(
-                            abs(velocidad) * signo,
-                            error_gyro_extra * kp_gyro
-                        )
-
                 break
 
-            # Ignora el sensor durante cierta distancia para no volver
-            # a contar la misma línea.
+            # Evita contar varias veces la misma línea.
             distancia_desbloqueo_mm = (
                 distancia_actual_mm
                 + margen_linea_cm * 10
             )
 
+        wait(2)
+
+    # ==================================================================
+    # AVANCE EXTRA POR DISTANCIA DESPUÉS DE LA ÚLTIMA LÍNEA
+    # ==================================================================
+    if abs(distancia_extra_cm) > 0:
+        self.drive_base.reset()
+
+        distancia_extra_mm = (
+            abs(distancia_extra_cm) * 10
+        )
+
+        # Normalmente continúa en el mismo sentido.
+        signo_extra = (
+            signo
+            if distancia_extra_cm > 0
+            else -signo
+        )
+
+        while (
+            abs(self.drive_base.distance())
+            < distancia_extra_mm
+        ):
+            actual_heading = self.Hub.imu.heading()
+
+            error_gyro = self._error_angular(
+                heading_objetivo,
+                actual_heading
+            )
+
+            self.drive_base.drive(
+                abs(velocidad) * signo_extra,
+                error_gyro * kp_gyro
+            )
+
+            wait(2)
+
+    # Retraso opcional adicional basado en tiempo.
+    if retraso_freno_ms > 0:
+        reloj_extra = StopWatch()
+        reloj_extra.reset()
+
+        while reloj_extra.time() < retraso_freno_ms:
+            actual_heading = self.Hub.imu.heading()
+
+            error_gyro = self._error_angular(
+                heading_objetivo,
+                actual_heading
+            )
+
+            self.drive_base.drive(
+                abs(velocidad) * signo,
+                error_gyro * kp_gyro
+            )
+
+            wait(2)
+
     self.drive_base.stop()
 
-    self.motor_izquierdo.brake()
-    self.motor_derecho.brake()
-    wait(60)
+    if perfil == "encadenado":
+        self.motor_izquierdo.brake()
+        self.motor_derecho.brake()
+        wait(10)
 
-    self.motor_izquierdo.hold()
-    self.motor_derecho.hold()
-    wait(20)
+    else:
+        self.motor_izquierdo.brake()
+        self.motor_derecho.brake()
+        wait(60)
 
+        self.motor_izquierdo.hold()
+        self.motor_derecho.hold()
+        wait(20)
 
 # -----------------------------------------------------------------------------
 # avanzar_hibrido
