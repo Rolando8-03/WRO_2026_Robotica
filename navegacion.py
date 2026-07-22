@@ -421,62 +421,101 @@ def _giro_un_motor(
     angulo_deg,
     sentido_motor,
     velocidad=1000,
-    velocidad_min=260,
-    anticipacion=12,
-    zona_freno=28,
+    velocidad_min=180,
+    zona_freno=22,
+    tolerancia=1.2,
+    tiempo_max_ms=None,
     perfil="seguro"
 ):
     if angulo_deg == 0:
         return
 
+    # No es necesario reiniciar el giroscopio.
+    # Medimos el giro desde el heading actual.
     self.preparar_movimiento(
         reset_motores=False,
-        reset_gyro=True,
+        reset_gyro=False,
         perfil=perfil
     )
 
-    objetivo = abs(angulo_deg)
-    objetivo_corte = max(0, objetivo - anticipacion)
+    inicio = self.Hub.imu.heading()
+    objetivo = inicio + angulo_deg
 
-    signo = 1 if angulo_deg > 0 else -1
+    # La rueda de apoyo debe permanecer firmemente inmóvil.
+    motor_fijo.hold()
+    wait(3)
 
-    motor_fijo.brake()
-    wait(2)
+    # Timeout proporcional al tamaño del giro.
+    if tiempo_max_ms is None:
+        tiempo_max_ms = max(
+            350,
+            int(abs(angulo_deg) * 18)
+        )
 
-    while True:
-        actual = abs(self.Hub.imu.heading())
+    cronometro = StopWatch()
+    cronometro.reset()
 
-        if actual >= objetivo_corte:
-            break
+    lecturas_estables = 0
 
-        restante = objetivo_corte - actual
+    while cronometro.time() < tiempo_max_ms:
+        actual = self.Hub.imu.heading()
+        error = self._error_angular(objetivo, actual)
+        error_abs = abs(error)
 
-        if restante > zona_freno:
-            vel = velocidad
+        # Dos lecturas consecutivas dentro de tolerancia.
+        if error_abs <= tolerancia:
+            lecturas_estables += 1
+
+            if lecturas_estables >= 2:
+                break
         else:
-            vel = max(
-                velocidad_min,
-                int(velocidad * restante / zona_freno)
+            lecturas_estables = 0
+
+        # Velocidad máxima lejos del objetivo.
+        if error_abs >= zona_freno:
+            velocidad_actual = velocidad
+        else:
+            # Reducción progresiva al acercarse al objetivo.
+            proporcion = error_abs / zona_freno
+
+            velocidad_actual = (
+                velocidad_min
+                + (velocidad - velocidad_min) * proporcion
             )
 
-        potencia = vel * signo * sentido_motor
-        potencia = self.limitar(potencia, -1000, 1000)
+        velocidad_actual = int(
+            self.limitar(
+                velocidad_actual,
+                velocidad_min,
+                velocidad
+            )
+        )
 
-        motor_activo.run(potencia)
+        # El signo del error permite corregir un sobrepaso.
+        direccion_error = 1 if error > 0 else -1
 
-        wait(1)
+        velocidad_motor = (
+            velocidad_actual
+            * direccion_error
+            * sentido_motor
+        )
 
+        motor_activo.run(velocidad_motor)
+
+        wait(2)
+
+    # Frenado corto para eliminar inercia.
     motor_activo.brake()
-    motor_fijo.brake()
+    motor_fijo.hold()
+    wait(12)
 
     if perfil == "encadenado":
-        wait(8)
+        motor_activo.stop()
+        wait(2)
     else:
-        wait(22)
-
-    motor_activo.stop()
-    motor_fijo.stop()
-    wait(2)
+        motor_activo.hold()
+        motor_fijo.hold()
+        wait(15)
 
 # -----------------------------------------------------------------------------
 # giro_derecha
@@ -486,9 +525,9 @@ def giro_derecha(
     self,
     angulo_deg,
     velocidad=1000,
-    velocidad_min=260,
-    anticipacion=12,
-    zona_freno=28,
+    velocidad_min=180,
+    zona_freno=22,
+    tolerancia=1.2,
     perfil="seguro"
 ):
     self._giro_un_motor(
@@ -498,22 +537,19 @@ def giro_derecha(
         sentido_motor=-1,
         velocidad=velocidad,
         velocidad_min=velocidad_min,
-        anticipacion=anticipacion,
         zona_freno=zona_freno,
+        tolerancia=tolerancia,
         perfil=perfil
     )
 
-# -----------------------------------------------------------------------------
-# giro_izquierda
-# Gira apoyándose en un solo motor del lado izquierdo mediante la función interna de giro.
-# -----------------------------------------------------------------------------
+#Giro izquierda
 def giro_izquierda(
     self,
     angulo_deg,
     velocidad=1000,
-    velocidad_min=260,
-    anticipacion=12,
-    zona_freno=28,
+    velocidad_min=180,
+    zona_freno=22,
+    tolerancia=1.2,
     perfil="seguro"
 ):
     self._giro_un_motor(
@@ -523,8 +559,8 @@ def giro_izquierda(
         sentido_motor=1,
         velocidad=velocidad,
         velocidad_min=velocidad_min,
-        anticipacion=anticipacion,
         zona_freno=zona_freno,
+        tolerancia=tolerancia,
         perfil=perfil
     )
 
