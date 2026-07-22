@@ -120,10 +120,11 @@ robot.girar(angulo_deg=90, potencia_max=85, perfil="encadenado")
 wait(100) 
 
 robot.mover_torque(grados_torque=166, velocidad_torque=300, esperar=False)
-robot.avanzar_recto(distancia_cm=-5, velocidad_max=900, perfil="encadenado") 
+robot.avanzar_recto(distancia_cm=-8.5, velocidad_max=900, perfil="encadenado") 
+robot.avanzar_recto(4, 850)
 
 # SECCIÓN 3 (IR POR LOS CEMENTOS BLANCOS) =======================================================================
-robot.giro_derecha(-93, 900)
+robot.giro_derecha(-92, 900)
 robot.seguir_linea(
     sensor_color=robot.seguidor,
     distancia_cm=19,           
@@ -199,7 +200,7 @@ robot.seguir_linea_hasta_color(
     velocidad_max=95, 
     lado="izquierda"
 )
-robot.giro_izquierda(15, 800)
+robot.girar_corto(10, potencia_max=75, potencia_min=45)
 robot.avanzar_recto(14, 700)
 matriz_detectada = robot.escanear_matriz()
 
