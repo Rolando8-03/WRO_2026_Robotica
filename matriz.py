@@ -119,7 +119,7 @@ def escanear_matriz(self):
     return matriz_detectada
 
 def dejar_bloques_matriz(self, robot, distancia_matriz=14):
-    robot.seguir_linea(velocidad_max=80,distancia_cm=distancia_seguidor, tiempo_aceleracion_ms=140,
+    robot.seguir_linea(velocidad_max=80,distancia_cm=13, tiempo_aceleracion_ms=140,
     kp=1.25,kd=2.7,k_freno=0.16,tiempo_captura_ms=280,potencia_captura=60,kp_captura=2.5)
     robot.mover_garra_principal(300,80,esperar=False)
     robot.mover_garra_delantera(600, -90)
