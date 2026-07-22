@@ -11,7 +11,7 @@ from pybricks.tools import wait
 def ejecutar_matriz_3(robot):
     """Ejecuta el recorrido activo de la matriz 2."""
 
-
+    #Tomar los bloques verdes
     robot.avanzar_cruzando_lineas(cruces_objetivo=2, velocidad= 500, distancia_extra_cm=15)
     robot.girar(-90, 100, perfil="encadenado")
 
@@ -34,10 +34,9 @@ def ejecutar_matriz_3(robot):
         apretar=True
     )
     
-    robot.avanzar_recto(-14.3, velocidad_max=800)
-
+    robot.avanzar_recto(-17, velocidad_max=800)
     robot.girar(-90, 100)
-
+    
     wait(100)
 
     robot.mover_garra_principal(
@@ -49,12 +48,16 @@ def ejecutar_matriz_3(robot):
         velocidad=850,
         grados=-270
     )
-    robot.avanzar_recto(-5.5, 700)
+    robot.avanzar_recto(-7, 700)
+
+    robot.giro_izquierda(35)
+    robot.giro_derecha(-35)
+
 
     robot.seguir_linea(
         sensor_color=robot.seguidor,
         velocidad_max=100,
-        distancia_cm=31,
+        distancia_cm=24,
         lado="derecha",
         perfil_salida="encadenado"    
     )
@@ -66,7 +69,7 @@ def ejecutar_matriz_3(robot):
         grados=273
     )
 
-    robot.avanzar_recto(9, 800)
+    robot.avanzar_recto(12, 800)
 
     robot.mover_garra_principal(
         velocidad=500,
@@ -75,7 +78,7 @@ def ejecutar_matriz_3(robot):
         apretar=True
     )
 
-    robot.avanzar_recto(distancia_cm=-11.6, velocidad_max=800)
+    robot.avanzar_recto(distancia_cm=-14, velocidad_max=800)
 
     robot.girar(90)
 
@@ -84,17 +87,22 @@ def ejecutar_matriz_3(robot):
         grados=34
     )
 
+    robot.avanzar_recto(-7, 700)
+
     robot.mover_garra_delantera(
         velocidad=850,
         grados=-270
     )
 
 
+    robot.giro_derecha(-28)
+    robot.giro_izquierda(28)
+    
     robot.seguir_linea(
         sensor_color=robot.seguidor,
         velocidad_max=100,
         distancia_cm=37,
-        lado="derecha",
+        lado="izquierda",
         perfil_salida="encadenado"    
     )
 
@@ -230,7 +238,7 @@ def ejecutar_matriz_3(robot):
     robot.mover_garra_delantera(400, -120)
     
 
-#Tomar los siguientes seis bloques de la matriz=====================
+#Tomar los siguientes seis bloques de la matriz==============================================================================
     robot.avanzar_recto(-60, 850)
 
     robot.girar(-88)
@@ -242,7 +250,7 @@ def ejecutar_matriz_3(robot):
 
     robot.mover_garra_delantera(
         velocidad=800,
-        grados=120
+        grados=117
     )
 
     robot.avanzar_recto(7, 800)
@@ -254,10 +262,10 @@ def ejecutar_matriz_3(robot):
         apretar=True
     )
 
-    robot.avanzar_recto(-15, velocidad_max=800)
+    robot.avanzar_recto(-17, velocidad_max=800)
 
     robot.girar(-90, 100)
-
+    
     wait(100)
 
     robot.mover_garra_principal(
@@ -269,12 +277,17 @@ def ejecutar_matriz_3(robot):
         velocidad=850,
         grados=-270
     )
-    robot.avanzar_recto(-5, 700)
+    robot.avanzar_recto(-7, 700)
+
+    robot.giro_izquierda(35)
+    robot.giro_derecha(-35)
+
+    wait(100)
 
     robot.seguir_linea(
         sensor_color=robot.seguidor,
         velocidad_max=100,
-        distancia_cm=35,
+        distancia_cm=24,
         lado="derecha",
         perfil_salida="encadenado"    
     )
@@ -283,7 +296,7 @@ def ejecutar_matriz_3(robot):
 
     robot.mover_garra_delantera(
         velocidad=800,
-        grados=260
+        grados=273
     )
 
     robot.avanzar_recto(14, 800)
@@ -295,7 +308,7 @@ def ejecutar_matriz_3(robot):
         apretar=True
     )
 
-    robot.avanzar_recto(distancia_cm=-16.8, velocidad_max=800)
+    robot.avanzar_recto(distancia_cm=-16, velocidad_max=800)
 
     robot.girar(90)
 
@@ -304,22 +317,71 @@ def ejecutar_matriz_3(robot):
         grados=34
     )
 
+    robot.avanzar_recto(-7, 700)
+
     robot.mover_garra_delantera(
         velocidad=850,
         grados=-270
     )
+
+
+    robot.giro_derecha(-28)
+    robot.giro_izquierda(28)
+    
+    robot.seguir_linea(
+        sensor_color=robot.seguidor,
+        velocidad_max=100,
+        distancia_cm=36.3,
+        lado="izquierda",
+        perfil_salida="encadenado"    
+    )
+
+    
+    robot.giro_derecha(-90, velocidad= 600)
+
+    robot.mover_garra_delantera(
+        velocidad=800,
+        grados=271
+    )
+
+    robot.mover_garra_principal(
+        velocidad=500,
+        grados=20,
+    )
+
+
+    robot.avanzar_recto(12, 500)
+
+    robot.mover_garra_principal(
+        velocidad=500,
+        grados=-40,
+        potencia_apriete=40,
+        apretar=True
+    )
+
+    robot.avanzar_recto(-18, 500)
+    robot.girar(-90)
+
+    robot.avanzar_recto(28)
+
+    robot.girar(-90)
+
+
+
+
+    '''
 
 #Seguir linea para ir por los blancos #======================================
 
     robot.seguir_linea(
         sensor_color=robot.seguidor,
         velocidad_max=100,
-        distancia_cm=34,
+        distancia_cm=36,
         lado="derecha",
         perfil_salida="encadenado"    
     )
 
-    robot.giro_derecha(-101, velocidad= 600)
+    robot.giro_derecha(-100, velocidad= 600)
 
     robot.mover_garra_delantera(
         velocidad=800,
@@ -338,7 +400,7 @@ def ejecutar_matriz_3(robot):
     robot.avanzar_recto(-18, 500)
     robot.girar(-90)
 
-    robot.avanzar_recto(24)
+    robot.avanzar_recto(26)
 
     robot.girar(-90)
 
@@ -377,7 +439,7 @@ def ejecutar_matriz_3(robot):
         perfil="seguro"
     )
 
-    robot.mover_garra_delantera(600, 95)
+    robot.mover_garra_delantera(600, 98)
 
     robot.seguir_linea(
         sensor_color=robot.seguidor,
@@ -447,37 +509,13 @@ def ejecutar_matriz_3(robot):
         robot.girar_corto(-8, potencia_max=75, potencia_min=45)
 
     robot.mover_garra_delantera(400, -120)
+    '''
     
 
     ###
-
-
-    
-
-    
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
- 
-    
 
 
 if __name__ == "__main__":
     robot = Base()
     print("Voltaje:", robot.Hub.battery.voltage())
     ejecutar_matriz_3(robot)
-
-
