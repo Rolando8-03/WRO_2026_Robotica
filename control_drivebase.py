@@ -129,9 +129,6 @@ class Base:
     #Abre o cierra la garra usando una versión rápida
     mover_garra_rapida = actuadores.mover_garra_rapida
 
-    #Detiene la presion continua de la garra principal
-    soltar_garra_principal = actuadores.soltar_garra_principal
-
 
     # ================================ MATRIZ ================================
     # Función interna que determina un color mediante varias lecturas estáticas.
