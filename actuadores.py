@@ -57,88 +57,68 @@ def mover_garra_delantera(
         wait=esperar
     )
 
-
-# -----------------------------------------------------------------------------
-# mover_garra_principal
-# Abre o cierra la garra principal. Cuando cierra, puede mantener una presión
-# constante para sujetar el objeto después de completar el movimiento.
-#
-# Convención conservada del código original:
-# - grados positivos: mueve la garra en dirección de apertura.
-# - grados negativos: mueve la garra en dirección de cierre.
-# -----------------------------------------------------------------------------
 def mover_garra_principal(
     self,
     velocidad,
-    grados,
+    grados=0,
     esperar=True,
     potencia_apriete=60,
     tiempo_apriete_ms=120,
-    apretar=True
+    apretar=True,
+    modo_soltar=None
 ):
+    # 1. FUNCIÓN "SOLTAR" FUSIONADA
+    # Si envías un modo_soltar, ignora los grados y ejecuta la acción directa.
+    if modo_soltar == "hold":
+        self.motor_garra.hold()
+        return
+    elif modo_soltar == "stop":
+        self.motor_garra.stop()
+        return
+    elif modo_soltar == "brake":
+        self.motor_garra.brake()
+        return
+
     if grados == 0:
         return
 
+    # 2. TOPE DE SEGURIDAD (Protección directa)
+    # Si le pides más de 170 grados, lo recorta a 170 automáticamente.
+    if abs(grados) > 170:
+        grados = 170 if grados > 0 else -170
+
     self.motor_garra.stop()
 
-    # Abrir la garra.
+    # 3. ABRIR (grados positivos -> movimiento negativo)
     if grados > 0:
         wait(40)
-
         self.motor_garra.run_angle(
-            velocidad,
+            abs(velocidad),
             -abs(grados),
-            then=Stop.BRAKE,
+            then=Stop.HOLD,  # ¡Esto ancla la garra rígidamente!
             wait=esperar
         )
 
-    # Cerrar la garra.
+    # 4. CERRAR (grados negativos -> movimiento positivo)
     else:
         wait(20)
-
-        # La presión posterior depende de que primero se complete el cierre.
-        # Por eso esta parte conserva wait=True.
         self.motor_garra.run_angle(
-            velocidad,
+            abs(velocidad),
             abs(grados),
-            then=Stop.BRAKE,
+            then=Stop.HOLD,  # ¡Esto ancla la garra rígidamente!
             wait=True
         )
 
         if apretar:
+            # Asegura que el valor esté en un rango seguro
+            if hasattr(self, 'limitar'):
+                potencia_apriete = self.limitar(potencia_apriete, -100, 100)
+                
             self.motor_garra.dc(potencia_apriete)
             wait(tiempo_apriete_ms)
+            # En lugar de dejar un voltaje continuo que resbala, forzamos HOLD
+            self.motor_garra.hold()
 
-            # Mantiene la presión después de terminar la función.
-            self.motor_garra.dc(potencia_apriete)
-
-
-# -----------------------------------------------------------------------------
-# soltar_garra_principal
-# Detiene la presión continua de la garra principal.
-# Debe usarse antes de abrirla o cuando ya no sea necesario sujetar el objeto.
-# -----------------------------------------------------------------------------
-def soltar_garra_principal(self, modo="brake"):
-    if modo == "hold":
-        self.motor_garra.hold()
-
-    elif modo == "stop":
-        self.motor_garra.stop()
-
-    else:
-        self.motor_garra.brake()
-
-
-# -----------------------------------------------------------------------------
-# mover_torque_seguro
-# Mueve el motor de torque hasta encontrar resistencia física.
-# Esta función es útil para buscar un tope mecánico y evitar forzar el motor.
-#
-# IMPORTANTE:
-# run_until_stalled() no se detiene al alcanzar grados_torque; se detiene
-# únicamente cuando detecta que el motor se ha atascado. El argumento
-# grados_torque se usa aquí para elegir la dirección y comparar el recorrido.
-# -----------------------------------------------------------------------------
 def mover_torque_seguro(
     self,
     grados_torque,
@@ -221,84 +201,6 @@ def mover_garra_delantera(
         wait=esperar
     )
 
-# -----------------------------------------------------------------------------
-# mover_garra_principal
-# Abre o cierra la garra principal.
-#
-# Convención:
-# - grados positivos: abrir.
-# - grados negativos: cerrar.
-#
-# Cuando cierra, puede mantener una potencia constante para seguir sujetando
-# el objeto mientras el robot ejecuta otras acciones.
-# -----------------------------------------------------------------------------
-def mover_garra_principal(
-    self,
-    velocidad,
-    grados,
-    esperar=True,
-    potencia_apriete=60,
-    tiempo_apriete_ms=120,
-    apretar=True
-):
-    if grados == 0:
-        return
-
-    # Evita enviar valores fuera del rango permitido por dc().
-    potencia_apriete = self.limitar(
-        potencia_apriete,
-        -100,
-        100
-    )
-
-    self.motor_garra.stop()
-
-    # ABRIR
-    if grados > 0:
-        wait(40)
-
-        self.motor_garra.run_angle(
-            velocidad,
-            -abs(grados),
-            then=Stop.BRAKE,
-            wait=esperar
-        )
-
-    # CERRAR
-    else:
-        wait(20)
-
-        # Para aplicar presión después del cierre, primero debe completar
-        # físicamente el movimiento.
-        self.motor_garra.run_angle(
-            velocidad,
-            abs(grados),
-            then=Stop.BRAKE,
-            wait=True
-        )
-
-        if apretar:
-            self.motor_garra.dc(
-                potencia_apriete
-            )
-
-            wait(
-                tiempo_apriete_ms
-            )
-
-            # El motor continúa aplicando presión mientras se ejecutan
-            # las siguientes acciones.
-            self.motor_garra.dc(
-                potencia_apriete
-            )
-
-# -----------------------------------------------------------------------------
-# mover_garra_rapida
-# Abre la garra usando potencia directa y el encoder del motor.
-# También permite cerrar usando run_angle y mantener presión.
-#
-# El tiempo máximo evita que el programa quede atrapado si la garra se atasca.
-# -----------------------------------------------------------------------------
 def mover_garra_rapida(
     self,
     potencia=100,
@@ -367,16 +269,3 @@ def mover_garra_rapida(
         self.motor_garra.dc(
             potencia_apriete
         )
-
-def soltar_garra_principal(
-    self,
-    modo="brake"
-):
-    if modo == "hold":
-        self.motor_garra.hold()
-
-    elif modo == "stop":
-        self.motor_garra.stop()
-
-    else:
-        self.motor_garra.brake()
