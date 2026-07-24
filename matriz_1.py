@@ -3,9 +3,7 @@ from pybricks.parameters import Color
 from pybricks.tools import wait
 
 def ejecutar_matriz_1(robot):
-    robot.mover_garra_principal(850, 0)
-    #robot.mover_garra_delantera(850, -250)
-    '''
+
     print("Voltaje:", robot.Hub.battery.voltage(), "mV")
     print("Ejecutando recorrido de matriz 1")
     
@@ -80,7 +78,7 @@ def ejecutar_matriz_1(robot):
     robot.girar(-90,potencia_max=100)
     robot.avanzar_recto(-22)
     #Aqui ya termina el reto con los azules
-      '''
+
 if __name__ == "__main__":
     robot = Base()
     ejecutar_matriz_1(robot)
