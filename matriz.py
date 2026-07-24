@@ -118,16 +118,16 @@ def escanear_matriz(self):
 
     return matriz_detectada
 
-def dejar_bloques_matriz(self, robot, distancia_matriz=14):
-    robot.seguir_linea(velocidad_max=80,distancia_cm=13, tiempo_aceleracion_ms=140,
+def dejar_bloques_matriz(self, robot, distancia_matriz=14,dis_retr=-12):
+    robot.seguir_linea(velocidad_max=80,distancia_cm=12, tiempo_aceleracion_ms=140,
     kp=1.25,kd=2.7,k_freno=0.16,tiempo_captura_ms=280,potencia_captura=60,kp_captura=2.5)
     robot.mover_garra_principal(300,80,esperar=False)
     robot.mover_garra_delantera(600, -90)
-    robot.avanzar_recto(distancia_cm=-13,velocidad_max=400,perfil="seguro")
+    robot.avanzar_recto(distancia_cm=-12,velocidad_max=400,perfil="seguro")
     robot.mover_garra_delantera(600, 95)
-    robot.seguir_linea(velocidad_max=80,distancia_cm=13, tiempo_aceleracion_ms=140,
+    robot.seguir_linea(velocidad_max=80,distancia_cm=17, tiempo_aceleracion_ms=140,
     kp=1.25,kd=2.7,k_freno=0.16,tiempo_captura_ms=280,potencia_captura=60,kp_captura=2.5)
-    robot.mover_garra_principal(500,-50,esperar=False,potencia_apriete=100)
+    robot.mover_garra_principal(550,-55,esperar=False,potencia_apriete=100)
     robot.mover_garra_delantera(600, -150)
     #Aqui ya acomodó los 6 bloques en la garra para dejarlos
 
@@ -145,6 +145,7 @@ def dejar_bloques_matriz(self, robot, distancia_matriz=14):
         robot.girar_corto(8 ,potencia_max=75, potencia_min=45)
         robot.girar_corto(-8, potencia_max=75, potencia_min=45)
     robot.avanzar_recto(-1,velocidad_max=400,zona_rampa_cm=0.5,perfil="seguro")
-    robot.mover_garra_delantera(400, -120)
-    robot.avanzar_recto(-12,velocidad_max=400,perfil="seguro")
+    robot.mover_garra_principal(850, -180)
+    robot.mover_garra_delantera(850, -250)
+    robot.avanzar_recto(dis_retr,velocidad_max=400,perfil="seguro")
     #Aqui ya salió de la matriz y se encamina a agarrar la otra combinación
