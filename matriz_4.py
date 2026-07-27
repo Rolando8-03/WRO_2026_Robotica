@@ -7,11 +7,21 @@ def ejecutar_matriz_4(robot):
     print("Voltaje:", robot.Hub.battery.voltage(), "mV")
     print("Ejecutando recorrido de matriz 4")
 
-    robot.avanzar_cruzando_lineas(cruces_objetivo=2, velocidad=900, escape_inicial_cm=8, retraso_freno_ms=90)
-    robot.avanzar_recto(distancia_cm=0.5, velocidad_max=900, perfil="encadenado")
-    wait(400)
-    robot.girar(-90, potencia_max=85, potencia_min=35, kp_base=5.0, tolerancia_fin=1.0, perfil="encadenado")
-    robot.mover_garra_principal(300, 90, esperar=False)
+    robot.avanzar_cruzando_lineas(2,900,retraso_freno_ms=95.5)    
+    robot.mover_garra_principal(850, 130)
+    robot.girar(-90, potencia_max=100)
+    robot.avanzar_recto(10, 800)
+    robot.mover_garra_delantera(850, 286)
+    #Aqui ya agarro los primeros 4 bloques azules 
+
+    robot.avanzar_recto(-8.5, 800)
+    robot.girar(88, potencia_max=100)
+    robot.avanzar_recto(9.5)
+    robot.girar(-90, potencia_max=80)
+    robot.mover_garra_principal(850, -105,apretar=False)
+    robot.avanzar_recto(11)
+    robot.mover_garra_principal(850, -30,apretar=True)
+    #Aqui ya agarro un bloque amarillo 
 
     robot.avanzar_recto(distancia_cm=10, velocidad_max=900, perfil="encadenado")
     robot.mover_garra_delantera(600, 290)
