@@ -78,7 +78,7 @@ def ejecutar_matriz_1(robot):
     robot.girar(-90,potencia_max=100)
     robot.avanzar_recto(-22)
     #Aqui ya termina el reto con los azules
-
+    
 if __name__ == "__main__":
     robot = Base()
     ejecutar_matriz_1(robot)
