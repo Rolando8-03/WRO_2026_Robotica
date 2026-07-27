@@ -148,6 +148,7 @@ robot.seguir_linea(
     kp_captura=3.8,
     perfil_salida="encadenado"
 )
+robot.avanzar_recto(-7, velocidad_max=500)
 robot.girar(angulo_deg=185, potencia_max=100, perfil="encadenado")  
 
 gc.collect()
@@ -161,7 +162,7 @@ gc.collect()
 # SECCIÓN 4.1 -> POSICIONARSE EN LA LÍNEA FRENTE A LA MATRIZ
 robot.seguir_linea(
     sensor_color=robot.seguidor,
-    distancia_cm=10,           
+    distancia_cm=12,           
     velocidad_max=100,
     lado="derecha",            
     
@@ -182,16 +183,16 @@ robot.seguir_linea(
     kp_captura=3.8,
     perfil_salida="encadenado"
 )
-robot.girar(angulo_deg=70, potencia_max=90, perfil="encadenado")
+robot.girar(angulo_deg=71, potencia_max=90, perfil="encadenado")
 wait(80)
 
 robot.avanzar_cruzando_lineas(
-    cruces_objetivo=2, 
+    cruces_objetivo=3, 
     velocidad=900, 
     escape_inicial_cm=8,
     retraso_freno_ms=0
 )
-robot.avanzar_recto(2, 800)
+robot.avanzar_recto(5, 800)
 robot.girar(angulo_deg=-70, potencia_max=100, perfil="encadenado") 
 
 #SEGUIR LINEA HASTA LA MATRIZ
