@@ -35,28 +35,7 @@ def mover_torque(
     )
 
 
-# -----------------------------------------------------------------------------
-# mover_garra_delantera
-# Mueve la garra delantera una cantidad determinada de grados y mantiene
-# su posición al terminar.
-# -----------------------------------------------------------------------------
-def mover_garra_delantera(
-    self,
-    velocidad,
-    grados,
-    esperar=True,
-    modo_final=Stop.HOLD
-):
-    if grados == 0:
-        return
-
-    self.motor_garra_delantera.run_angle(
-        velocidad,
-        grados,
-        then=modo_final,
-        wait=esperar
-    )
-
+#Funcion en desarollo JAJSHAJASHJH
 def mover_garra_principal(
     self,
     velocidad,
@@ -184,88 +163,29 @@ def mover_torque_seguro(
 # Mueve la garra delantera una cantidad determinada de grados.
 # Al terminar mantiene la posición usando Stop.HOLD.
 # -----------------------------------------------------------------------------
+#FUNCION ACTUALIZADA DE MOVER GARRA DELANTERA
 def mover_garra_delantera(
     self,
-    velocidad,
-    grados,
-    esperar=True,
-    modo_final=Stop.HOLD
+    posicion,
+    velocidad=500,
+    simultaneo=False,
+    modo_final=Stop.HOLD,
+    limite_maximo=320
 ):
-    if grados == 0:
-        return
 
-    self.motor_garra_delantera.run_angle(
-        velocidad,
-        grados,
+    # Impide posiciones menores que el tope superior.
+    if posicion < 0:
+        posicion = 0
+
+    # Impide sobrepasar el límite inferior.
+    if posicion > limite_maximo:
+        posicion = limite_maximo
+
+    self.motor_garra_delantera.run_target(
+        speed=abs(velocidad),
+        target_angle=posicion,
         then=modo_final,
-        wait=esperar
+        wait=not simultaneo
     )
 
-def mover_garra_rapida(
-    self,
-    potencia=100,
-    grados=90,
-    abrir=True,
-    velocidad=200,
-    potencia_apriete=40,
-    tiempo_apriete_ms=300,
-    tiempo_max_ms=1500
-):
-    if grados == 0:
-        return
-
-    potencia = self.limitar(
-        potencia,
-        0,
-        100
-    )
-
-    potencia_apriete = self.limitar(
-        potencia_apriete,
-        -100,
-        100
-    )
-
-    self.motor_garra.reset_angle(0)
-
-    # ABRIR RÁPIDAMENTE
-    if abrir:
-        cronometro = StopWatch()
-        cronometro.reset()
-
-        self.motor_garra.dc(
-            -abs(potencia)
-        )
-
-        while (
-            abs(self.motor_garra.angle()) < abs(grados)
-            and cronometro.time() < tiempo_max_ms
-        ):
-            wait(1)
-
-        self.motor_garra.brake()
-
-    # CERRAR
-    else:
-        self.motor_garra.stop()
-        wait(20)
-
-        self.motor_garra.run_angle(
-            abs(velocidad),
-            abs(grados),
-            then=Stop.BRAKE,
-            wait=True
-        )
-
-        self.motor_garra.dc(
-            potencia_apriete
-        )
-
-        wait(
-            tiempo_apriete_ms
-        )
-
-        # Mantiene presión para sujetar el objeto.
-        self.motor_garra.dc(
-            potencia_apriete
-        )
+    return posicion
