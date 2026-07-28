@@ -17,6 +17,7 @@ print("Voltaje:", robot.Hub.battery.voltage())
 # Giro de salida y seguidor hasta el cemento
 
 
+
 robot.giro_de_arco(
     radio_cm=22,        # Radio del arco
     angulo_deg=90,      # Ángulo a girar
@@ -117,7 +118,8 @@ robot.seguir_linea(
 )
 
 robot.girar(angulo_deg=90, potencia_max=85, perfil="encadenado")
-wait(100) 
+
+#wait(100) 
 
 robot.mover_torque(grados_torque=166, velocidad_torque=300, esperar=False)
 robot.avanzar_recto(distancia_cm=-8.5, velocidad_max=900, perfil="encadenado") 
@@ -125,6 +127,7 @@ robot.avanzar_recto(4, 850)
 
 # SECCIÓN 3 (IR POR LOS CEMENTOS BLANCOS) =======================================================================
 robot.giro_derecha(-92, 900)
+
 robot.seguir_linea(
     sensor_color=robot.seguidor,
     distancia_cm=19,           
@@ -149,7 +152,7 @@ robot.seguir_linea(
     perfil_salida="encadenado"
 )
 robot.avanzar_recto(-7, velocidad_max=500)
-robot.girar(angulo_deg=185, potencia_max=100, perfil="encadenado")  
+robot.girar(angulo_deg=180, potencia_max=100, perfil="encadenado")  
 
 gc.collect()
 # AGARRAR LOS CEMENTOS BLANCOS
@@ -162,7 +165,7 @@ gc.collect()
 # SECCIÓN 4.1 -> POSICIONARSE EN LA LÍNEA FRENTE A LA MATRIZ
 robot.seguir_linea(
     sensor_color=robot.seguidor,
-    distancia_cm=12,           
+    distancia_cm=20,           
     velocidad_max=100,
     lado="derecha",            
     
@@ -183,17 +186,21 @@ robot.seguir_linea(
     kp_captura=3.8,
     perfil_salida="encadenado"
 )
-robot.girar(angulo_deg=71, potencia_max=90, perfil="encadenado")
-wait(80)
+robot.girar(angulo_deg=77, potencia_max=90, perfil="encadenado")
+wait(70)
 
 robot.avanzar_cruzando_lineas(
-    cruces_objetivo=3, 
-    velocidad=900, 
+    cruces_objetivo=4, 
+    velocidad=850, 
     escape_inicial_cm=8,
-    retraso_freno_ms=0
+    retraso_freno_ms=0,
+    distancia_extra_cm=2
 )
-robot.avanzar_recto(5, 800)
-robot.girar(angulo_deg=-70, potencia_max=100, perfil="encadenado") 
+
+
+robot.girar(angulo_deg=-77, potencia_max=100, perfil="encadenado") 
+wait(80)
+
 
 #SEGUIR LINEA HASTA LA MATRIZ
 robot.seguir_linea_hasta_color(
@@ -201,18 +208,18 @@ robot.seguir_linea_hasta_color(
     velocidad_max=95, 
     lado="izquierda"
 )
-robot.girar_corto(10, potencia_max=75, potencia_min=45)
+robot.girar_corto(7, potencia_max=60, potencia_min=40)
 robot.avanzar_recto(14, 700)
+robot.girar_corto(-7, potencia_max=60, potencia_min=40)
 matriz_detectada = robot.escanear_matriz()
 
 
 #Salir de la matriz-----------------
 robot.avanzar_recto(distancia_cm=-37, velocidad_max=900, perfil="seguro") 
-wait(90)
+
 robot.girar(angulo_deg=-181, potencia_max=100, perfil="encadenado")
 robot.avanzar_recto(distancia_cm=-22.5, velocidad_max=650, perfil="seguro") 
 robot.avanzar_recto(distancia_cm=7, velocidad_max=900, perfil="seguro") 
-wait(300)
 
 # Giro para entrar en los cementos blancos y dejarlos =====================
 robot.girar(angulo_deg=41, potencia_max=100, perfil="encadenado")
@@ -230,7 +237,7 @@ robot.avanzar_cruzando_lineas(
     retraso_freno_ms=120 # Sigue retrocediendo 150 milisegundos después de ver la 3ra línea
 )
 
-wait(100)
+
 robot.girar(angulo_deg=-36, potencia_max=100, perfil="encadenado")
 
 #Seguir la linea para ir a los verdes
@@ -258,7 +265,9 @@ robot.seguir_linea(
     perfil_salida="encadenado"
 )
 robot.avanzar_recto(-4, 900) #RETROCESO DESPUES DE SEGUIR LA LINEA HASTA LA SECCIÓN DE LOS VERDES
-wait(100)
+
+
+
 robot.girar(angulo_deg=-184, potencia_max=90, perfil="encadenado")
 
 #AGARRAR LOS CEMENTOS VERDES---------------------
@@ -289,7 +298,8 @@ robot.seguir_linea(
     kp_captura=3.8,
     perfil_salida="encadenado"
 )
-wait(400)
+
+
 robot.girar(angulo_deg=180, potencia_max=90, perfil="encadenado")
 
 # DEJAR LOS CEMENTOS VERDES --------------------------------------------------
@@ -299,30 +309,30 @@ robot.avanzar_recto(distancia_cm=-19, velocidad_max=900, perfil="encadenado")
 #Avance para ir por los amarillos y giro
 robot.avanzar_recto(distancia_cm=25, velocidad_max=900, perfil="encadenado")
 robot.girar(angulo_deg=-48, potencia_max=100, perfil="encadenado")
+
 wait(80)
 
+robot.avanzar_cruzando_lineas(2,900, retraso_freno_ms=95.5)
 #avance hasta la linea para tomar los amarillos
-robot.avanzar_hibrido(
-    distancia_inicial_cm=20,
-    color_objetivo=Color.BLACK,
-    velocidad_max=350,
-    cruces=1
-)
+#robot.avanzar_hibrido(distancia_inicial_cm=15,color_objetivo=Color.BLACK,velocidad_max=350,cruces=1)
 
-robot.avanzar_recto(distancia_cm=5, velocidad_max=200)
-robot.girar(angulo_deg=48, potencia_max=100, perfil="encadenado")
-wait(100)
+robot.girar(angulo_deg=-132, potencia_max=100, perfil="encadenado")
 
-robot.seguir_linea_hasta_color(color_objetivo=Color.YELLOW, velocidad_max=500, lado="derecha")
-robot.avanzar_recto(distancia_cm=-11, velocidad_max=900, perfil="encadenado")
+#robot.seguir_linea_hasta_color(color_objetivo=Color.YELLOW, velocidad_max=500, lado="derecha")
 
-wait(300)
-robot.girar(angulo_deg=-177, potencia_max=100, perfil="encadenado")
+
+#robot.girar(angulo_deg=-177, potencia_max=100, perfil="encadenado")
 
 # AGARRAR LOS CEMENTOS AMARILLOS
 robot.mover_torque(grados_torque=-171, velocidad_torque=200, esperar=False)
-robot.avanzar_recto(distancia_cm=-21, velocidad_max=900, perfil="encadenado")
+robot.avanzar_recto(distancia_cm=-25, velocidad_max=900, perfil="encadenado")
+robot.girar(angulo_deg=-75, potencia_max=100, perfil="encadenado")
+# Avanzar a la linea para ir a los amarillos
+wait(80)
+robot.avanzar_cruzando_lineas(2,900, escape_inicial_cm=8,retraso_freno_ms=0,distancia_extra_cm=23)
 
+robot.girar(angulo_deg=60, potencia_max=100, perfil="encadenado")
+'''
 robot.seguir_linea(
     sensor_color=robot.seguidor,
     distancia_cm=14,           
@@ -346,19 +356,15 @@ robot.seguir_linea(
     kp_captura=3.8,
     perfil_salida="encadenado"
 )
-wait(100)
-robot.girar(angulo_deg=-75, potencia_max=100, perfil="encadenado")
 
-wait(100)
-# Avanzar a la linea para ir a los amarillos
-robot.avanzar_cruzando_lineas(
-    cruces_objetivo=2, 
-    velocidad=900, 
-    escape_inicial_cm=8,
-    retraso_freno_ms=0 # Sigue retrocediendo 150 milisegundos después de ver la 3ra línea
-)
-robot.avanzar_recto(distancia_cm=20, velocidad_max=800)
-robot.girar(angulo_deg=60, potencia_max=100, perfil="encadenado")
+
+
+
+
+
+wait(80)
+
+
 
 robot.seguir_linea(
     sensor_color=robot.seguidor,
@@ -379,7 +385,6 @@ robot.seguir_linea(
     perfil_salida="encadenado"
 )
 
-wait(100)
 robot.girar(angulo_deg=-88, potencia_max=100, perfil="encadenado")
 
 # DEJAR LOS CEMENTOS AMARILLOS
@@ -388,7 +393,7 @@ robot.avanzar_recto(distancia_cm=-15, velocidad_max=900, perfil="encadenado")
 
 # Salir de la seccion amarilla
 robot.avanzar_recto(14, 850)
-wait(300)
+
 robot.girar(angulo_deg=-88, potencia_max=100, perfil="encadenado")
 
 
@@ -411,7 +416,8 @@ robot.seguir_linea(
     perfil_salida="encadenado"
 )
 
-wait(100)
+wait(80)
+
 
 #movimeinto para tomar la pala
 robot.girar(angulo_deg=-40, potencia_max=100, perfil="encadenado")
@@ -454,7 +460,11 @@ robot.avanzar_recto(distancia_cm=-25, velocidad_max=800, perfil="seguro")
 # Salir de la seccion de azul y tomar la linea
 robot.avanzar_recto(distancia_cm=15, velocidad_max=800, perfil="seguro")
 robot.girar(angulo_deg=-40, potencia_max=80)
+'''
+'''
 wait(100)
+'''
+'''
 robot.avanzar_recto(25, 900)
 
 robot.girar(angulo_deg=40, potencia_max=80)
@@ -476,11 +486,12 @@ robot.seguir_linea(
     kp_captura=2.5,
     perfil_salida="encadenado"
 )
-wait(100)
+#wait(100)
+
 
 robot.avanzar_recto(-25, 800)
 robot.mover_torque(grados_torque=152, velocidad_torque=500, esperar=True)
 robot.avanzar_recto(9, 800)
 robot.girar(90, potencia_max=80)
 robot.avanzar_recto(10, 800)
-wait(100)
+'''
