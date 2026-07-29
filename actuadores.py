@@ -193,3 +193,72 @@ def mover_garra_delantera(
     )
 
     return posicion
+
+def mover_garra_rapida(
+    self,
+    potencia=100,
+    grados=90,
+    abrir=True,
+    velocidad=200,
+    potencia_apriete=40,
+    tiempo_apriete_ms=300,
+    tiempo_max_ms=1500
+):
+    if grados == 0:
+        return
+
+    potencia = self.limitar(
+        potencia,
+        0,
+        100
+    )
+
+    potencia_apriete = self.limitar(
+        potencia_apriete,
+        -100,
+        100
+    )
+
+    self.motor_garra.reset_angle(0)
+
+    # ABRIR RÁPIDAMENTE
+    if abrir:
+        cronometro = StopWatch()
+        cronometro.reset()
+
+        self.motor_garra.dc(
+            -abs(potencia)
+        )
+
+        while (
+            abs(self.motor_garra.angle()) < abs(grados)
+            and cronometro.time() < tiempo_max_ms
+        ):
+            wait(1)
+
+        self.motor_garra.brake()
+
+    # CERRAR
+    else:
+        self.motor_garra.stop()
+        wait(20)
+
+        self.motor_garra.run_angle(
+            abs(velocidad),
+            abs(grados),
+            then=Stop.BRAKE,
+            wait=True
+        )
+
+        self.motor_garra.dc(
+            potencia_apriete
+        )
+
+        wait(
+            tiempo_apriete_ms
+        )
+
+        # Mantiene presión para sujetar el objeto.
+        self.motor_garra.dc(
+            potencia_apriete
+        )
