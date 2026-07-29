@@ -170,16 +170,20 @@ def mover_garra_delantera(
     velocidad=500,
     simultaneo=False,
     modo_final=Stop.HOLD,
-    limite_maximo=320
+    limite_minimo=0,
+    limite_maximo=300
 ):
+    """
+    Mueve la garra delantera.
 
-    # Impide posiciones menores que el tope superior.
-    if posicion < 0:
-        posicion = 0
+    0°   = Garra completamente arriba.
+    300° = Garra completamente abajo.
 
-    # Impide sobrepasar el límite inferior.
-    if posicion > limite_maximo:
-        posicion = limite_maximo
+    Cualquier valor fuera del rango será limitado automáticamente.
+    """
+
+    # Limitar el rango permitido
+    posicion = max(limite_minimo, min(posicion, limite_maximo))
 
     self.motor_garra_delantera.run_target(
         speed=abs(velocidad),
