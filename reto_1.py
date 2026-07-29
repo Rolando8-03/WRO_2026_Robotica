@@ -405,7 +405,7 @@ robot.avanzar_recto(distancia_cm=-12, velocidad_max=900, perfil="seguro")
 robot.avanzar_recto(distancia_cm=29, velocidad_max=800)
 robot.mover_torque(grados_torque=160, velocidad_torque=250, esperar=True)
 
-robot.avanzar_recto(8, 900)
+robot.avanzar_recto(7.8, 900)
 robot.girar(angulo_deg=40, potencia_max=100, perfil="encadenado")
 robot.seguir_linea(
     sensor_color=robot.seguidor,
@@ -487,4 +487,3 @@ robot.seguir_linea(
 
 robot.avanzar_recto(-11, 900)
 robot.girar(90, potencia_max=80)
-
