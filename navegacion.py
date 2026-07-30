@@ -8,97 +8,194 @@ from pybricks.tools import wait, StopWatch
 
 # -----------------------------------------------------------------------------
 # avanzar_recto
-# Avanza o retrocede una distancia manteniendo el rumbo con el giroscopio y rampas de velocidad.
+# Avanza o retrocede una distancia manteniendo el rumbo con el giroscopio
+# y rampas de velocidad.
+#
+# Opcionalmente puede iniciar un movimiento de torque después de cierto tiempo,
+# sin detener el avance.
 # -----------------------------------------------------------------------------
 def avanzar_recto(
-        self,
-        distancia_cm,
-        velocidad_max=900,
-        velocidad_min=100,     
-        kp_gyro=20.0,          
-        zona_rampa_cm=8, 
-        perfil="encadenado",
-        rumbo_esperado=None   # 🔥 Parámetro de Memoria de Rumbo (IMU Shock)
-    ):
-        if distancia_cm == 0:
-            return
+    self,
+    distancia_cm,
+    velocidad_max=900,
+    velocidad_min=100,
+    kp_gyro=20.0,
+    zona_rampa_cm=8,
+    perfil="encadenado",
+    rumbo_esperado=None,
 
-        self.preparar_movimiento(reset_motores=False, reset_gyro=False, perfil=perfil)
+    # Torque opcional durante el avance.
+    torque_grados=None,
+    torque_velocidad=180,
+    torque_retraso_ms=0
+):
+    if distancia_cm == 0:
+        return
 
-        self.motor_izquierdo.hold()
-        self.motor_derecho.hold()
-        wait(90) # Arranque veloz
+    self.preparar_movimiento(
+        reset_motores=False,
+        reset_gyro=False,
+        perfil=perfil
+    )
 
-        self.drive_base.reset()
+    self.motor_izquierdo.hold()
+    self.motor_derecho.hold()
+    wait(90)
 
-        # =========================================================
-        # 🔥 LÓGICA DE MEMORIA DE RUMBO
-        # Si le mandamos un rumbo pre-guardado, usa ese. 
-        # Si no, lee el giroscopio en este instante.
-        # =========================================================
-        if rumbo_esperado is not None:
-            heading_objetivo = rumbo_esperado
+    self.drive_base.reset()
+
+    # =========================================================
+    # MEMORIA DE RUMBO
+    # Si se proporciona un rumbo, utiliza ese valor.
+    # De lo contrario, toma el rumbo actual del IMU.
+    # =========================================================
+    if rumbo_esperado is not None:
+        heading_objetivo = rumbo_esperado
+    else:
+        heading_objetivo = self.Hub.imu.heading()
+
+    # Conversión de centímetros a grados de las ruedas.
+    grados_por_cm = (
+        360 / (self.circunferencia / 10)
+    )
+
+    grados_objetivo = (
+        abs(distancia_cm) * grados_por_cm
+    )
+
+    rampa_efectiva_cm = min(
+        zona_rampa_cm,
+        abs(distancia_cm) / 2.0
+    )
+
+    grados_rampa = (
+        rampa_efectiva_cm * grados_por_cm
+    )
+
+    signo = (
+        1
+        if distancia_cm > 0
+        else -1
+    )
+
+    cronometro = StopWatch()
+    cronometro.reset()
+
+    # Impide que el torque se active más de una vez.
+    torque_iniciado = False
+
+    while True:
+        # Distancia real recorrida por el DriveBase.
+        recorrido = (
+            abs(self.drive_base.distance())
+            * self.grados_por_mm
+        )
+
+        restante = (
+            grados_objetivo - recorrido
+        )
+
+        # Finalizar al alcanzar la distancia.
+        if restante <= 1.5:
+            break
+
+        actual_heading = (
+            self.Hub.imu.heading()
+        )
+
+        error_gyro = self._error_angular(
+            heading_objetivo,
+            actual_heading
+        )
+
+        # Rampa de aceleración.
+        if recorrido < grados_rampa:
+            proporcion = (
+                recorrido / grados_rampa
+            )
+
+            vel_base = (
+                velocidad_min
+                + (
+                    velocidad_max
+                    - velocidad_min
+                ) * proporcion
+            )
+
+        # Rampa de desaceleración.
+        elif restante < grados_rampa:
+            proporcion = (
+                restante / grados_rampa
+            )
+
+            vel_base = (
+                velocidad_min * 0.4
+                + (
+                    velocidad_max
+                    - velocidad_min * 0.4
+                ) * proporcion
+            )
+
         else:
-            heading_objetivo = self.Hub.imu.heading()
+            vel_base = velocidad_max
 
-        # Corrección exacta basada en tu circunferencia
-        grados_por_cm = 360 / (self.circunferencia / 10) 
-        grados_objetivo = abs(distancia_cm) * grados_por_cm
+        tiempo_ms = cronometro.time()
 
-        rampa_efectiva_cm = min(zona_rampa_cm, abs(distancia_cm) / 2.0)
-        grados_rampa = rampa_efectiva_cm * grados_por_cm
+        # =====================================================
+        # TORQUE RETRASADO DURANTE EL AVANCE
+        #
+        # Cuando se cumple el tiempo indicado, inicia el torque
+        # sin bloquear el movimiento del robot.
+        # =====================================================
+        if (
+            torque_grados is not None
+            and not torque_iniciado
+            and tiempo_ms >= torque_retraso_ms
+        ):
+            self.mover_torque(
+                grados_torque=torque_grados,
+                velocidad_torque=torque_velocidad,
+                esperar=False
+            )
 
-        signo = 1 if distancia_cm > 0 else -1
+            torque_iniciado = True
 
-        cronometro = StopWatch()
-        cronometro.reset()
+        # Rampa temporal inicial original.
+        if tiempo_ms < 150:
+            vel = (
+                vel_base
+                * (tiempo_ms / 150)
+            )
+        else:
+            vel = vel_base
 
-        while True:
-            # Usamos la distancia real de la DriveBase
-            recorrido = abs(self.drive_base.distance()) * self.grados_por_mm
-            restante = grados_objetivo - recorrido
+        vel = self.limitar(
+            vel,
+            25,
+            velocidad_max
+        )
 
-            # Cortar milimétricamente
-            if restante <= 1.5: 
-                break
+        correccion_giro = (
+            error_gyro * kp_gyro
+        )
 
-            actual_heading = self.Hub.imu.heading()
-            error_gyro = self._error_angular(heading_objetivo, actual_heading)
+        self.drive_base.drive(
+            vel * signo,
+            correccion_giro
+        )
 
-            if recorrido < grados_rampa:
-                proporcion = recorrido / grados_rampa
-                vel_base = velocidad_min + (velocidad_max - velocidad_min) * proporcion
-            elif restante < grados_rampa:
-                proporcion = restante / grados_rampa
-                vel_base = (velocidad_min * 0.4) + (velocidad_max - (velocidad_min * 0.4)) * proporcion
-            else:
-                vel_base = velocidad_max
+    # =======================================================
+    # Frenado original de dos fases.
+    # =======================================================
+    self.drive_base.stop()
 
-            tiempo_ms = cronometro.time()
-            if tiempo_ms < 150:
-                vel = vel_base * (tiempo_ms / 150)
-            else:
-                vel = vel_base
+    self.motor_izquierdo.brake()
+    self.motor_derecho.brake()
+    wait(60)
 
-            vel = self.limitar(vel, 25, velocidad_max)
-            correccion_giro = error_gyro * kp_gyro
-
-            self.drive_base.drive(vel * signo, correccion_giro)
-
-        # =======================================================
-        # 🔥 MODIFICACIÓN ÉLITE: Frenado de Dos Fases (Anti-Rebote)
-        # =======================================================
-        self.drive_base.stop() 
-
-        # Fase 1: Freno pasivo (cortocircuito) para disipar inercia sin rebotar
-        self.motor_izquierdo.brake() 
-        self.motor_derecho.brake()
-        wait(60) 
-
-        # Fase 2: Freno activo. Ya sin inercia, clavamos el robot en su lugar.
-        self.motor_izquierdo.hold()
-        self.motor_derecho.hold()
-        wait(20)
+    self.motor_izquierdo.hold()
+    self.motor_derecho.hold()
+    wait(20)
 
 # -----------------------------------------------------------------------------
 # girar
