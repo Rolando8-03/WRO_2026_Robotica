@@ -210,7 +210,7 @@ matriz_detectada = robot.escanear_matriz()
 robot.avanzar_recto(distancia_cm=-37, velocidad_max=900, perfil="seguro") 
 
 robot.girar(angulo_deg=-181, potencia_max=100, perfil="encadenado")
-robot.avanzar_recto(distancia_cm=-22.5, velocidad_max=750, perfil="seguro") 
+robot.avanzar_recto(distancia_cm=-17.5, velocidad_max=750, perfil="seguro") 
 robot.avanzar_recto(distancia_cm=7, velocidad_max=900, perfil="seguro") 
 
 # Giro para entrar en los cementos blancos y dejarlos =====================
@@ -254,7 +254,7 @@ robot.seguir_linea(
     kp_captura=3.8,
     perfil_salida="encadenado"
 )
-robot.avanzar_recto(-4, 900) #RETROCESO DESPUES DE SEGUIR LA LINEA HASTA LA SECCIÓN DE LOS VERDES
+robot.avanzar_recto(-5, 900) #RETROCESO DESPUES DE SEGUIR LA LINEA HASTA LA SECCIÓN DE LOS VERDES
 
 robot.girar(angulo_deg=-184, potencia_max=90, perfil="encadenado")
 
@@ -397,15 +397,38 @@ robot.seguir_linea(
 
 wait(80)
 
-#movimeinto para tomar la pala
-robot.girar(angulo_deg=-40, potencia_max=100, perfil="encadenado")
-robot.mover_torque(grados_torque=-152, velocidad_torque=230, esperar=False)
+# Movimiento para tomar la pala.
+robot.girar(
+    angulo_deg=-40,
+    potencia_max=100,
+    perfil="encadenado"
+)
 
-robot.avanzar_recto(distancia_cm=-12, velocidad_max=900, perfil="seguro")
-robot.avanzar_recto(distancia_cm=29, velocidad_max=800)
-robot.mover_torque(grados_torque=160, velocidad_torque=250, esperar=True)
+# Empieza a bajar el torque.
+robot.mover_torque(
+    grados_torque=-148,
+    velocidad_torque=230,
+    esperar=False
+)
 
-robot.avanzar_recto(7.8, 900)
+# Retrocede mientras el torque baja.
+robot.avanzar_recto(
+    distancia_cm=-12,
+    velocidad_max=900,
+    perfil="seguro"
+)
+
+# Empieza a avanzar inmediatamente.
+# El torque permanece abajo durante el retraso indicado.
+# Después comienza a subir mientras el robot continúa avanzando.
+robot.avanzar_recto(
+    distancia_cm=36.8,
+    velocidad_max=800,
+    torque_grados=160,
+    torque_velocidad=250,
+    torque_retraso_ms=800
+)
+
 robot.girar(angulo_deg=40, potencia_max=100, perfil="encadenado")
 robot.seguir_linea(
     sensor_color=robot.seguidor,
@@ -430,7 +453,7 @@ robot.avanzar_hasta_color(color_objetivo=Color.BLUE, velocidad=500)
 robot.avanzar_recto(-10, 800)
 robot.girar(angulo_deg=-180, potencia_max=100, perfil="encadenado")
 
-robot.mover_torque(grados_torque=-152, velocidad_torque=500, esperar=False)
+robot.mover_torque(grados_torque=-155, velocidad_torque=500, esperar=False)
 robot.avanzar_recto(distancia_cm=-25, velocidad_max=800, perfil="seguro")
 
 # Salir de la seccion de azul y tomar la linea
@@ -466,24 +489,11 @@ robot.seguir_linea(
 #wait(100)
 robot.mover_torque(grados_torque=152, velocidad_torque=500, esperar=True)
 
-robot.seguir_linea(
-    sensor_color=robot.seguidor,
-    velocidad_max=100,
-    distancia_cm=18,
-    lado="izquierda",
-    tiempo_acomodo_ms=140,
-    tiempo_aceleracion_ms=140,
-    kp=1.25,
-    kd=2.7,
-    k_freno=0.16,
-    correccion_max=100,
-    objetivo_reflexion=27,
-    captura_inicial=True,
-    tiempo_captura_ms=280,
-    potencia_captura=60,
-    kp_captura=2.5,
-    perfil_salida="encadenado"
-)
+robot.avanzar_recto(11, velocidad_max=800)
 
-robot.avanzar_recto(-11, 900)
-robot.girar(90, potencia_max=80)
+robot.avanzar_recto(-7.2, 900)
+robot.girar(91, potencia_max=80)
+
+
+wait(100)
+robot.m3(robot)
