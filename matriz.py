@@ -118,34 +118,210 @@ def escanear_matriz(self):
 
     return matriz_detectada
 
-def dejar_bloques_matriz(self, robot, distancia_matriz=14,dis_retr=-12):
-    robot.seguir_linea(velocidad_max=80,distancia_cm=12, tiempo_aceleracion_ms=140,
-    kp=1.25,kd=2.7,k_freno=0.16,tiempo_captura_ms=280,potencia_captura=60,kp_captura=2.5)
-    robot.mover_garra_principal(300,80,esperar=False)
-    robot.mover_garra_delantera(600, -90)
-    robot.avanzar_recto(distancia_cm=-12,velocidad_max=400,perfil="seguro")
-    robot.mover_garra_delantera(600, 95)
-    robot.seguir_linea(velocidad_max=80,distancia_cm=17, tiempo_aceleracion_ms=140,
-    kp=1.25,kd=2.7,k_freno=0.16,tiempo_captura_ms=280,potencia_captura=60,kp_captura=2.5)
-    robot.mover_garra_principal(550,-55,esperar=False,potencia_apriete=100)
-    robot.mover_garra_delantera(600, -150)
-    #Aqui ya acomodó los 6 bloques en la garra para dejarlos
+def dejar_bloques_matriz(self, robot):
+    robot.seguir_linea(
+        sensor_color=robot.seguidor,
+        velocidad_max=80,
+        distancia_cm=13,
+        lado="derecha",
+        tiempo_acomodo_ms=140,
+        tiempo_aceleracion_ms=140,
+        kp=1.25,
+        kd=2.7,
+        k_freno=0.16,
+        correccion_max=100,
+        objetivo_reflexion=27,
+        captura_inicial=True,
+        tiempo_captura_ms=280,
+        potencia_captura=60,
+        kp_captura=2.5,
+        perfil_salida="encadenado"
+    ) 
 
-    robot.seguir_linea_hasta_color(Color.BLUE,velocidad_max=100,lado="derecha")
+    robot.mover_garra_principal(
+        300,
+        80,
+        esperar=False
+    ) 
+
+    robot.mover_garra_delantera(100)
+
+    robot.avanzar_recto(
+        distancia_cm=-13,
+        velocidad_max=400,
+        perfil="seguro"
+    )
+
+    robot.mover_garra_delantera(290)
+
+    robot.seguir_linea(
+        sensor_color=robot.seguidor,
+        velocidad_max=100,
+        distancia_cm=13,
+        lado="derecha",
+        tiempo_acomodo_ms=140,
+        tiempo_aceleracion_ms=140,
+        kp=1.25,
+        kd=2.7,
+        k_freno=0.16,
+        correccion_max=100,
+        objetivo_reflexion=27,
+        captura_inicial=True,
+        tiempo_captura_ms=280,
+        potencia_captura=60,
+        kp_captura=2.5,
+        perfil_salida="encadenado"
+    )
+
+    robot.mover_garra_principal(
+        500,
+        -55,
+        esperar=False,
+        potencia_apriete=100
+    )
+
+    robot.mover_garra_delantera(100)
+
+    robot.seguir_linea_hasta_color(
+        color_objetivo=Color.BLUE,
+        velocidad_max=100,
+        lado="derecha"
+    )
+
     wait(400)
-    robot.girar_corto(-11)
-    robot.avanzar_recto(distancia_matriz,velocidad_max=650,perfil="encadenado")
-    robot.mover_garra_delantera(400, 99)
-    robot.mover_garra_rapida(potencia=100,grados=50,abrir=True)
-    robot.avanzar_recto(0.2,velocidad_max=650,zona_rampa_cm=0.1,perfil="encadenado")
-    #Aqui ya puso los bloques en la matriz
-    
-    robot.mover_garra_delantera(400, 55)
+
+    # Se conserva girar() porque este movimiento es de -3°.
+    robot.girar_corto(-9)
+    robot.avanzar_recto(
+        distancia_cm=14.5,
+        velocidad_max=650,
+        perfil="encadenado"
+    )
+
+    robot.mover_garra_delantera(250)
+
+    robot.mover_garra_rapida(
+        potencia=100,
+        grados=43,
+        abrir=True
+    )
+
+    robot.avanzar_recto(
+        distancia_cm=0.2,
+        velocidad_max=650,
+        zona_rampa_cm=0.1,
+        perfil="encadenado"
+    )
+
+    robot.mover_garra_delantera(290)
+
+    # Sacudida: aquí sí se usa exclusivamente girar_corto().
     for i in range(4):
         robot.girar_corto(8 ,potencia_max=75, potencia_min=45)
         robot.girar_corto(-8, potencia_max=75, potencia_min=45)
-    robot.avanzar_recto(-1,velocidad_max=400,zona_rampa_cm=0.5,perfil="seguro")
-    robot.mover_garra_principal(850, -180)
-    robot.mover_garra_delantera(850, -250)
-    robot.avanzar_recto(dis_retr,velocidad_max=400,perfil="seguro")
-    #Aqui ya salió de la matriz y se encamina a agarrar la otra combinación
+
+    robot.mover_garra_delantera(0)
+    robot.mover_garra_principal(600, -40)
+    #Aquí termina la sección de movimientos para entrar en la matriz =========================================================
+
+def dejar_bloques_matriz2(self, robot):
+    #Entrar en la matriz
+    robot.seguir_linea(
+        sensor_color=robot.seguidor,
+        velocidad_max=80,
+        distancia_cm=15,
+        lado="derecha",
+        tiempo_acomodo_ms=140,
+        tiempo_aceleracion_ms=140,
+        kp=1.25,
+        kd=2.7,
+        k_freno=0.16,
+        correccion_max=100,
+        objetivo_reflexion=27,
+        captura_inicial=True,
+        tiempo_captura_ms=280,
+        potencia_captura=60,
+        kp_captura=2.5,
+        perfil_salida="encadenado"
+    ) 
+
+    robot.mover_garra_principal(
+        300,
+        80,
+        esperar=False
+    ) 
+
+    robot.mover_garra_delantera(100)
+
+    robot.avanzar_recto(
+        distancia_cm=-13,
+        velocidad_max=400,
+        perfil="seguro"
+    )
+
+    robot.mover_garra_delantera(290)
+
+    robot.seguir_linea(
+        sensor_color=robot.seguidor,
+        velocidad_max=100,
+        distancia_cm=13,
+        lado="derecha",
+        tiempo_acomodo_ms=140,
+        tiempo_aceleracion_ms=140,
+        kp=1.25,
+        kd=2.7,
+        k_freno=0.16,
+        correccion_max=100,
+        objetivo_reflexion=27,
+        captura_inicial=True,
+        tiempo_captura_ms=280,
+        potencia_captura=60,
+        kp_captura=2.5,
+        perfil_salida="encadenado"
+    )
+
+    robot.mover_garra_principal(
+        500,
+        -50,
+        esperar=False,
+        potencia_apriete=100
+    )
+
+    robot.mover_garra_delantera(100)
+
+    robot.seguir_linea_hasta_color(
+        color_objetivo=Color.BLUE,
+        velocidad_max=100,
+        lado="derecha"
+    )
+
+    wait(400)
+
+    # Se conserva girar() porque este movimiento es de -3°.
+    robot.girar_corto(-9)
+    robot.avanzar_recto(
+        distancia_cm=4,
+        velocidad_max=650,
+        perfil="encadenado"
+    )
+
+    robot.mover_garra_delantera(250)
+
+    robot.mover_garra_rapida(potencia=100, grados=50, abrir=True)   
+
+    robot.avanzar_recto(
+        distancia_cm=0.2,
+        velocidad_max=650,
+        zona_rampa_cm=0.1,
+        perfil="encadenado"
+    )
+
+    robot.mover_garra_delantera(290)
+
+    # Sacudida: aquí sí se usa exclusivamente girar_corto().
+    for i in range(4):
+        robot.girar_corto(8 ,potencia_max=75, potencia_min=45)
+        robot.girar_corto(-8, potencia_max=75, potencia_min=45)
+
+    robot.mover_garra_delantera(0)
+    robot.mover_garra_principal(600, -40)
