@@ -3,26 +3,27 @@
 Todas as llamadas usan las funciones del proyecto organizado.
 """
 
-from control_drivebase import Base
+#from control_drivebase import Base
 from pybricks.parameters import Color
 from pybricks.tools import wait
 
 
-def ejecutar_matriz_3(robot):
+def ejecutar_matriz_3(self, robot):
     """Ejecuta el recorrido activo de la matriz 2."""
+    #Tomar los bloques verdes =======================================================
     robot.motor_garra_delantera.reset_angle(0)
+
+    robot.avanzar_cruzando_lineas(cruces_objetivo=2, velocidad=500, distancia_extra_cm=16)
+    robot.girar(-89, 100, perfil="encadenado")
+    wait(80)
+    robot.avanzar_hasta_color(color_objetivo=Color.BLACK )
+    robot.avanzar_recto(-5, 800)
     
-    #Tomar los bloques verdes ================================================
-    robot.motor_garra_delantera.reset_angle(0)
-
-    robot.avanzar_cruzando_lineas(cruces_objetivo=2, velocidad=500, distancia_extra_cm=15)
-    robot.girar(-90, 100, perfil="encadenado")
-
     robot.mover_garra_principal(
         velocidad=600,
-        grados=40
+        grados=35
     )
-    robot.mover_garra_delantera(posicion=281)
+    robot.mover_garra_delantera(posicion=280)
 
     robot.avanzar_recto(9, 800)
 
@@ -33,7 +34,7 @@ def ejecutar_matriz_3(robot):
         apretar=True
     ) #Aqui ya tomó los bloques verdes
     
-    robot.avanzar_recto(-20.8, velocidad_max=800)
+    robot.avanzar_recto(-20, velocidad_max=800)
     robot.girar(-89, 100)
     
     wait(100)
@@ -61,7 +62,7 @@ def ejecutar_matriz_3(robot):
         perfil_salida="encadenado"    
     )
 
-    robot.girar(90, 100)
+    robot.girar(90, 80)
 
     robot.mover_garra_delantera(
         posicion=281
@@ -75,6 +76,7 @@ def ejecutar_matriz_3(robot):
         potencia_apriete=40,
         apretar=True
     ) #Tomarlos
+
 
     robot.avanzar_recto(distancia_cm=-15, velocidad_max=800)
 
@@ -99,7 +101,7 @@ def ejecutar_matriz_3(robot):
     robot.seguir_linea(
         sensor_color=robot.seguidor,
         velocidad_max=100,
-        distancia_cm=37,
+        distancia_cm=36,
         lado="izquierda",
         perfil_salida="encadenado"    
     )
@@ -107,7 +109,7 @@ def ejecutar_matriz_3(robot):
     robot.avanzar_recto(5) #Avance que hace que choque a veces (En evaluación :|)
 
     robot.mover_garra_delantera(
-        posicion=281
+        posicion=280
     )
 
     robot.girar(-91)
@@ -206,7 +208,7 @@ def ejecutar_matriz_3(robot):
         perfil="encadenado"
     )
 
-    robot.mover_garra_delantera(280)
+    robot.mover_garra_delantera(250)
 
     robot.mover_garra_rapida(
         potencia=100,
@@ -322,7 +324,7 @@ def ejecutar_matriz_3(robot):
     robot.seguir_linea(
         sensor_color=robot.seguidor,
         velocidad_max=100,
-        distancia_cm=30,
+        distancia_cm=29,
         lado="izquierda",
         perfil_salida="encadenado"    
     )
@@ -424,12 +426,12 @@ def ejecutar_matriz_3(robot):
     # Se conserva girar() porque este movimiento es de -3°.
     robot.girar_corto(-9)
     robot.avanzar_recto(
-        distancia_cm=3,
+        distancia_cm=4,
         velocidad_max=650,
         perfil="encadenado"
     )
 
-    robot.mover_garra_delantera(280)
+    robot.mover_garra_delantera(250)
 
     robot.mover_garra_rapida(potencia=100, grados=50, abrir=True)   
 
@@ -449,8 +451,11 @@ def ejecutar_matriz_3(robot):
 
     robot.mover_garra_delantera(0)
     robot.mover_garra_principal(600, -40)
+    
 
+'''
 if __name__ == "__main__":
     robot = Base()
     print(robot.Hub.battery.voltage())
     ejecutar_matriz_3(robot)
+'''
