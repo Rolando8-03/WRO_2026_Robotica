@@ -189,7 +189,7 @@ robot.avanzar_cruzando_lineas(
     velocidad=850, 
     escape_inicial_cm=8,
     retraso_freno_ms=0,
-    distancia_extra_cm=2
+    distancia_extra_cm=3
 )
 
 robot.girar(angulo_deg=-75, potencia_max=100, perfil="encadenado") 
@@ -203,7 +203,7 @@ robot.seguir_linea_hasta_color(
 )
 robot.girar_corto(7, potencia_max=60, potencia_min=40)
 robot.avanzar_recto(14, 700)
-robot.girar_corto(-6, potencia_max=60, potencia_min=40)
+robot.girar_corto(-4, potencia_max=60, potencia_min=40)
 matriz_detectada = robot.escanear_matriz()
 
 #Salir de la matriz-----------------
@@ -211,10 +211,10 @@ robot.avanzar_recto(distancia_cm=-37, velocidad_max=900, perfil="seguro")
 
 robot.girar(angulo_deg=-181, potencia_max=100, perfil="encadenado")
 robot.avanzar_recto(distancia_cm=-17.5, velocidad_max=750, perfil="seguro") 
-robot.avanzar_recto(distancia_cm=7, velocidad_max=900, perfil="seguro") 
+robot.avanzar_recto(distancia_cm=8, velocidad_max=900, perfil="seguro") 
 
 # Giro para entrar en los cementos blancos y dejarlos =====================
-robot.girar(angulo_deg=40, potencia_max=100, perfil="encadenado")
+robot.girar(angulo_deg=41, potencia_max=100, perfil="encadenado")
 
 # DEJAR LOS CEMENTOS BLANCOS
 robot.mover_torque(grados_torque=150, velocidad_torque=500, esperar=False)
@@ -453,7 +453,7 @@ robot.avanzar_hasta_color(color_objetivo=Color.BLUE, velocidad=500)
 robot.avanzar_recto(-10, 800)
 robot.girar(angulo_deg=-180, potencia_max=100, perfil="encadenado")
 
-robot.mover_torque(grados_torque=-155, velocidad_torque=500, esperar=False)
+robot.mover_torque(grados_torque=-165, velocidad_torque=500, esperar=False)
 robot.avanzar_recto(distancia_cm=-25, velocidad_max=800, perfil="seguro")
 
 # Salir de la seccion de azul y tomar la linea
@@ -468,6 +468,7 @@ robot.girar(angulo_deg=-40, potencia_max=80)
 robot.avanzar_recto(25, 900)
 
 robot.girar(angulo_deg=40, potencia_max=80)
+
 robot.seguir_linea(
     sensor_color=robot.seguidor,
     velocidad_max=100,
@@ -489,11 +490,13 @@ robot.seguir_linea(
 #wait(100)
 robot.mover_torque(grados_torque=152, velocidad_torque=500, esperar=True)
 
-robot.avanzar_recto(11, velocidad_max=800)
+#robot.avanzar_recto(11, velocidad_max=800)
+robot.seguir_linea_hasta_color(Color.BLUE,robot.seguidor,lado="izquierda")
 
 robot.avanzar_recto(-7.2, 900)
 robot.girar(91, potencia_max=80)
 
 
 wait(100)
-robot.m3(robot)
+#robot.m1(robot)
+robot.m2(robot)
