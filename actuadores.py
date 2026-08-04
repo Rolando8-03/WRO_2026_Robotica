@@ -167,7 +167,7 @@ def mover_torque_seguro(
 def mover_garra_delantera(
     self,
     posicion,
-    velocidad=500,
+    velocidad=700,
     simultaneo=False,
     modo_final=Stop.HOLD,
     limite_minimo=0,
@@ -196,69 +196,37 @@ def mover_garra_delantera(
 
 def mover_garra_rapida(
     self,
-    potencia=100,
     grados=90,
-    abrir=True,
-    velocidad=200,
-    potencia_apriete=40,
-    tiempo_apriete_ms=300,
-    tiempo_max_ms=1500
+    potencia=100,
+    tiempo_max_ms=1200
 ):
-    if grados == 0:
+    """
+    Abre la garra lo más rápido posible.
+
+    - Usa potencia máxima.
+    - Se detiene exactamente en el ángulo solicitado.
+    - No realiza apriete.
+    """
+
+    if grados <= 0:
         return
 
-    potencia = self.limitar(
-        potencia,
-        0,
-        100
-    )
+    potencia = self.limitar(potencia, 10, 100)
 
-    potencia_apriete = self.limitar(
-        potencia_apriete,
-        -100,
-        100
-    )
-
+    self.motor_garra.stop()
+    wait(10)
     self.motor_garra.reset_angle(0)
 
-    # ABRIR RÁPIDAMENTE
-    if abrir:
-        cronometro = StopWatch()
-        cronometro.reset()
+    cronometro = StopWatch()
 
-        self.motor_garra.dc(
-            -abs(potencia)
-        )
+    self.motor_garra.dc(-potencia)
 
-        while (
-            abs(self.motor_garra.angle()) < abs(grados)
-            and cronometro.time() < tiempo_max_ms
-        ):
-            wait(1)
+    while True:
 
-        self.motor_garra.brake()
+        if abs(self.motor_garra.angle()) >= grados:
+            break
 
-    # CERRAR
-    else:
-        self.motor_garra.stop()
-        wait(20)
+        if cronometro.time() >= tiempo_max_ms:
+            break
 
-        self.motor_garra.run_angle(
-            abs(velocidad),
-            abs(grados),
-            then=Stop.BRAKE,
-            wait=True
-        )
-
-        self.motor_garra.dc(
-            potencia_apriete
-        )
-
-        wait(
-            tiempo_apriete_ms
-        )
-
-        # Mantiene presión para sujetar el objeto.
-        self.motor_garra.dc(
-            potencia_apriete
-        )
+    self.motor_garra.hold()
