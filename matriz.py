@@ -323,5 +323,7 @@ def dejar_bloques_matriz2(self, robot):
         robot.girar_corto(8 ,potencia_max=75, potencia_min=45)
         robot.girar_corto(-8, potencia_max=75, potencia_min=45)
 
-    robot.mover_garra_delantera(0)
-    robot.mover_garra_principal(600, -40)
+    robot.avanzar_recto(distancia_cm=-1, velocidad_max=500, zona_rampa_cm=0.5, perfil="seguro")
+    robot.mover_garra_delantera(190)
+    robot.avanzar_recto(distancia_cm=-18, velocidad_max=500, perfil="seguro")
+    robot.girar(180, potencia_max=90, potencia_min=35, kp_base=5.0, tolerancia_fin=1.0, perfil="encadenado")
