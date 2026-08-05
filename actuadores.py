@@ -41,13 +41,12 @@ def mover_garra_principal(
     velocidad,
     grados=0,
     esperar=True,
-    potencia_apriete=60,
-    tiempo_apriete_ms=120,
+    potencia_apriete=150,
+    tiempo_apriete_ms=120,  # ya no se usa para apretar, se deja por compatibilidad
     apretar=True,
     modo_soltar=None
 ):
     # 1. FUNCIÓN "SOLTAR" FUSIONADA
-    # Si envías un modo_soltar, ignora los grados y ejecuta la acción directa.
     if modo_soltar == "hold":
         self.motor_garra.hold()
         return
@@ -61,42 +60,44 @@ def mover_garra_principal(
     if grados == 0:
         return
 
-    # 2. TOPE DE SEGURIDAD (Protección directa)
-    # Si le pides más de 170 grados, lo recorta a 170 automáticamente.
+    # 2. TOPE DE SEGURIDAD
     if abs(grados) > 170:
         grados = 170 if grados > 0 else -170
 
     self.motor_garra.stop()
 
-    # 3. ABRIR (grados positivos -> movimiento negativo)
+    # 3. ABRIR
     if grados > 0:
         wait(40)
         self.motor_garra.run_angle(
             abs(velocidad),
             -abs(grados),
-            then=Stop.HOLD,  # ¡Esto ancla la garra rígidamente!
+            then=Stop.HOLD,
             wait=esperar
         )
 
-    # 4. CERRAR (grados negativos -> movimiento positivo)
+    # 4. CERRAR
     else:
         wait(20)
         self.motor_garra.run_angle(
             abs(velocidad),
             abs(grados),
-            then=Stop.HOLD,  # ¡Esto ancla la garra rígidamente!
+            then=Stop.HOLD,
             wait=True
         )
 
         if apretar:
-            # Asegura que el valor esté en un rango seguro
             if hasattr(self, 'limitar'):
                 potencia_apriete = self.limitar(potencia_apriete, -100, 100)
-                
-            self.motor_garra.dc(potencia_apriete)
-            wait(tiempo_apriete_ms)
-            # En lugar de dejar un voltaje continuo que resbala, forzamos HOLD
-            self.motor_garra.hold()
+
+            # En vez de aplicar potencia por un tiempo fijo (inconsistente),
+            # empujamos hasta que el motor REALMENTE se cale contra el objeto.
+            # duty_limit controla la fuerza máxima de apriete.
+            self.motor_garra.run_until_stalled(
+                abs(velocidad) if velocidad else 200,
+                then=Stop.HOLD,
+                duty_limit=abs(potencia_apriete)
+            )
 
 def mover_torque_seguro(
     self,
