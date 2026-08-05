@@ -224,7 +224,7 @@ def dejar_bloques_matriz(self, robot):
     robot.mover_garra_principal(600, -40)
     #Aquí termina la sección de movimientos para entrar en la matriz =========================================================
 
-def dejar_bloques_matriz2(self, robot):
+def dejar_bloques_matriz2(robot):
     #Entrar en la matriz
     robot.seguir_linea(
         sensor_color=robot.seguidor,
