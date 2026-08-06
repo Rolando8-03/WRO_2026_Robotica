@@ -9,13 +9,14 @@ from control_drivebase import Base
 from pybricks.parameters import Color
 from pybricks.tools import wait
 import gc 
-
+from matriz_2 import ejecutar_matriz_2
 robot = Base()
 print("Voltaje:", robot.Hub.battery.voltage())
 
 # SECCION 1: =================================================================================
 # Giro de salida y seguidor hasta el cemento
 
+robot.motor_garra_delantera.reset_angle(0)
 robot.giro_de_arco(
     radio_cm=22,        # Radio del arco
     angulo_deg=90,      # Ángulo a girar
@@ -56,7 +57,7 @@ robot.girar(angulo_deg=-90, potencia_max=100, perfil="encadenado")
 
 # ACTIVAMOS TORQUE SIN ESPERAR Y LUEGO RETROCEDEMOS
 robot.mover_torque(grados_torque=-170, velocidad_torque=600, esperar=False)
-robot.avanzar_recto(distancia_cm=-17, velocidad_max=1000, perfil="encadenado") 
+robot.avanzar_recto(distancia_cm=-16, velocidad_max=1000, perfil="encadenado") 
 
 # Pequeño avance despues de tomar el cemento y giro en direccion a la llana
 robot.avanzar_recto(distancia_cm=6, velocidad_max=1000, perfil="encadenado")
@@ -201,7 +202,7 @@ robot.seguir_linea_hasta_color(
     velocidad_max=95, 
     lado="izquierda"
 )
-robot.girar_corto(7, potencia_max=60, potencia_min=40)
+robot.girar_corto(6, potencia_max=60, potencia_min=40)
 robot.avanzar_recto(14, 700)
 robot.girar_corto(-4, potencia_max=60, potencia_min=40)
 matriz_detectada = robot.escanear_matriz()
@@ -210,7 +211,7 @@ matriz_detectada = robot.escanear_matriz()
 robot.avanzar_recto(distancia_cm=-37, velocidad_max=900, perfil="seguro") 
 
 robot.girar(angulo_deg=-181, potencia_max=100, perfil="encadenado")
-robot.avanzar_recto(distancia_cm=-17.5, velocidad_max=750, perfil="seguro") 
+robot.avanzar_recto(distancia_cm=-23.5, velocidad_max=750, perfil="seguro") 
 robot.avanzar_recto(distancia_cm=8, velocidad_max=900, perfil="seguro") 
 
 # Giro para entrar en los cementos blancos y dejarlos =====================
@@ -422,7 +423,7 @@ robot.avanzar_recto(
 # El torque permanece abajo durante el retraso indicado.
 # Después comienza a subir mientras el robot continúa avanzando.
 robot.avanzar_recto(
-    distancia_cm=36.8,
+    distancia_cm=36,
     velocidad_max=800,
     torque_grados=160,
     torque_velocidad=250,
@@ -460,11 +461,6 @@ robot.avanzar_recto(distancia_cm=-25, velocidad_max=800, perfil="seguro")
 robot.avanzar_recto(distancia_cm=15, velocidad_max=800, perfil="seguro")
 robot.girar(angulo_deg=-40, potencia_max=80)
 
-'''
-#wait(100)
-
-'''
-
 robot.avanzar_recto(25, 900)
 
 robot.girar(angulo_deg=40, potencia_max=80)
@@ -472,7 +468,7 @@ robot.girar(angulo_deg=40, potencia_max=80)
 robot.seguir_linea(
     sensor_color=robot.seguidor,
     velocidad_max=100,
-    distancia_cm=130,
+    distancia_cm=125,
     lado="izquierda",
     tiempo_acomodo_ms=140,
     tiempo_aceleracion_ms=140,
@@ -488,15 +484,24 @@ robot.seguir_linea(
     perfil_salida="encadenado"
 )
 #wait(100)
-robot.mover_torque(grados_torque=152, velocidad_torque=500, esperar=True)
+robot.mover_torque(grados_torque=170, velocidad_torque=500, esperar=True)
+robot.avanzar_recto(16, 900)
 
-#robot.avanzar_recto(11, velocidad_max=800)
-robot.seguir_linea_hasta_color(Color.BLUE,robot.seguidor,lado="izquierda")
+robot.avanzar_recto(-8, 900)
+wait(300)
+robot.girar(90, potencia_max=80)
 
-robot.avanzar_recto(-7.2, 900)
-robot.girar(91, potencia_max=80)
+# =================================================================================
+# INICIALIZACIÓN DE LA MATRIZ DETECTADA
+# =================================================================================
+# Al terminar todo el reto 1, según lo que haya devuelto escanear_matriz()
+# más arriba (guardado en matriz_detectada), se ejecuta el recorrido de la
+# matriz correspondiente. Por ahora solo está implementada la matriz 2.
 
-
-wait(100)
-#robot.m1(robot)
-robot.m2(robot)
+print("Matriz detectada:", matriz_detectada)
+ 
+if matriz_detectada == 2:
+    print("Iniciando recorrido de la matriz 2...")
+    ejecutar_matriz_2(robot)
+else:
+    print("No hay recorrido definido para la matriz detectada:", matriz_detectada)
