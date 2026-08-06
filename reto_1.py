@@ -487,7 +487,7 @@ robot.seguir_linea(
 robot.mover_torque(grados_torque=170, velocidad_torque=500, esperar=True)
 robot.avanzar_recto(16, 900)
 
-robot.avanzar_recto(-8, 900)
+robot.avanzar_recto(-8.5, 900)
 wait(300)
 robot.girar(90, potencia_max=80)
 
