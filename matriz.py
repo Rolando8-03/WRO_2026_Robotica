@@ -152,7 +152,7 @@ def dejar_bloques_matriz(robot):
         perfil="seguro"
     )
 
-    robot.mover_garra_delantera(290)
+    robot.mover_garra_delantera(270)
 
     robot.seguir_linea(
         sensor_color=robot.seguidor,
@@ -177,7 +177,7 @@ def dejar_bloques_matriz(robot):
         500,
         -55,
         esperar=False,
-        potencia_apriete=100
+        potencia_apriete=150
     )
 
     robot.mover_garra_delantera(100)
@@ -353,7 +353,7 @@ def dejar_bloques_matriz3(robot):
 
     robot.mover_garra_delantera(230)
     robot.avanzar_recto(distancia_cm=-17, velocidad_max=400, perfil="seguro")
-    robot.mover_garra_delantera(285)
+    robot.mover_garra_delantera(270)
 
     robot.seguir_linea(
         sensor_color=robot.seguidor, velocidad_max=100, distancia_cm=16, lado="derecha",
@@ -362,20 +362,20 @@ def dejar_bloques_matriz3(robot):
         tiempo_captura_ms=280, potencia_captura=60, kp_captura=2.5, perfil_salida="encadenado"
     )
 
-    robot.mover_garra_principal(500, -50, esperar=False, potencia_apriete=150)
+    robot.mover_garra_principal(500, -50, esperar=False, potencia_apriete=140)
     robot.mover_garra_delantera(100)
     robot.seguir_linea_hasta_color(color_objetivo=Color.BLUE, velocidad_max=100, lado="derecha")
 
     wait(200)
 
     # Se conserva girar() porque este movimiento es de -3°.
-    robot.girar_corto(-9)
+    robot.girar_corto(-10)
 
     robot.avanzar_recto(distancia_cm=5, velocidad_max=650, zona_rampa_cm=0.1, perfil="encadenado")
     robot.mover_garra_delantera(270)
-    robot.mover_garra_rapida(potencia=100, grados=50)
+    robot.mover_garra_rapida(potencia=100, grados=70)
     robot.avanzar_recto(distancia_cm=-0.6, velocidad_max=650, zona_rampa_cm=0.1, perfil="encadenado")
-    robot.mover_garra_delantera(290)
+    robot.mover_garra_delantera(285)
     robot.avanzar_recto(distancia_cm=1.3, velocidad_max=750, zona_rampa_cm=0.1, perfil="encadenado")
 
     # Sacudida: aquí sí se usa exclusivamente girar_corto().
