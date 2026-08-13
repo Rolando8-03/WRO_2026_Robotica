@@ -202,121 +202,203 @@ def avanzar_recto(
 # Realiza un giro sobre el centro con control PD del IMU y detección de posibles bloqueos.
 # -----------------------------------------------------------------------------
 def girar(
+
     self,
+
     angulo_deg,
+
     potencia_max=85,
+
     potencia_min=35,
+
     kp_base=3.5,
+
     kd_base=5.0,
+
     tiempo_curva_s_ms=100,
+
     tolerancia_fin=1.2,
+
     perfil="encadenado"
+
 ):
+
     """
+
     Giro con control de giroscopio y detección automática de bloqueos.
+
     Esta versión reemplaza completamente a la anterior.
+
     """
+
     if angulo_deg == 0:
+
         return
 
+
+
     # Preparar motores
+
     self.motor_izquierdo.hold()
+
     self.motor_derecho.hold()
+
     wait(40)
+
+
 
     self.preparar_movimiento(reset_motores=False, reset_gyro=True, perfil=perfil)
 
+
+
     inicio = self.Hub.imu.heading()
+
     objetivo = inicio + angulo_deg
 
+
+
     error_anterior = self._error_angular(objetivo, inicio)
+
     derivada_anterior = 0
 
+
+
     cronometro = StopWatch()
+
     cronometro.reset()
 
+
+
     # ============================================================
+
     # 🔥 VARIABLES PARA DETECCIÓN DE BLOQUEO
+
     # ============================================================
+
     ultimo_angulo_imu = inicio
     ultimo_angulo_motores = (self.motor_izquierdo.angle() + self.motor_derecho.angle()) / 2
     contador_sin_cambio = 0
     bloqueo_detectado = False
 
     while True:
+
         # ============================================================
+
         # 1. LECTURA DE SENSORES
+
         # ============================================================
+
         actual_imu = self.Hub.imu.heading()
         error = self._error_angular(objetivo, actual_imu)
-
         # Lectura de motores (odometría)
+
         angulo_motores = (self.motor_izquierdo.angle() + self.motor_derecho.angle()) / 2
 
         # ============================================================
+
         # 2. DETECCIÓN DE BLOQUEO
+
         # ============================================================
+
         if abs(error) > 5:
+
             # Calculamos cuánto debería haber girado según el IMU
             delta_imu = abs(actual_imu - ultimo_angulo_imu)
             delta_motores = abs(angulo_motores - ultimo_angulo_motores)
 
             # Si el IMU dice que no estamos girando pero los motores dicen que sí
+
             if delta_imu < 1.0 and delta_motores > 5.0:
+
                 contador_sin_cambio += 1
+
                 if contador_sin_cambio > 5:
+
                     # ¡BLOQUEO DETECTADO!
+
                     bloqueo_detectado = True
 
+
+
                     # Identificar qué rueda está patinando
+
                     if abs(self.motor_izquierdo.angle() - ultimo_angulo_motores) > abs(self.motor_derecho.angle() - ultimo_angulo_motores):
+
                         # La izquierda está patinando - frenarla
+
                         self.motor_izquierdo.dc(-20)
+
                         wait(20)
+
                     else:
+
                         # La derecha está patinando - frenarla
+
                         self.motor_derecho.dc(-20)
+
                         wait(20)
+
+
 
                     # Reseteamos y continuamos
+
                     self.reset_motores()
+
                     angulo_motores = 0
+
                     bloqueo_detectado = False
+
                     contador_sin_cambio = 0
+
             else:
+
                 contador_sin_cambio = max(0, contador_sin_cambio - 1)
 
+
+
             ultimo_angulo_imu = actual_imu
+
             ultimo_angulo_motores = angulo_motores
 
+
+
         # ============================================================
+
         # 3. CONTROL DE GIRO NORMAL
+
         # ============================================================
+
         if abs(error) <= tolerancia_fin:
+
             break
 
         # Ganancia dinámica
+
         if abs(error) > 25:
+
             kp_dinamico = kp_base * 1.1
             kd_dinamico = kd_base * 1.1
+
         else:
+
             kp_dinamico = kp_base * 1.5
             kd_dinamico = kd_base * 0.3
 
         derivada_cruda = error - error_anterior
         derivada = (derivada_cruda * 0.7) + (derivada_anterior * 0.3)
-
         correccion = (error * kp_dinamico) + (derivada * kd_base)
-
         tiempo_transcurrido = cronometro.time()
+
         if tiempo_transcurrido < tiempo_curva_s_ms:
             limite_potencia = potencia_min + (potencia_max - potencia_min) * (tiempo_transcurrido / tiempo_curva_s_ms)
+
         else:
             limite_potencia = potencia_max
 
         potencia_final = self.limitar(correccion, -limite_potencia, limite_potencia)
 
         # Si hay bloqueo, más agresivo
+
         if bloqueo_detectado:
             potencia_final = potencia_final * 1.5
             potencia_final = self.limitar(potencia_final, -limite_potencia, limite_potencia)
@@ -325,6 +407,7 @@ def girar(
                 potencia_final = potencia_min * 0.5 if potencia_final > 0 else -potencia_min * 0.5
 
         # Aplicar potencia a los motores
+
         pot_izq = int(potencia_final)
         pot_der = int(-potencia_final)
 
@@ -336,6 +419,7 @@ def girar(
         wait(2)
 
     # Frenado final
+
     self.motor_izquierdo.hold()
     self.motor_derecho.hold()
     wait(20)
