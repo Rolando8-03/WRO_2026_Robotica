@@ -42,7 +42,7 @@ def ejecutar_matriz_2(robot):
     robot.mover_garra_principal(900, 250, apretar=False, duty_cierre=60)
 
     # Avanza hacia la zona de recolección del bloque azul
-    robot.avanzar_recto(distancia_cm=11.5, velocidad_max=900, perfil="encadenado")
+    robot.avanzar_recto(distancia_cm=12, velocidad_max=900, perfil="encadenado")
     
     # Baja/activa la garra delantera a la posición 300 para sujetar el bloque azul
     robot.mover_garra_delantera(290)
@@ -59,8 +59,8 @@ def ejecutar_matriz_2(robot):
     # Sigue la línea usando el sensor por el lado izquierdo durante 8 cm
     robot.seguir_linea(
         sensor_color=robot.seguidor, 
-        velocidad_max=70, 
-        distancia_cm=8, 
+        velocidad_max=60, 
+        distancia_cm=7, 
         lado="izquierda", 
         tiempo_acomodo_ms=140, 
         tiempo_aceleracion_ms=140, 
@@ -86,7 +86,7 @@ def ejecutar_matriz_2(robot):
     
     # Ajusta garra delantera y garra principal con apriete para sujetar
     robot.mover_garra_delantera(255)
-    robot.mover_garra_principal(900, 90, apretar=False, duty_cierre=60)
+    robot.mover_garra_principal(900, 80, apretar=False, duty_cierre=60)
     wait(200)
     
     # Avanza hacia los bloques amarillos
@@ -97,7 +97,7 @@ def ejecutar_matriz_2(robot):
     robot.mover_garra_principal(300, esperar=False, potencia_apriete=80, apretar=True)
     
     # Retrocede con la carga asegurada
-    robot.avanzar_recto(distancia_cm=-14, velocidad_max=550, perfil="seguro")
+    robot.avanzar_recto(distancia_cm=-13.5, velocidad_max=550, perfil="seguro")
     wait(200)
     
     # Giro de 90° a la derecha para reconectarse con el trayecto
@@ -212,8 +212,8 @@ def ejecutar_matriz_2(robot):
 
     # Posicionamiento final frente al objetivo
     robot.girar(90, potencia_max=90, potencia_min=35, kp_base=5.0, tolerancia_fin=1.0, perfil="encadenado")
-    robot.mover_garra_delantera(280)
-    robot.mover_garra_principal(900, 90, apretar=False, duty_cierre=60)
+    robot.mover_garra_delantera(270)
+    robot.mover_garra_principal(900, 150, apretar=False, duty_cierre=60)
     wait(300)
 
     # Secuencia de agarre de precisión
