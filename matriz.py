@@ -10,7 +10,6 @@ from pybricks.parameters import Button, Color, Direction, Port, Side, Stop
 from pybricks.robotics import DriveBase
 from pybricks.tools import wait, StopWatch
 
-
 # -----------------------------------------------------------------------------
 # _realizar_lectura_estatica
 # Detiene el robot, toma varias lecturas del sensor y devuelve el color con
@@ -138,11 +137,7 @@ def dejar_bloques_matriz(robot):
         perfil_salida="encadenado"
     ) 
 
-    robot.mover_garra_principal(
-        300,
-        80,
-        esperar=False
-    ) 
+    robot.mover_garra_principal(900, 230, apretar=False, duty_cierre=60)
 
     robot.mover_garra_delantera(100)
 
@@ -173,12 +168,7 @@ def dejar_bloques_matriz(robot):
         perfil_salida="encadenado"
     )
 
-    robot.mover_garra_principal(
-        500,
-        -55,
-        esperar=False,
-        potencia_apriete=150
-    )
+    robot.mover_garra_principal(300, esperar=False, potencia_apriete=150, apretar=True)
 
     robot.mover_garra_delantera(100)
 
@@ -200,10 +190,7 @@ def dejar_bloques_matriz(robot):
 
     robot.mover_garra_delantera(270)
 
-    robot.mover_garra_rapida(
-        potencia=100,
-        grados=70,
-    )
+    robot.mover_garra_rapida(130)
 
     robot.avanzar_recto(
         distancia_cm=-0.6,
@@ -233,6 +220,7 @@ def dejar_bloques_matriz(robot):
     #Aquí termina la sección de movimientos para entrar en la matriz =========================================================
 
 def dejar_bloques_matriz2(robot):
+
     #Entrar en la matriz
     robot.seguir_linea(
         sensor_color=robot.seguidor,
@@ -253,11 +241,7 @@ def dejar_bloques_matriz2(robot):
         perfil_salida="encadenado"
     ) 
 
-    robot.mover_garra_principal(
-        300,
-        80,
-        esperar=False
-    ) 
+    robot.mover_garra_principal(900, 230, apretar=False, duty_cierre=60)
 
     robot.mover_garra_delantera(100)
 
@@ -288,12 +272,7 @@ def dejar_bloques_matriz2(robot):
         perfil_salida="encadenado"
     )
 
-    robot.mover_garra_principal(
-        500,
-        -50,
-        esperar=False,
-        potencia_apriete=100
-    )
+    robot.mover_garra_principal(300, esperar=False, potencia_apriete=150, apretar=True)
 
     robot.mover_garra_delantera(100)
 
@@ -315,7 +294,7 @@ def dejar_bloques_matriz2(robot):
 
     robot.mover_garra_delantera(250)
 
-    robot.mover_garra_rapida(potencia=100, grados=50)   
+    robot.mover_garra_rapida(90)   
 
     robot.avanzar_recto(
         distancia_cm=0.2,
@@ -349,7 +328,7 @@ def dejar_bloques_matriz3(robot):
         tiempo_captura_ms=280, potencia_captura=60, kp_captura=2.5, perfil_salida="encadenado"
     )
 
-    robot.mover_garra_principal(300, 90, esperar=False)
+    robot.mover_garra_principal(900, 230, apretar=False, duty_cierre=60)
 
     robot.mover_garra_delantera(230)
     robot.avanzar_recto(distancia_cm=-17, velocidad_max=400, perfil="seguro")
@@ -362,7 +341,7 @@ def dejar_bloques_matriz3(robot):
         tiempo_captura_ms=280, potencia_captura=60, kp_captura=2.5, perfil_salida="encadenado"
     )
 
-    robot.mover_garra_principal(500, -50, esperar=False, potencia_apriete=140)
+    robot.mover_garra_principal(300, esperar=False, potencia_apriete=150, apretar=True)
     robot.mover_garra_delantera(100)
     robot.seguir_linea_hasta_color(color_objetivo=Color.BLUE, velocidad_max=100, lado="derecha")
 
@@ -373,7 +352,7 @@ def dejar_bloques_matriz3(robot):
 
     robot.avanzar_recto(distancia_cm=5, velocidad_max=650, zona_rampa_cm=0.1, perfil="encadenado")
     robot.mover_garra_delantera(270)
-    robot.mover_garra_rapida(potencia=100, grados=70)
+    robot.mover_garra_rapida(130)
     robot.avanzar_recto(distancia_cm=-0.6, velocidad_max=650, zona_rampa_cm=0.1, perfil="encadenado")
     robot.mover_garra_delantera(285)
     robot.avanzar_recto(distancia_cm=1.3, velocidad_max=750, zona_rampa_cm=0.1, perfil="encadenado")
