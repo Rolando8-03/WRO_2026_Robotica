@@ -65,7 +65,7 @@ robot.girar(angulo_deg=77, potencia_max=100, perfil="encadenado")
 
 
 # Retroceso para dejar la llana en su lugar y mov.recto para regresar a la linea
-robot.avanzar_recto(distancia_cm=-33, velocidad_max=1000, perfil="seguro")
+robot.avanzar_recto(distancia_cm=-32, velocidad_max=1000, perfil="seguro")
 # Cruzar 3 líneas y detenerse un poquito después de la tercera
 robot.avanzar_cruzando_lineas(
     cruces_objetivo=3, 
@@ -152,7 +152,7 @@ robot.girar(angulo_deg=180, potencia_max=100, perfil="encadenado")
 
 gc.collect()
 # AGARRAR LOS CEMENTOS BLANCOS
-robot.mover_torque(grados_torque=-170, velocidad_torque=250, esperar=False)
+robot.mover_torque(grados_torque=-171, velocidad_torque=250, esperar=False)
 robot.avanzar_recto(distancia_cm=-23, velocidad_max=700, perfil="encadenado")
 
 gc.collect()
@@ -211,11 +211,11 @@ matriz_detectada = robot.escanear_matriz()
 robot.avanzar_recto(distancia_cm=-37, velocidad_max=900, perfil="seguro") 
 
 robot.girar(angulo_deg=-181, potencia_max=100, perfil="encadenado")
-robot.avanzar_recto(distancia_cm=-23.5, velocidad_max=750, perfil="seguro") 
+robot.avanzar_recto(distancia_cm=-23.5, velocidad_max=670, perfil="seguro") 
 robot.avanzar_recto(distancia_cm=8, velocidad_max=900, perfil="seguro") 
 
 # Giro para entrar en los cementos blancos y dejarlos =====================
-robot.girar(angulo_deg=41, potencia_max=100, perfil="encadenado")
+robot.girar(angulo_deg=41.5, potencia_max=100, perfil="encadenado")
 
 # DEJAR LOS CEMENTOS BLANCOS
 robot.mover_torque(grados_torque=150, velocidad_torque=500, esperar=False)
@@ -423,7 +423,7 @@ robot.avanzar_recto(
 # El torque permanece abajo durante el retraso indicado.
 # Después comienza a subir mientras el robot continúa avanzando.
 robot.avanzar_recto(
-    distancia_cm=36,
+    distancia_cm=38,
     velocidad_max=800,
     torque_grados=160,
     torque_velocidad=250,
