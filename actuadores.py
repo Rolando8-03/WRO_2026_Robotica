@@ -42,11 +42,14 @@ def mover_garra_principal(
     grados=0,
     esperar=True,
     potencia_apriete=150,
-    tiempo_apriete_ms=120,  # ya no se usa para apretar, se deja por compatibilidad
-    apretar=True,
-    modo_soltar=None
+    tiempo_apriete_ms=120,
+    apretar=False,
+    modo_soltar=None,
+    duty_cierre=60
 ):
-    # 1. FUNCIÓN "SOLTAR" FUSIONADA
+    # ==========================================
+    # 1. CONTROL MANUAL
+    # ==========================================
     if modo_soltar == "hold":
         self.motor_garra.hold()
         return
@@ -57,47 +60,53 @@ def mover_garra_principal(
         self.motor_garra.brake()
         return
 
-    if grados == 0:
+    velocidad = abs(velocidad)
+    if velocidad <= 0:
+        velocidad = 200
+
+    # ==========================================
+    # 2. APRIETE (agarrar un objeto de tamaño variable)
+    #
+    # Cuando apretar=True, el ángulo objetivo (grados) se ignora:
+    # la garra cierra hasta encontrar resistencia real (el objeto),
+    # no hasta una posición fija.
+    # ==========================================
+    if apretar:
+        if hasattr(self, "limitar"):
+            potencia_apriete = self.limitar(potencia_apriete, -100, 100)
+        else:
+            potencia_apriete = max(-100, min(100, potencia_apriete))
+
+        self.motor_garra.run_until_stalled(
+            -velocidad,
+            then=Stop.HOLD,
+            duty_limit=abs(potencia_apriete)
+        )
         return
 
-    # 2. TOPE DE SEGURIDAD
-    if abs(grados) > 170:
-        grados = 170 if grados > 0 else -170
+    # ==========================================
+    # 3. LIMITAR ESCALA 0-200 (solo aplica si NO es apriete)
+    # ==========================================
+    grados = max(0, min(200, grados))
 
-    self.motor_garra.stop()
-
-    # 3. ABRIR
-    if grados > 0:
-        wait(40)
-        self.motor_garra.run_angle(
-            abs(velocidad),
-            -abs(grados),
+    # ==========================================
+    # 4. MOVER A LA POSICIÓN
+    # ==========================================
+    if grados == 0:
+        self.motor_garra.run_until_stalled(
+            -velocidad,
+            then=Stop.HOLD,
+            duty_limit=duty_cierre
+        )
+        self.motor_garra.reset_angle(0)
+    else:
+        posicion_motor = grados
+        self.motor_garra.run_target(
+            velocidad,
+            posicion_motor,
             then=Stop.HOLD,
             wait=esperar
         )
-
-    # 4. CERRAR
-    else:
-        wait(20)
-        self.motor_garra.run_angle(
-            abs(velocidad),
-            abs(grados),
-            then=Stop.HOLD,
-            wait=True
-        )
-
-        if apretar:
-            if hasattr(self, 'limitar'):
-                potencia_apriete = self.limitar(potencia_apriete, -100, 100)
-
-            # En vez de aplicar potencia por un tiempo fijo (inconsistente),
-            # empujamos hasta que el motor REALMENTE se cale contra el objeto.
-            # duty_limit controla la fuerza máxima de apriete.
-            self.motor_garra.run_until_stalled(
-                abs(velocidad) if velocidad else 200,
-                then=Stop.HOLD,
-                duty_limit=abs(potencia_apriete)
-            )
 
 def mover_torque_seguro(
     self,
@@ -197,19 +206,12 @@ def mover_garra_delantera(
 
 def mover_garra_rapida(
     self,
-    grados=90,
-    potencia=100,
+    grados=130,
+    potencia=120,
     tiempo_max_ms=1200
 ):
-    """
-    Abre la garra lo más rápido posible.
-
-    - Usa potencia máxima.
-    - Se detiene exactamente en el ángulo solicitado.
-    - No realiza apriete.
-    """
-
     if grados <= 0:
+        print("mover_garra_rapida: grados <= 0, no se movió")
         return
 
     potencia = self.limitar(potencia, 10, 100)
@@ -220,14 +222,18 @@ def mover_garra_rapida(
 
     cronometro = StopWatch()
 
-    self.motor_garra.dc(-potencia)
+    self.motor_garra.dc(potencia)
 
     while True:
-
         if abs(self.motor_garra.angle()) >= grados:
             break
-
         if cronometro.time() >= tiempo_max_ms:
+            print(
+                "mover_garra_rapida: se agotó el tiempo, llegó a",
+                self.motor_garra.angle(),
+                "de",
+                grados
+            )
             break
 
     self.motor_garra.hold()
