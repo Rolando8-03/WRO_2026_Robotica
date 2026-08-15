@@ -182,7 +182,7 @@ robot.seguir_linea(
     kp_captura=3.8,
     perfil_salida="encadenado"
 )
-robot.girar(angulo_deg=75, potencia_max=90, perfil="encadenado")
+robot.girar(angulo_deg=75, potencia_max=90, perfil="encadenado",)
 wait(70)
 
 robot.avanzar_cruzando_lineas(
@@ -203,12 +203,12 @@ robot.seguir_linea_hasta_color(
     lado="izquierda"
 )
 robot.girar_corto(6, potencia_max=60, potencia_min=40)
-robot.avanzar_recto(14, 700)
-robot.girar_corto(-4, potencia_max=60, potencia_min=40)
+robot.avanzar_recto(14.5, 700)
+robot.girar_corto(-3, potencia_max=60, potencia_min=40)
 matriz_detectada = robot.escanear_matriz()
 
 #Salir de la matriz-----------------
-robot.avanzar_recto(distancia_cm=-37, velocidad_max=900, perfil="seguro") 
+robot.avanzar_recto(distancia_cm=-37.5, velocidad_max=900, perfil="seguro") 
 
 robot.girar(angulo_deg=-181, potencia_max=100, perfil="encadenado")
 robot.avanzar_recto(distancia_cm=-23.5, velocidad_max=670, perfil="seguro") 
@@ -299,11 +299,11 @@ robot.girar(angulo_deg=-48, potencia_max=100, perfil="encadenado")
 
 wait(80)
 
-robot.avanzar_cruzando_lineas(2,900, retraso_freno_ms=95.5)
+robot.avanzar_cruzando_lineas(2, 900, retraso_freno_ms=80)
 #avance hasta la linea para tomar los amarillos
 #robot.avanzar_hibrido(distancia_inicial_cm=15,color_objetivo=Color.BLACK,velocidad_max=350,cruces=1)
 
-robot.girar(angulo_deg=-132, potencia_max=100, perfil="encadenado")
+robot.girar(angulo_deg=-129, potencia_max=100, perfil="encadenado")
 
 #robot.seguir_linea_hasta_color(color_objetivo=Color.YELLOW, velocidad_max=500, lado="derecha")
 
@@ -315,7 +315,7 @@ robot.avanzar_recto(distancia_cm=-25, velocidad_max=900, perfil="encadenado")
 robot.girar(angulo_deg=-70, potencia_max=100, perfil="encadenado")
 # Avanzar a la linea para ir a los amarillos
 wait(80)
-robot.avanzar_cruzando_lineas(2,900, escape_inicial_cm=8,retraso_freno_ms=0,distancia_extra_cm=23)
+robot.avanzar_cruzando_lineas(2,900, escape_inicial_cm=8,retraso_freno_ms=0,distancia_extra_cm=22)
 
 robot.girar(angulo_deg=55, potencia_max=100, perfil="encadenado")
 
@@ -380,7 +380,7 @@ robot.girar(angulo_deg=-88, potencia_max=100, perfil="encadenado")
 robot.seguir_linea(
     sensor_color=robot.seguidor,
     velocidad_max=100,
-    distancia_cm=44,
+    distancia_cm=45,
     lado="derecha",
     tiempo_acomodo_ms=140,
     tiempo_aceleracion_ms=140,
@@ -451,10 +451,10 @@ robot.seguir_linea(
 )
 robot.avanzar_hasta_color(color_objetivo=Color.BLUE, velocidad=500)
 
-robot.avanzar_recto(-10, 800)
+robot.avanzar_recto(-9, 800)
 robot.girar(angulo_deg=-180, potencia_max=100, perfil="encadenado")
 
-robot.mover_torque(grados_torque=-165, velocidad_torque=500, esperar=False)
+robot.mover_torque(grados_torque=-164, velocidad_torque=400, esperar=False)
 robot.avanzar_recto(distancia_cm=-25, velocidad_max=800, perfil="seguro")
 
 # Salir de la seccion de azul y tomar la linea
@@ -468,7 +468,7 @@ robot.girar(angulo_deg=40, potencia_max=80)
 robot.seguir_linea(
     sensor_color=robot.seguidor,
     velocidad_max=100,
-    distancia_cm=125,
+    distancia_cm=126,
     lado="izquierda",
     tiempo_acomodo_ms=140,
     tiempo_aceleracion_ms=140,
@@ -484,11 +484,29 @@ robot.seguir_linea(
     perfil_salida="encadenado"
 )
 #wait(100)
-robot.mover_torque(grados_torque=170, velocidad_torque=500, esperar=True)
-robot.avanzar_recto(16, 900)
+robot.mover_torque(grados_torque=180, velocidad_torque=500, esperar=True)
+robot.seguir_linea(
+    sensor_color=robot.seguidor,
+    velocidad_max=70,
+    distancia_cm=14,
+    lado="izquierda",
+    tiempo_acomodo_ms=140,
+    tiempo_aceleracion_ms=140,
+    kp=1.25,
+    kd=2.7,
+    k_freno=0.16,
+    correccion_max=100,
+    objetivo_reflexion=27,
+    captura_inicial=True,
+    tiempo_captura_ms=280,
+    potencia_captura=60,
+    kp_captura=2.5,
+    perfil_salida="encadenado"
+)
+robot.avanzar_recto(4, 900)
 
-robot.avanzar_recto(-8.5, 900)
-wait(300)
+robot.avanzar_recto(-10.5, 900)
+wait(400)
 robot.girar(90, potencia_max=80)
 
 # =================================================================================
