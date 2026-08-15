@@ -143,4 +143,5 @@ class Base:
     #Función para dejar los bloques en la matriz.
     dejar_bloques_matriz = matriz.dejar_bloques_matriz
 
-    
+    #FUNCION PARA DEJAR LOS BLOQUES DE MATRIZ3
+    dejar_bloques_matriz3 = matriz.dejar_bloques_matriz3
