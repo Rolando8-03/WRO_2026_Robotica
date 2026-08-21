@@ -43,7 +43,7 @@ robot.seguir_linea(
     correccion_max=100,
     objetivo_reflexion=27,     
     
-    captura_inicial=True,
+    captura_inicial=True,   
     tiempo_captura_ms=280,
     potencia_captura=60,
     kp_captura=2.5,
@@ -317,7 +317,7 @@ robot.girar(angulo_deg=-70, potencia_max=100, perfil="encadenado")
 wait(80)
 robot.avanzar_cruzando_lineas(2,900, escape_inicial_cm=8,retraso_freno_ms=0,distancia_extra_cm=22)
 
-robot.girar(angulo_deg=55, potencia_max=100, perfil="encadenado")
+robot.girar(angulo_deg=56, potencia_max=100, perfil="encadenado")
 
 robot.seguir_linea(
     sensor_color=robot.seguidor,
@@ -468,7 +468,7 @@ robot.girar(angulo_deg=40, potencia_max=80)
 robot.seguir_linea(
     sensor_color=robot.seguidor,
     velocidad_max=100,
-    distancia_cm=126,
+    distancia_cm=127,
     lado="izquierda",
     tiempo_acomodo_ms=140,
     tiempo_aceleracion_ms=140,
@@ -488,7 +488,7 @@ robot.mover_torque(grados_torque=180, velocidad_torque=500, esperar=True)
 robot.seguir_linea(
     sensor_color=robot.seguidor,
     velocidad_max=70,
-    distancia_cm=14,
+    distancia_cm=13,
     lado="izquierda",
     tiempo_acomodo_ms=140,
     tiempo_aceleracion_ms=140,
@@ -506,8 +506,8 @@ robot.seguir_linea(
 robot.avanzar_recto(4, 900)
 
 robot.avanzar_recto(-10.5, 900)
-wait(400)
-robot.girar(90, potencia_max=80)
+wait(500)
+robot.girar(90, potencia_max=70)
 
 # =================================================================================
 # INICIALIZACIÓN DE LA MATRIZ DETECTADA
