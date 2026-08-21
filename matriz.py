@@ -266,12 +266,14 @@ def dejar_bloques_matriz2(robot):
     robot.avanzar_recto(distancia_cm=-0.6, velocidad_max=650, zona_rampa_cm=0.1, perfil="encadenado")
     robot.mover_garra_delantera(285)
     robot.avanzar_recto(distancia_cm=1.5, velocidad_max=750, zona_rampa_cm=0.1, perfil="encadenado")
+    
 
     # Sacudida: aquí sí se usa exclusivamente girar_corto().
     for i in range(4):
         robot.girar_corto(8, potencia_max=75, potencia_min=45)
         robot.girar_corto(-8, potencia_max=75, potencia_min=45)
 
+    robot.mover_garra_delantera(255)
     robot.avanzar_recto(distancia_cm=-30, velocidad_max=900, zona_rampa_cm=0.1, perfil="encadenado")
     robot.girar(180, potencia_max=85, potencia_min=35, kp_base=5.0, tolerancia_fin=1.0, perfil="encadenado")
     robot.avanzar_recto(distancia_cm=-21, velocidad_max=900, zona_rampa_cm=0.1, perfil="encadenado")
