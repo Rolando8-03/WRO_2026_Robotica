@@ -28,12 +28,12 @@ gc.collect()
 
 robot.seguir_linea(
     sensor_color=robot.seguidor,
-    distancia_cm=81,           
+    distancia_cm=82,           
     velocidad_max=100,         
     lado="derecha",            
     
     tiempo_acomodo_ms=50,      
-    tiempo_aceleracion_ms=80,  
+    tiempo_aceleracion_ms=50,  
     
     #CEREBRO PREDICTIVO (PID):
     kp=1.15,                   
@@ -63,7 +63,6 @@ robot.avanzar_recto(distancia_cm=-16, velocidad_max=1000, perfil="encadenado")
 robot.avanzar_recto(distancia_cm=6, velocidad_max=1000, perfil="encadenado")
 robot.girar(angulo_deg=77, potencia_max=100, perfil="encadenado") 
 
-
 # Retroceso para dejar la llana en su lugar y mov.recto para regresar a la linea
 robot.avanzar_recto(distancia_cm=-32, velocidad_max=1000, perfil="seguro")
 # Cruzar 3 líneas y detenerse un poquito después de la tercera
@@ -89,7 +88,7 @@ robot.giro_de_arco(
 # Seguir linea hasta lugar de cemento. Giro y movimiento torque para dejarlo en su lugar
 robot.seguir_linea(
     sensor_color=robot.seguidor,
-    distancia_cm=43,           
+    distancia_cm=42,           
     velocidad_max=100,         
     lado="derecha",            
     
@@ -454,7 +453,7 @@ robot.avanzar_hasta_color(color_objetivo=Color.BLUE, velocidad=500)
 robot.avanzar_recto(-9, 800)
 robot.girar(angulo_deg=-180, potencia_max=100, perfil="encadenado")
 
-robot.mover_torque(grados_torque=-164, velocidad_torque=400, esperar=False)
+robot.mover_torque(grados_torque=-164, velocidad_torque=300, esperar=False)
 robot.avanzar_recto(distancia_cm=-25, velocidad_max=800, perfil="seguro")
 
 # Salir de la seccion de azul y tomar la linea
