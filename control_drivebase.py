@@ -82,6 +82,9 @@ class Base:
     # Avanza o retrocede una distancia manteniendo el rumbo con el IMU.
     avanzar_recto = navegacion.avanzar_recto
 
+    # Avanza recto manteniendo el rumbo hasta dejar de detectar negro.
+    avanzar_hasta_salir_negro = navegacion.avanzar_hasta_salir_negro
+
     # Realiza un giro sobre el centro del robot utilizando el IMU.
     girar = navegacion.girar
 
@@ -116,6 +119,9 @@ class Base:
     # Combina un avance por distancia con una búsqueda posterior por color.
     avanzar_hibrido = deteccion_color.avanzar_hibrido
 
+    # Comprueba continuamente la reflexión del sensor de color.
+    comprobar_reflexion_negro = deteccion_color.comprobar_reflexion_negro
+
     # ============================== ACTUADORES ==============================
     # Mueve el mecanismo de torque para tomar o soltar objetos.
     mover_torque = actuadores.mover_torque
@@ -126,7 +132,6 @@ class Base:
     #Abre o cierra la garra principal
     mover_garra_principal = actuadores.mover_garra_principal
 
-    #Abre o cierra la garra usando una versión rápida
     mover_garra_rapida = actuadores.mover_garra_rapida
 
 
@@ -143,5 +148,4 @@ class Base:
     #Función para dejar los bloques en la matriz.
     dejar_bloques_matriz = matriz.dejar_bloques_matriz
 
-    #FUNCION PARA DEJAR LOS BLOQUES DE MATRIZ3
-    dejar_bloques_matriz3 = matriz.dejar_bloques_matriz3
+    
