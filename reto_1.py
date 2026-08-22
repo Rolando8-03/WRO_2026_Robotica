@@ -217,7 +217,7 @@ robot.avanzar_recto(distancia_cm=-23.5, velocidad_max=670, perfil="seguro")
 robot.avanzar_recto(distancia_cm=7.5, velocidad_max=900, perfil="seguro") 
 
 # Giro para entrar en los cementos blancos y dejarlos =====================
-robot.girar(angulo_deg=41.5, potencia_max=100, perfil="encadenado")
+robot.girar(angulo_deg=39, potencia_max=100, perfil="encadenado")
 
 # DEJAR LOS CEMENTOS BLANCOS
 robot.mover_torque(grados_torque=150, velocidad_torque=500, esperar=False)
