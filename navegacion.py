@@ -202,146 +202,113 @@ def avanzar_recto(
 # Realiza un giro sobre el centro con control PD del IMU y detección de posibles bloqueos.
 # -----------------------------------------------------------------------------
 def girar(
+
     self,
+
     angulo_deg,
+
     potencia_max=85,
-    potencia_min=35,
+
+    potencia_min=40,
+
     kp_base=3.5,
+
     kd_base=5.0,
+
     tiempo_curva_s_ms=100,
-    tolerancia_fin=1.2,
+
+    tolerancia_fin=1.9,
+
     perfil="encadenado"
+
 ):
+
     """
+
     Giro con control de giroscopio y detección automática de bloqueos.
 
-    Mantiene el comportamiento original.
-    Único ajuste añadido:
-    en giros de ±180° se fuerza el sentido indicado por el signo
-    de angulo_deg para evitar que el IMU elija aleatoriamente
-    entre los dos caminos equivalentes.
+    Esta versión reemplaza completamente a la anterior.
+
     """
 
     if angulo_deg == 0:
+
         return
 
+
+
     # Preparar motores
+
     self.motor_izquierdo.hold()
+
     self.motor_derecho.hold()
+
     wait(40)
 
-    self.preparar_movimiento(
-        reset_motores=False,
-        reset_gyro=True,
-        perfil=perfil
-    )
+
+
+    self.preparar_movimiento(reset_motores=False, reset_gyro=True, perfil=perfil)
+
+
 
     inicio = self.Hub.imu.heading()
+
     objetivo = inicio + angulo_deg
+
+
 
     error_anterior = self._error_angular(objetivo, inicio)
 
-    # ============================================================
-    # AJUSTE ÚNICO:
-    # FORZAR SENTIDO EN GIROS DE ±180°
-    # ============================================================
-    #
-    # A 180° hay dos caminos matemáticamente equivalentes:
-    # +180° y -180°.
-    #
-    # Debido a pequeñas variaciones del IMU, el error puede aparecer
-    # unas veces como +180 y otras como -180.
-    #
-    # Aquí hacemos que:
-    #
-    # girar(180)  -> conserve siempre sentido positivo
-    # girar(-180) -> conserve siempre sentido negativo
-    #
-    # Esto NO afecta giros diferentes de 180°.
-    #
-    if abs(abs(angulo_deg) - 180) < 0.5:
-        error_anterior = (
-            abs(error_anterior)
-            if angulo_deg > 0
-            else -abs(error_anterior)
-        )
-
     derivada_anterior = 0
 
+
+
     cronometro = StopWatch()
+
     cronometro.reset()
 
+
+
     # ============================================================
-    # VARIABLES PARA DETECCIÓN DE BLOQUEO
+
+    # 🔥 VARIABLES PARA DETECCIÓN DE BLOQUEO
+
     # ============================================================
 
     ultimo_angulo_imu = inicio
-
-    ultimo_angulo_motores = (
-        self.motor_izquierdo.angle()
-        + self.motor_derecho.angle()
-    ) / 2
-
+    ultimo_angulo_motores = (self.motor_izquierdo.angle() + self.motor_derecho.angle()) / 2
     contador_sin_cambio = 0
     bloqueo_detectado = False
 
     while True:
 
         # ============================================================
+
         # 1. LECTURA DE SENSORES
+
         # ============================================================
 
         actual_imu = self.Hub.imu.heading()
-
-        error = self._error_angular(
-            objetivo,
-            actual_imu
-        )
-
-        # ============================================================
-        # AJUSTE ÚNICO:
-        # CONSERVAR EL SENTIDO SOLICITADO CERCA DE 180°
-        # ============================================================
-
-        if (
-            abs(abs(angulo_deg) - 180) < 0.5
-            and abs(error) > 175
-        ):
-            error = (
-                abs(error)
-                if angulo_deg > 0
-                else -abs(error)
-            )
-
+        error = self._error_angular(objetivo, actual_imu)
         # Lectura de motores (odometría)
 
-        angulo_motores = (
-            self.motor_izquierdo.angle()
-            + self.motor_derecho.angle()
-        ) / 2
+        angulo_motores = (self.motor_izquierdo.angle() + self.motor_derecho.angle()) / 2
 
         # ============================================================
+
         # 2. DETECCIÓN DE BLOQUEO
+
         # ============================================================
 
         if abs(error) > 5:
 
             # Calculamos cuánto debería haber girado según el IMU
-            delta_imu = abs(
-                actual_imu - ultimo_angulo_imu
-            )
+            delta_imu = abs(actual_imu - ultimo_angulo_imu)
+            delta_motores = abs(angulo_motores - ultimo_angulo_motores)
 
-            delta_motores = abs(
-                angulo_motores - ultimo_angulo_motores
-            )
+            # Si el IMU dice que no estamos girando pero los motores dicen que sí
 
-            # Si el IMU dice que no estamos girando
-            # pero los motores dicen que sí
-
-            if (
-                delta_imu < 1.0
-                and delta_motores > 5.0
-            ):
+            if delta_imu < 1.0 and delta_motores > 5.0:
 
                 contador_sin_cambio += 1
 
@@ -351,19 +318,11 @@ def girar(
 
                     bloqueo_detectado = True
 
+
+
                     # Identificar qué rueda está patinando
 
-                    if (
-                        abs(
-                            self.motor_izquierdo.angle()
-                            - ultimo_angulo_motores
-                        )
-                        >
-                        abs(
-                            self.motor_derecho.angle()
-                            - ultimo_angulo_motores
-                        )
-                    ):
+                    if abs(self.motor_izquierdo.angle() - ultimo_angulo_motores) > abs(self.motor_derecho.angle() - ultimo_angulo_motores):
 
                         # La izquierda está patinando - frenarla
 
@@ -379,6 +338,8 @@ def girar(
 
                         wait(20)
 
+
+
                     # Reseteamos y continuamos
 
                     self.reset_motores()
@@ -391,20 +352,24 @@ def girar(
 
             else:
 
-                contador_sin_cambio = max(
-                    0,
-                    contador_sin_cambio - 1
-                )
+                contador_sin_cambio = max(0, contador_sin_cambio - 1)
+
+
 
             ultimo_angulo_imu = actual_imu
 
             ultimo_angulo_motores = angulo_motores
 
+
+
         # ============================================================
+
         # 3. CONTROL DE GIRO NORMAL
+
         # ============================================================
 
         if abs(error) <= tolerancia_fin:
+
             break
 
         # Ganancia dinámica
@@ -419,98 +384,46 @@ def girar(
             kp_dinamico = kp_base * 1.5
             kd_dinamico = kd_base * 0.3
 
-        derivada_cruda = (
-            error - error_anterior
-        )
-
-        derivada = (
-            derivada_cruda * 0.7
-        ) + (
-            derivada_anterior * 0.3
-        )
-
-        correccion = (
-            error * kp_dinamico
-        ) + (
-            derivada * kd_base
-        )
-
+        derivada_cruda = error - error_anterior
+        derivada = (derivada_cruda * 0.7) + (derivada_anterior * 0.3)
+        correccion = (error * kp_dinamico) + (derivada * kd_base)
         tiempo_transcurrido = cronometro.time()
 
         if tiempo_transcurrido < tiempo_curva_s_ms:
-
-            limite_potencia = (
-                potencia_min
-                + (potencia_max - potencia_min)
-                * (
-                    tiempo_transcurrido
-                    / tiempo_curva_s_ms
-                )
-            )
+            limite_potencia = potencia_min + (potencia_max - potencia_min) * (tiempo_transcurrido / tiempo_curva_s_ms)
 
         else:
-
             limite_potencia = potencia_max
 
-        potencia_final = self.limitar(
-            correccion,
-            -limite_potencia,
-            limite_potencia
-        )
+        potencia_final = self.limitar(correccion, -limite_potencia, limite_potencia)
 
         # Si hay bloqueo, más agresivo
 
         if bloqueo_detectado:
-
             potencia_final = potencia_final * 1.5
-
-            potencia_final = self.limitar(
-                potencia_final,
-                -limite_potencia,
-                limite_potencia
-            )
+            potencia_final = self.limitar(potencia_final, -limite_potencia, limite_potencia)
 
             if abs(potencia_final) < potencia_min * 0.5:
-
-                potencia_final = (
-                    potencia_min * 0.5
-                    if potencia_final > 0
-                    else -potencia_min * 0.5
-                )
+                potencia_final = potencia_min * 0.5 if potencia_final > 0 else -potencia_min * 0.5
 
         # Aplicar potencia a los motores
 
         pot_izq = int(potencia_final)
         pot_der = int(-potencia_final)
 
-        self.motor_izquierdo.dc(
-            self.limitar(
-                pot_izq,
-                -100,
-                100
-            )
-        )
-
-        self.motor_derecho.dc(
-            self.limitar(
-                pot_der,
-                -100,
-                100
-            )
-        )
+        self.motor_izquierdo.dc(self.limitar(pot_izq, -100, 100))
+        self.motor_derecho.dc(self.limitar(pot_der, -100, 100))
 
         error_anterior = error
         derivada_anterior = derivada
-
         wait(2)
 
     # Frenado final
 
     self.motor_izquierdo.hold()
     self.motor_derecho.hold()
-
     wait(20)
-    
+
 # -----------------------------------------------------------------------------
 # giro_de_arco
 # Describe un arco haciendo que cada rueda recorra una trayectoria distinta y corrigiendo con el IMU.
@@ -910,3 +823,169 @@ def girar_corto(
         self.motor_izquierdo.hold()
         self.motor_derecho.hold()
         wait(20)
+
+def avanzar_hasta_salir_negro(
+    self,
+    velocidad_max=900,
+    velocidad_min=100,
+    kp_gyro=20.0,
+    zona_rampa_cm=8,
+    perfil="encadenado",
+    rumbo_esperado=None,
+
+    sensor_color=None,
+    objetivo_reflexion=15,
+    lecturas_salida=5,
+
+    torque_grados=None,
+    torque_velocidad=180,
+    torque_retraso_ms=0
+):
+    if sensor_color is None:
+        sensor_color = self.seguidor
+
+    self.preparar_movimiento(
+        reset_motores=False,
+        reset_gyro=False,
+        perfil=perfil
+    )
+
+    self.motor_izquierdo.hold()
+    self.motor_derecho.hold()
+    wait(90)
+
+    self.drive_base.reset()
+
+    if rumbo_esperado is not None:
+        heading_objetivo = rumbo_esperado
+    else:
+        heading_objetivo = self.Hub.imu.heading()
+
+    grados_por_cm = (
+        360 / (self.circunferencia / 10)
+    )
+
+    grados_rampa = (
+        zona_rampa_cm * grados_por_cm
+    )
+
+    cronometro = StopWatch()
+    cronometro.reset()
+
+    torque_iniciado = False
+
+    # Contador para confirmar que realmente salió del negro.
+    contador_salida = 0
+
+    while True:
+
+        reflexion = sensor_color.reflection()
+
+        # =====================================================
+        # CONFIRMACIÓN DE SALIDA DEL NEGRO
+        # =====================================================
+        if reflexion > objetivo_reflexion:
+            contador_salida += 1
+        else:
+            contador_salida = 0
+
+        if contador_salida >= lecturas_salida:
+            break
+
+        # =====================================================
+        # DISTANCIA RECORRIDA
+        # =====================================================
+        recorrido = (
+            abs(self.drive_base.distance())
+            * self.grados_por_mm
+        )
+
+        # =====================================================
+        # RAMPA DE ACELERACIÓN
+        # =====================================================
+        if recorrido < grados_rampa:
+
+            proporcion = (
+                recorrido / grados_rampa
+            )
+
+            vel_base = (
+                velocidad_min
+                + (
+                    velocidad_max
+                    - velocidad_min
+                ) * proporcion
+            )
+
+        else:
+            vel_base = velocidad_max
+
+        tiempo_ms = cronometro.time()
+
+        # =====================================================
+        # TORQUE
+        # =====================================================
+        if (
+            torque_grados is not None
+            and not torque_iniciado
+            and tiempo_ms >= torque_retraso_ms
+        ):
+            self.mover_torque(
+                grados_torque=torque_grados,
+                velocidad_torque=torque_velocidad,
+                esperar=False
+            )
+
+            torque_iniciado = True
+
+        # =====================================================
+        # RAMPA TEMPORAL
+        # =====================================================
+        if tiempo_ms < 150:
+            vel = (
+                vel_base
+                * (tiempo_ms / 150)
+            )
+        else:
+            vel = vel_base
+
+        vel = self.limitar(
+            vel,
+            25,
+            velocidad_max
+        )
+
+        # =====================================================
+        # GIROSCOPIO
+        # =====================================================
+        actual_heading = self.Hub.imu.heading()
+
+        error_gyro = self._error_angular(
+            heading_objetivo,
+            actual_heading
+        )
+
+        correccion_giro = (
+            error_gyro * kp_gyro
+        )
+
+        # =====================================================
+        # AVANCE
+        # =====================================================
+        self.drive_base.drive(
+            vel,
+            correccion_giro
+        )
+
+    # =========================================================
+    # FRENADO
+    # =========================================================
+    self.drive_base.stop()
+
+    self.motor_izquierdo.brake()
+    self.motor_derecho.brake()
+    wait(60)
+
+    self.motor_izquierdo.hold()
+    self.motor_derecho.hold()
+    wait(20)
