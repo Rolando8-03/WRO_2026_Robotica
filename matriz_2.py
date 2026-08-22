@@ -25,29 +25,35 @@ def ejecutar_matriz_2(robot):
     # PRIMERA PARTE DE LA MATRIZ: BLOQUES AZULES
     # ==========================================
 
-    # Reiniciar la posición angular del motor de la garra delantera a cero
+    
+    
+ # Reiniciar la posición angular del motor de la garra delantera a cero
     robot.motor_garra.reset_angle(0)
     robot.motor_garra_delantera.reset_angle(0)
-    wait(400)
-    
+    wait(200)
+
     # Avanza detectando 2 líneas negras a alta velocidad (900 deg/s)
-    robot.avanzar_cruzando_lineas(cruces_objetivo=2, velocidad=900, escape_inicial_cm=8, retraso_freno_ms=20)
-    robot.avanzar_recto(distancia_cm=2, velocidad_max=900, perfil="encadenado")
-    wait(400)
+    robot.avanzar_cruzando_lineas(cruces_objetivo=2, velocidad=900, escape_inicial_cm=8, retraso_freno_ms=95.5)
+    
+    wait(200)
     
     # Giro de 90° a la izquierda (antihorario) para orientarse hacia los bloques azules
-    robot.girar(-92, potencia_max=85, potencia_min=45, kp_base=5.0, tolerancia_fin=1.0, perfil="encadenado")
+    robot.girar(-90, potencia_max=55, potencia_min=45, kp_base=5.0, tolerancia_fin=1.0, perfil="encadenado")
     
     # Abre/posiciona la garra principal a 90° de manera asíncrona (esperar=False)
-    robot.mover_garra_principal(900, 250, apretar=False, duty_cierre=60)
+    robot.mover_garra_principal(900, 250, apretar=False, duty_cierre=100)
     
-    robot.avanzar_recto(distancia_cm=6.7, velocidad_max=900, perfil="encadenado")
-    robot.avanzar_cruzando_lineas(cruces_objetivo=1, velocidad=-300)
-    robot.avanzar_recto(distancia_cm=8.7, velocidad_max=900, perfil="encadenado")
+    robot.avanzar_hasta_salir_negro(
+    velocidad_max=1000,
+    velocidad_min=100,
+    objetivo_reflexion=15,
+    lecturas_salida=3
+    )   
+    
+    robot.avanzar_recto(distancia_cm=4.8, velocidad_max=900, perfil="encadenado")
     # Baja/activa la garra delantera a la posición 300 para sujetar el bloque azul
     robot.mover_garra_delantera(290)
 
-    
     # --- Salir de la zona del bloque azul ---
     
     # Retrocede en modo seguro para despejar la zona
@@ -61,7 +67,7 @@ def ejecutar_matriz_2(robot):
     robot.seguir_linea(
         sensor_color=robot.seguidor, 
         velocidad_max=60, 
-        distancia_cm=8, 
+        distancia_cm=9, 
         lado="izquierda", 
         tiempo_acomodo_ms=140, 
         tiempo_aceleracion_ms=140, 
@@ -87,7 +93,7 @@ def ejecutar_matriz_2(robot):
     
     # Ajusta garra delantera y garra principal con apriete para sujetar
     robot.mover_garra_delantera(255)
-    robot.mover_garra_principal(900, 80, apretar=False, duty_cierre=60)
+    robot.mover_garra_principal(900, 80, apretar=False, duty_cierre=100)
     wait(200)
     
     # Avanza hacia los bloques amarillos
@@ -95,7 +101,7 @@ def ejecutar_matriz_2(robot):
     robot.mover_garra_delantera(260)
 
     # Aplica presión adicional con la garra principal
-    robot.mover_garra_principal(300, esperar=False, potencia_apriete=80, apretar=True)
+    robot.mover_garra_principal(300, esperar=False, potencia_apriete=100, apretar=True)
     
     # Retrocede con la carga asegurada
     robot.avanzar_recto(distancia_cm=-13, velocidad_max=550, perfil="seguro")
@@ -108,7 +114,7 @@ def ejecutar_matriz_2(robot):
     robot.seguir_linea(
         sensor_color=robot.seguidor, 
         velocidad_max=100, 
-        distancia_cm=13, 
+        distancia_cm=12, 
         lado="derecha", 
         tiempo_acomodo_ms=140, 
         tiempo_aceleracion_ms=140, 
@@ -156,13 +162,13 @@ def ejecutar_matriz_2(robot):
         kp_captura=2.5, 
         perfil_salida="encadenado"
     )
-    wait(200)
+    wait(300)
     
     # Reorientación para cambio de carril/pasillo
-    robot.girar(-90, potencia_max=90, potencia_min=35, kp_base=5.0, tolerancia_fin=1.0, perfil="encadenado")
-    robot.avanzar_recto(distancia_cm=4.65, velocidad_max=500, perfil="seguro")
+    robot.girar(-90, potencia_max=80, potencia_min=35, kp_base=5.0, tolerancia_fin=1.0, perfil="encadenado")
+    robot.avanzar_recto(distancia_cm=4.5, velocidad_max=500, perfil="seguro")
     wait(200)
-    robot.girar(90, potencia_max=90, potencia_min=35, kp_base=5.0, tolerancia_fin=1.0, perfil="encadenado")
+    robot.girar(90, potencia_max=80, potencia_min=35, kp_base=5.0, tolerancia_fin=1.0, perfil="encadenado")
     
     # Alineación final mediante seguimiento de línea por el lado derecho
     robot.seguir_linea(
@@ -232,16 +238,16 @@ def ejecutar_matriz_2(robot):
     robot.mover_garra_delantera(260)
     
     # Salida y retroceso final
-    robot.avanzar_recto(distancia_cm=-40.9, velocidad_max=600, perfil="seguro")
+    robot.avanzar_recto(distancia_cm=-38.5, velocidad_max=600, perfil="seguro")
     wait(300)
-    robot.girar(90, potencia_max=90, potencia_min=35, kp_base=5.0, tolerancia_fin=1.0, perfil="encadenado")
+    robot.girar(90, potencia_max=70, potencia_min=35, kp_base=5.0, tolerancia_fin=1.0, perfil="encadenado")
     robot.avanzar_recto(distancia_cm=-18, velocidad_max=600, perfil="seguro")
     
     # Acciona mecanismo por torque para liberación o mecanismo secundario
-    robot.mover_torque(grados_torque=-170, velocidad_torque=900, esperar=False)
+    robot.mover_torque(grados_torque=-175, velocidad_torque=900, esperar=False)
 
     # Ejecuta función de descarga final para matriz 3
-    dejar_bloques_matriz3(robot)
+    dejar_bloques_matriz2(robot)
     
 
 # Punto de entrada principal si el script se ejecuta directamente
