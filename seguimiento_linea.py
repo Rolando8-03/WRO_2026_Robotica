@@ -287,6 +287,12 @@ def seguir_linea_hasta_color(
             if hsv.s < 30 and reflexion < 15:
                 encontrado = True
 
+        elif color_objetivo == Color.GRAY:
+            # El gris tiene baja saturación (falta de color puro) y una reflexión media.
+            # Ajusta estos valores (20 y 60) según la iluminación y el tono de gris de tu pista.
+            if hsv.s < 25 and 15 < reflexion < 60:
+                encontrado = True
+
         else:
             if color_actual == color_objetivo:
                 encontrado = True
