@@ -120,8 +120,8 @@ def escanear_matriz(self):
 def dejar_bloques_matriz(robot):
     robot.seguir_linea(
         sensor_color=robot.seguidor,
-        velocidad_max=80,
-        distancia_cm=13,
+        velocidad_max=70,
+        distancia_cm=14,
         lado="derecha",
         tiempo_acomodo_ms=140,
         tiempo_aceleracion_ms=140,
@@ -181,14 +181,14 @@ def dejar_bloques_matriz(robot):
     wait(400)
 
     # Se conserva girar() porque este movimiento es de -3°.
-    robot.girar_corto(-9)
+    robot.girar_corto(-11)
     robot.avanzar_recto(
         distancia_cm=14.5,
         velocidad_max=650,
         perfil="encadenado"
     )
 
-    robot.mover_garra_delantera(240)
+    robot.mover_garra_delantera(220)
 
     robot.mover_garra_rapida(130)
 
@@ -209,9 +209,9 @@ def dejar_bloques_matriz(robot):
     )
 
     # Sacudida: aquí sí se usa exclusivamente girar_corto().
-    for i in range(4):
-        robot.girar_corto(8 ,potencia_max=75, potencia_min=45)
-        robot.girar_corto(-8, potencia_max=75, potencia_min=45)
+    for i in range(5):
+        robot.girar_corto(8 ,potencia_max=80, potencia_min=50)
+        robot.girar_corto(-8, potencia_max=80, potencia_min=50)
 
     robot.avanzar_recto(distancia_cm=-1, velocidad_max=500, zona_rampa_cm=0.5, perfil="seguro")
     robot.mover_garra_delantera(190)
@@ -261,7 +261,7 @@ def dejar_bloques_matriz2(robot):
     robot.girar_corto(-11)
 
     robot.avanzar_recto(distancia_cm=3.5, velocidad_max=650, zona_rampa_cm=0.1, perfil="encadenado")
-    robot.mover_garra_delantera(240)
+    robot.mover_garra_delantera(220)
     robot.mover_garra_rapida(130)
     robot.avanzar_recto(distancia_cm=-0.6, velocidad_max=650, zona_rampa_cm=0.1, perfil="encadenado")
     robot.mover_garra_delantera(290)
@@ -269,9 +269,9 @@ def dejar_bloques_matriz2(robot):
     
 
     # Sacudida: aquí sí se usa exclusivamente girar_corto().
-    for i in range(4):
-        robot.girar_corto(8, potencia_max=75, potencia_min=45)
-        robot.girar_corto(-8, potencia_max=75, potencia_min=45)
+    for i in range(5):
+        robot.girar_corto(8, potencia_max=80, potencia_min=50)
+        robot.girar_corto(-8, potencia_max=80, potencia_min=50)
 
     robot.mover_garra_delantera(0)
     robot.avanzar_recto(distancia_cm=-30, velocidad_max=900, zona_rampa_cm=0.1, perfil="encadenado")
@@ -378,3 +378,4 @@ def dejar_bloques_matriz3(robot, distancia_entrada=0):
         tolerancia_fin=1.0,
         perfil="encadenado"
     )
+    
