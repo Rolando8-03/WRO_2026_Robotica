@@ -85,6 +85,8 @@ class Base:
     # Avanza recto manteniendo el rumbo hasta dejar de detectar negro.
     avanzar_hasta_salir_negro = navegacion.avanzar_hasta_salir_negro
 
+    avanzar_con_torque = navegacion.avanzar_con_torque
+
     # Realiza un giro sobre el centro del robot utilizando el IMU.
     girar = navegacion.girar
 
