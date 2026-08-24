@@ -45,7 +45,7 @@ def mover_garra_principal(
     tiempo_apriete_ms=120,
     apretar=False,
     modo_soltar=None,
-    duty_cierre=60
+    duty_cierre=100
 ):
     # ==========================================
     # 1. CONTROL MANUAL
