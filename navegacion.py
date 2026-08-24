@@ -989,3 +989,160 @@ def avanzar_hasta_salir_negro(
     self.motor_izquierdo.hold()
     self.motor_derecho.hold()
     wait(20)
+
+def avanzar_con_torque(
+    self,
+    distancia_cm,
+    distancia_activacion_torque_cm,
+    torque_grados,
+    torque_velocidad=900,
+    velocidad_max=900,
+    velocidad_min=100,
+    kp_gyro=20.0,
+    zona_rampa_cm=8,
+    perfil="encadenado",
+    rumbo_esperado=None
+):
+    if distancia_cm == 0:
+        return
+
+    self.preparar_movimiento(
+        reset_motores=False,
+        reset_gyro=False,
+        perfil=perfil
+    )
+
+    self.motor_izquierdo.hold()
+    self.motor_derecho.hold()
+    wait(90)
+
+    self.drive_base.reset()
+
+    # =========================================================
+    # MEMORIA DE RUMBO
+    # =========================================================
+    if rumbo_esperado is not None:
+        heading_objetivo = rumbo_esperado
+    else:
+        heading_objetivo = self.Hub.imu.heading()
+
+    # Conversión de centímetros a grados de las ruedas
+    grados_por_cm = (
+        360 / (self.circunferencia / 10)
+    )
+
+    grados_objetivo = (
+        abs(distancia_cm) * grados_por_cm
+    )
+
+    # Convertimos la distancia a la que quieres que inicie el torque en grados
+    grados_activacion_torque = (
+        abs(distancia_activacion_torque_cm) * grados_por_cm
+    )
+
+    rampa_efectiva_cm = min(
+        zona_rampa_cm,
+        abs(distancia_cm) / 2.0
+    )
+
+    grados_rampa = (
+        rampa_efectiva_cm * grados_por_cm
+    )
+
+    signo = 1 if distancia_cm > 0 else -1
+
+    cronometro = StopWatch()
+    cronometro.reset()
+
+    # Impide que el torque se active más de una vez
+    torque_iniciado = False
+
+    while True:
+        # Distancia real recorrida calculada en grados
+        recorrido = (
+            abs(self.drive_base.distance())
+            * self.grados_por_mm
+        )
+
+        restante = (
+            grados_objetivo - recorrido
+        )
+
+        # Finalizar al alcanzar la distancia
+        if restante <= 1.5:
+            break
+
+        actual_heading = self.Hub.imu.heading()
+
+        error_gyro = self._error_angular(
+            heading_objetivo,
+            actual_heading
+        )
+
+        # Rampa de aceleración
+        if recorrido < grados_rampa:
+            proporcion = recorrido / grados_rampa
+            vel_base = (
+                velocidad_min
+                + (velocidad_max - velocidad_min) * proporcion
+            )
+
+        # Rampa de desaceleración
+        elif restante < grados_rampa:
+            proporcion = restante / grados_rampa
+            vel_base = (
+                velocidad_min * 0.4
+                + (velocidad_max - velocidad_min * 0.4) * proporcion
+            )
+
+        else:
+            vel_base = velocidad_max
+
+        tiempo_ms = cronometro.time()
+
+        # =====================================================
+        # TORQUE BASADO EN DISTANCIA
+        # =====================================================
+        if (
+            torque_grados is not None
+            and not torque_iniciado
+            and recorrido >= grados_activacion_torque
+        ):
+            self.mover_torque(
+                grados_torque=torque_grados,
+                velocidad_torque=torque_velocidad,
+                esperar=False  # Crucial: No detiene el bucle while
+            )
+            torque_iniciado = True
+
+        # Rampa temporal inicial original
+        if tiempo_ms < 150:
+            vel = vel_base * (tiempo_ms / 150)
+        else:
+            vel = vel_base
+
+        vel = self.limitar(
+            vel,
+            25,
+            velocidad_max
+        )
+
+        correccion_giro = error_gyro * kp_gyro
+
+        self.drive_base.drive(
+            vel * signo,
+            correccion_giro
+        )
+
+    # =======================================================
+    # Frenado de dos fases
+    # =======================================================
+    self.drive_base.stop()
+
+    self.motor_izquierdo.brake()
+    self.motor_derecho.brake()
+    wait(60)
+
+    self.motor_izquierdo.hold()
+    self.motor_derecho.hold()
+    wait(20)
