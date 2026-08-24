@@ -26,14 +26,13 @@ def ejecutar_matriz_2(robot):
     # ==========================================
 
     
-    
  # Reiniciar la posición angular del motor de la garra delantera a cero
     robot.motor_garra.reset_angle(0)
     robot.motor_garra_delantera.reset_angle(0)
     wait(200)
 
     # Avanza detectando 2 líneas negras a alta velocidad (900 deg/s)
-    robot.avanzar_cruzando_lineas(cruces_objetivo=2, velocidad=900, escape_inicial_cm=8, retraso_freno_ms=95.5)
+    robot.avanzar_cruzando_lineas(cruces_objetivo=2, velocidad=900, escape_inicial_cm=8, retraso_freno_ms=90)
     
     wait(200)
     
@@ -44,8 +43,8 @@ def ejecutar_matriz_2(robot):
     robot.mover_garra_principal(900, 250, apretar=False, duty_cierre=100)
     
     robot.avanzar_hasta_salir_negro(
-    velocidad_max=1000,
-    velocidad_min=100,
+    velocidad_max=900,
+    velocidad_min=200,
     objetivo_reflexion=15,
     lecturas_salida=3
     )   
@@ -57,7 +56,7 @@ def ejecutar_matriz_2(robot):
     # --- Salir de la zona del bloque azul ---
     
     # Retrocede en modo seguro para despejar la zona
-    robot.avanzar_recto(distancia_cm=-20.3, velocidad_max=900, perfil="seguro")
+    robot.avanzar_recto(distancia_cm=-20.4, velocidad_max=900, perfil="seguro")
     wait(200)
     
     # Giro de 90° a la izquierda para alinearse con la línea guía
