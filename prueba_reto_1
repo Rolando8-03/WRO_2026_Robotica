@@ -20,7 +20,10 @@ print("Voltaje:", robot.Hub.battery.voltage())
 # SECCION 1: =================================================================================
 # Giro de salida y seguidor hasta el cemento
 
+robot.motor_garra.reset_angle(0)
 robot.motor_garra_delantera.reset_angle(0)
+
+
 robot.giro_de_arco(
     radio_cm=22,        # Radio del arco
     angulo_deg=90,      # Ángulo a girar
@@ -153,12 +156,11 @@ robot.seguir_linea(
     lecturas_estables_captura=4,
     perfil_salida="encadenado"
 )
-'''
-'''
+
 robot.avanzar_hasta_color(color_objetivo=Color.GREEN, velocidad=700)
 '''
 robot.avanzar_recto(distancia_cm=-7, velocidad_max=900, perfil="encadenado")
-robot.girar(angulo_deg=-184, potencia_max=90, perfil="encadenado")
+robot.girar(angulo_deg=-182, potencia_max=90, perfil="encadenado")
 
 #AGARRAR LOS CEMENTOS VERDES---------------------
 robot.mover_torque(grados_torque=-170, velocidad_torque=250, esperar=False)
@@ -199,7 +201,7 @@ robot.seguir_linea_hasta_color(
 )
 
 robot.girar_corto(5, potencia_max=54, potencia_min=34)
-robot.avanzar_recto(14.5, 700)
+robot.avanzar_recto(14, 700)
 matriz_detectada = robot.escanear_matriz()
 robot.girar_corto(-5, potencia_max=54, potencia_min=34)
 
@@ -253,32 +255,34 @@ robot.avanzar_recto(distancia_cm=-22, velocidad_max=900, perfil="encadenado")
 robot.avanzar_recto(distancia_cm=20, velocidad_max=900, perfil="encadenado")
 robot.girar(angulo_deg=-38, potencia_max=90, perfil="encadenado")
 
-robot.mover_garra_delantera(250, simultaneo=True)
-robot.mover_garra_principal(200, grados=200, esperar=False)
+robot.mover_garra_delantera(posicion=245, simultaneo=True)
+robot.mover_garra_principal(velocidad=1000, grados=200, esperar=True)
+
+
 robot.avanzar_recto(distancia_cm=30, velocidad_max=900, perfil="encadenado")
 robot.mover_garra_principal(velocidad=300, grados=0)
-robot.avanzar_recto(distancia_cm=-4, velocidad_max=900, perfil="encadenado")
+robot.avanzar_recto(distancia_cm=-3, velocidad_max=900, perfil="encadenado")
 robot.girar(angulo_deg=36, potencia_max=80, perfil="encadenado")
 
 robot.avanzar_recto(distancia_cm=53, velocidad_max=900)
-
 
 robot.mover_garra_principal(velocidad=1000, grados=300, esperar=True)
 
 robot.avanzar_recto(distancia_cm=-1, velocidad_max=900)
 
 robot.mover_garra_delantera(posicion=0, simultaneo=True)
+robot.mover_garra_principal(velocidad=1000, grados= 0, esperar=True)
 
 robot.girar(angulo_deg=90, potencia_max=80, perfil="encadenado")
-robot.avanzar_recto(distancia_cm=22.5, velocidad_max=900)
+robot.avanzar_recto(distancia_cm=21, velocidad_max=900)
 
-robot.avanzar_recto(distancia_cm=-21.4, velocidad_max=900)
+robot.avanzar_recto(distancia_cm=-20.4, velocidad_max=900)
 robot.girar(angulo_deg=-92, potencia_max=90, perfil="encadenado")
 
 
 robot.seguir_linea_y_mover_torque(
     sensor_color=robot.seguidor,
-    distancia_cm=85,
+    distancia_cm=81,
     velocidad_max=100,
     lado="izquierda",
     tiempo_acomodo_ms=100,
@@ -296,6 +300,9 @@ robot.seguir_linea_y_mover_torque(
     velocidad_torque=350
 )
 
+robot.avanzar_recto(distancia_cm=4, velocidad_max=900)
+robot.avanzar_recto(distancia_cm=-13, velocidad_max=900)
+robot.girar(angulo_deg=90, potencia_max=90, perfil="encadenado")
 
 # =================================================================================
 # INICIALIZACIÓN DE LA MATRIZ DETECTADA
