@@ -75,53 +75,39 @@ def escanear_matriz(self):
         print("No se detecto un color de matriz valido.")
         return None
 
-    # El verde puede corresponder a dos matrices.
-    # Se necesita una segunda lectura para distinguirlas.
     if primer_color == Color.GREEN:
+        # Distancia mínima y velocidad más alta: solo necesitamos
+        # salir de la zona verde para leer la siguiente matriz.
         self.avanzar_recto(
-            distancia_cm=6,
-            velocidad_max=200,
-            perfil="seguro"
+            distancia_cm=4,          # antes 6cm; ajustar solo si la geometría real lo permite
+            velocidad_max=300,       # antes 200; tramo corto, no requiere tanto control
+            perfil="rapido"          # cambia a un perfil sin aceleración/frenado suave, si existe
         )
 
         segundo_color = self._realizar_lectura_estatica()
-
-        if segundo_color == Color.YELLOW:
-            matriz_detectada = 4
-        else:
-            matriz_detectada = 1
+        matriz_detectada = 4 if segundo_color == Color.YELLOW else 1
 
     elif primer_color == Color.YELLOW:
         matriz_detectada = 2
-
     elif primer_color == Color.BLUE:
         matriz_detectada = 3
-
     elif primer_color == Color.RED:
         matriz_detectada = 4
-
     elif primer_color == Color.WHITE:
         matriz_detectada = 5
-
     else:
         matriz_detectada = None
 
-    # Se guarda también en el robot para consultarlo después sin repetir
-    # el escaneo, además de devolverlo directamente.
     self.matriz_detectada = matriz_detectada
-
-    print(
-        "Matriz detectada:",
-        matriz_detectada
-    )
+    print("Matriz detectada:", matriz_detectada)
 
     return matriz_detectada
 
 def dejar_bloques_matriz(robot):
     robot.seguir_linea(
         sensor_color=robot.seguidor,
-        velocidad_max=70,
-        distancia_cm=14,
+        velocidad_max=65,
+        distancia_cm=15,
         lado="derecha",
         tiempo_acomodo_ms=140,
         tiempo_aceleracion_ms=140,
@@ -142,7 +128,7 @@ def dejar_bloques_matriz(robot):
     robot.mover_garra_delantera(100)
 
     robot.avanzar_recto(
-        distancia_cm=-13,
+        distancia_cm=-14,
         velocidad_max=400,
         perfil="seguro"
     )
@@ -183,7 +169,7 @@ def dejar_bloques_matriz(robot):
     # Se conserva girar() porque este movimiento es de -3°.
     robot.girar_corto(-11)
     robot.avanzar_recto(
-        distancia_cm=14.5,
+        distancia_cm=14,
         velocidad_max=650,
         perfil="encadenado"
     )
@@ -216,7 +202,17 @@ def dejar_bloques_matriz(robot):
     robot.avanzar_recto(distancia_cm=-1, velocidad_max=500, zona_rampa_cm=0.5, perfil="seguro")
     robot.mover_garra_delantera(190)
     robot.avanzar_recto(distancia_cm=-18, velocidad_max=500, perfil="seguro")
-    robot.girar(180, potencia_max=90, potencia_min=35, kp_base=5.0, tolerancia_fin=1.0, perfil="encadenado")
+    robot.girar(
+        angulo_deg=180,
+        direccion="derecha",
+        potencia_max=80,
+        potencia_min=40,
+        kp_base=4.0,
+        kd_base=6.0,
+        tolerancia_fin=0.6,
+        perfil="seguro"
+    
+    )
     #Aquí termina la sección de movimientos para entrar en la matriz =========================================================
 
 def dejar_bloques_matriz2(robot):
@@ -258,14 +254,14 @@ def dejar_bloques_matriz2(robot):
     wait(200)
 
     # Se conserva girar() porque este movimiento es de -3°.
-    robot.girar_corto(-11)
+    robot.girar_corto(-11.5)
 
-    robot.avanzar_recto(distancia_cm=3.5, velocidad_max=650, zona_rampa_cm=0.1, perfil="encadenado")
+    robot.avanzar_recto(distancia_cm=3, velocidad_max=650, zona_rampa_cm=0.1, perfil="encadenado")
     robot.mover_garra_delantera(220)
     robot.mover_garra_rapida(130)
     robot.avanzar_recto(distancia_cm=-0.6, velocidad_max=650, zona_rampa_cm=0.1, perfil="encadenado")
     robot.mover_garra_delantera(290)
-    robot.avanzar_recto(distancia_cm=1.5, velocidad_max=750, zona_rampa_cm=0.1, perfil="encadenado")
+    robot.avanzar_recto(distancia_cm=2, velocidad_max=750, zona_rampa_cm=0.1, perfil="encadenado")
     
 
     # Sacudida: aquí sí se usa exclusivamente girar_corto().
@@ -276,7 +272,7 @@ def dejar_bloques_matriz2(robot):
     robot.mover_garra_delantera(0)
     robot.avanzar_recto(distancia_cm=-30, velocidad_max=900, zona_rampa_cm=0.1, perfil="encadenado")
     robot.girar(180, potencia_max=85, potencia_min=35, kp_base=5.0, tolerancia_fin=1.0, perfil="encadenado")
-    robot.avanzar_recto(distancia_cm=-22, velocidad_max=900, zona_rampa_cm=0.1, perfil="encadenado")
+    robot.avanzar_recto(distancia_cm=-21, velocidad_max=900, zona_rampa_cm=0.1, perfil="encadenado")
 
 def dejar_bloques_matriz3(robot, distancia_entrada=0):
 
@@ -378,4 +374,3 @@ def dejar_bloques_matriz3(robot, distancia_entrada=0):
         tolerancia_fin=1.0,
         perfil="encadenado"
     )
-    
