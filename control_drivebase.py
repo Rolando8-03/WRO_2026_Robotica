@@ -109,6 +109,8 @@ class Base:
     # Sigue el borde de una línea hasta detectar un color objetivo.
     seguir_linea_hasta_color = seguimiento_linea.seguir_linea_hasta_color
 
+    seguir_linea_y_mover_torque = seguimiento_linea.seguir_linea_y_mover_torque
+
     # ====================== DETECCIÓN DE COLOR Y CRUCES =====================
     # Avanza recto hasta encontrar un color o una cantidad de cruces.
     avanzar_hasta_color = deteccion_color.avanzar_hasta_color
@@ -150,4 +152,8 @@ class Base:
     #Función para dejar los bloques en la matriz.
     dejar_bloques_matriz = matriz.dejar_bloques_matriz
 
+    # ============================== NAVEGACIÓN ==============================
+    # (Tus otras funciones aquí...)
     
+    # Realiza un giro absoluto usando el giroscopio como brújula
+    girar_a_rumbo = navegacion.girar_a_rumbo
