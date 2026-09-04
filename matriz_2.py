@@ -110,14 +110,14 @@ def ejecutar_matriz_2(robot):
 
 
     robot.mover_garra_delantera(255)
-    robot.mover_garra_principal(900, 100, apretar=False, duty_cierre=100)
+    robot.mover_garra_principal(900, 140, apretar=False, duty_cierre=100)
     wait(200)
 
     robot.avanzar_recto(distancia_cm=12.5, velocidad_max=750, perfil="encadenado")
     robot.mover_garra_delantera(260)
 
     robot.mover_garra_principal(
-        400,
+        300,
         esperar=False,
         potencia_apriete=100,
         apretar=True
