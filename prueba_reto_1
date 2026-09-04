@@ -96,7 +96,7 @@ robot.giro_de_arco(
 # Seguir linea hasta lugar de cemento. Giro y movimiento torque para dejarlo en su lugar
 robot.seguir_linea(
     sensor_color=robot.seguidor,
-    distancia_cm=48,           
+    distancia_cm=50,           
     velocidad_max=100,         
     lado="derecha",            
     
@@ -136,7 +136,7 @@ robot.avanzar_recto(distancia_cm=-7, velocidad_max=900, perfil="encadenado")
 robot.girar(angulo_deg=182, potencia_max=90, perfil="encadenado")
 
 #AGARRAR LOS CEMENTOS VERDES---------------------
-robot.mover_torque(grados_torque=-170, velocidad_torque=250, esperar=False)
+robot.mover_torque(grados_torque=-172, velocidad_torque=250, esperar=False)
 robot.avanzar_recto(distancia_cm=-22, velocidad_max=900, perfil="encadenado")
 
 #SEGUIR LINEA HASTA LA MATRIZ
@@ -193,7 +193,7 @@ robot.girar(angulo_deg=-90, potencia_max=90, perfil="encadenado")
 robot.avanzar_recto(distancia_cm=23, velocidad_max=900, perfil="encadenado")
 robot.girar(angulo_deg=-90, potencia_max=80, perfil="encadenado")
 robot.avanzar_recto(distancia_cm=15, velocidad_max=900, perfil="encadenado")
-robot.girar(angulo_deg=-90, potencia_max=80, perfil="encadenado")
+robot.girar(angulo_deg=-93.5, potencia_max=80, perfil="encadenado")
 wait(100) #Aqui ya tomó los cementos amarillos
 
 #ir por los azules -------------------------------------------------------------
@@ -201,7 +201,7 @@ robot.avanzar_cruzando_lineas(cruces_objetivo=2, velocidad=700, retraso_freno_ms
 robot.girar(angulo_deg=89, potencia_max=80, perfil="encadenado")
 
 #Tomar los azules --------------------------------------------------------------
-robot.mover_torque(grados_torque=-170, velocidad_torque=250, esperar=False)
+robot.mover_torque(grados_torque=-172, velocidad_torque=250, esperar=False)
 robot.avanzar_recto(distancia_cm=-22, velocidad_max=900, perfil="encadenado")
 
 #Ir por la pala
@@ -213,7 +213,7 @@ robot.mover_garra_principal(velocidad=1000, grados=200, esperar=True)
 
 robot.avanzar_cruzando_lineas(2, velocidad=500, distancia_extra_cm=14)
 robot.mover_garra_principal(velocidad=300, grados=0)
-robot.avanzar_recto(distancia_cm=-3, velocidad_max=900, perfil="encadenado")
+robot.avanzar_recto(distancia_cm=-2.5, velocidad_max=900, perfil="encadenado")
 robot.girar(angulo_deg=36, potencia_max=80, perfil="encadenado")
 
 #Ir a dejar los amarillos
@@ -226,10 +226,11 @@ robot.mover_garra_delantera(posicion=0, simultaneo=True)
 robot.mover_garra_principal(velocidad=1000, grados= 0, esperar=True)
 
 robot.girar(angulo_deg=90, potencia_max=80, perfil="encadenado")
-robot.avanzar_recto(distancia_cm=20, velocidad_max=900)
+robot.avanzar_hasta_color(color_objetivo=Color.YELLOW, velocidad=600)
+robot.avanzar_recto(distancia_cm=5, velocidad_max=900)
 
 #Salir de la sección amarilla
-robot.avanzar_recto(distancia_cm=-21, velocidad_max=900)
+robot.avanzar_recto(distancia_cm=-22, velocidad_max=900)
 robot.girar(angulo_deg=-92, potencia_max=90, perfil="encadenado")
 
 robot.seguir_linea_y_mover_torque(
@@ -253,8 +254,7 @@ robot.seguir_linea_y_mover_torque(
 )
 
 robot.avanzar_recto(distancia_cm=5, velocidad_max=900)
-robot.avanzar_recto(distancia_cm=-14, velocidad_max=900)
-robot.girar(angulo_deg=90, potencia_max=90, perfil="encadenado")
+
 
 # =================================================================================
 # INICIALIZACIÓN DE LA MATRIZ DETECTADA
@@ -265,7 +265,8 @@ robot.girar(angulo_deg=90, potencia_max=90, perfil="encadenado")
 
 gc.collect()
 
-
+ejecutar_matriz_3(robot)
+''')
 print("Matriz detectada:", matriz_detectada)
  
 if matriz_detectada == 2:
@@ -274,4 +275,4 @@ if matriz_detectada == 2:
 else:
     print("Matriz Predeterminada", matriz_detectada)
     ejecutar_matriz_2(robot)
-    
+'''   
