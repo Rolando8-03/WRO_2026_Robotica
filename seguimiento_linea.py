@@ -7,6 +7,7 @@ borde de una línea mediante el sensor de color y un controlador PD.
 from pybricks.parameters import Color
 from pybricks.tools import wait, StopWatch
 from pybricks.parameters import Stop
+from deteccion_color import HSV_RANGOS
 
 
 # -----------------------------------------------------------------------------
@@ -207,7 +208,8 @@ def seguir_linea_hasta_color(
     potencia_captura=55,
     kp_captura=2.4,
     margen_captura=5,
-    lecturas_estables_captura=2
+    lecturas_estables_captura=2,
+    lecturas_color_estables=3
 ):
     if sensor_color is None:
         sensor_color = self.seguidor
@@ -236,24 +238,41 @@ def seguir_linea_hasta_color(
             else:
                 estables = 0
 
-            correccion = error * kp_captura * multiplicador_lado
+            correccion = (
+                error
+                * kp_captura
+                * multiplicador_lado
+            )
+
             correccion = self.limitar(
                 correccion,
                 -correccion_max,
                 correccion_max
             )
 
-            velocidad_base = 28 if abs(error) > 22 else potencia_captura
+            velocidad_base = (
+                28
+                if abs(error) > 22
+                else potencia_captura
+            )
 
             potencia_izq = velocidad_base - correccion
             potencia_der = velocidad_base + correccion
 
             self.motor_izquierdo.dc(
-                self.limitar(potencia_izq, -100, 100)
+                self.limitar(
+                    potencia_izq,
+                    -100,
+                    100
+                )
             )
 
             self.motor_derecho.dc(
-                self.limitar(potencia_der, -100, 100)
+                self.limitar(
+                    potencia_der,
+                    -100,
+                    100
+                )
             )
 
             wait(2)
@@ -261,6 +280,7 @@ def seguir_linea_hasta_color(
         self.motor_izquierdo.brake()
         self.motor_derecho.brake()
         wait(8)
+
         self.reset_motores()
 
     # =====================================================================
@@ -270,36 +290,67 @@ def seguir_linea_hasta_color(
     cronometro.reset()
 
     velocidad_minima = 75
+
     error_anterior = 0
     derivada_anterior = 0
 
+    # Evita detenerse por una sola lectura accidental.
+    lecturas_color = 0
+
     while True:
-        color_actual = sensor_color.color()
         hsv = sensor_color.hsv()
         reflexion = sensor_color.reflection()
 
         encontrado = False
 
-        if color_objetivo == Color.BLUE:
-            if hsv.s > 70:
-                encontrado = True
+        # ================================================================
+        # DETECCIÓN USANDO LA LIBRERÍA HSV CALIBRADA
+        # ================================================================
+        if color_objetivo in HSV_RANGOS:
+            limites_color = HSV_RANGOS[color_objetivo]
 
-        elif color_objetivo == Color.BLACK:
-            if hsv.s < 30 and reflexion < 15:
-                encontrado = True
+            encontrado = True
 
-        elif color_objetivo == Color.GRAY:
-            # El gris tiene baja saturación (falta de color puro) y una reflexión media.
-            # Ajusta estos valores (20 y 60) según la iluminación y el tono de gris de tu pista.
-            if hsv.s < 25 and 15 < reflexion < 60:
-                encontrado = True
+            for componente, limites in limites_color.items():
+                minimo, maximo = limites
 
+                if componente == "h":
+                    valor = hsv.h
+
+                elif componente == "s":
+                    valor = hsv.s
+
+                elif componente == "v":
+                    valor = hsv.v
+
+                elif componente == "reflection":
+                    valor = reflexion
+
+                else:
+                    encontrado = False
+                    break
+
+                if not minimo <= valor <= maximo:
+                    encontrado = False
+                    break
+
+        # Si el color no está calibrado, usa Pybricks como respaldo.
         else:
-            if color_actual == color_objetivo:
-                encontrado = True
+            encontrado = (
+                sensor_color.color()
+                == color_objetivo
+            )
 
+        # ================================================================
+        # CONFIRMACIÓN MEDIANTE VARIAS LECTURAS CONSECUTIVAS
+        # ================================================================
         if encontrado:
-            # Contramarcha breve para reducir el desplazamiento por inercia.
+            lecturas_color += 1
+        else:
+            lecturas_color = 0
+
+        if lecturas_color >= lecturas_color_estables:
+            # Contramarcha breve para compensar la inercia.
             self.motor_izquierdo.dc(-100)
             self.motor_derecho.dc(-100)
             wait(30)
@@ -310,25 +361,36 @@ def seguir_linea_hasta_color(
 
             break
 
+        # ================================================================
+        # PERFIL DE VELOCIDAD
+        # ================================================================
         tiempo_actual = cronometro.time()
 
         if tiempo_actual < tiempo_acomodo_ms:
             velocidad_actual = velocidad_minima
 
-        elif tiempo_actual < tiempo_acomodo_ms + tiempo_aceleracion_ms:
+        elif (
+            tiempo_actual
+            < tiempo_acomodo_ms + tiempo_aceleracion_ms
+        ):
             progreso = (
                 tiempo_actual - tiempo_acomodo_ms
             ) / tiempo_aceleracion_ms
 
             velocidad_actual = (
                 velocidad_minima
-                + (velocidad_max - velocidad_minima) * progreso
+                + (
+                    velocidad_max - velocidad_minima
+                ) * progreso
             )
 
         else:
             velocidad_actual = velocidad_max
 
-        lectura = sensor_color.reflection()
+        # ================================================================
+        # CONTROL PD DEL SEGUIDOR DE LÍNEA
+        # ================================================================
+        lectura = reflexion
         error = lectura - objetivo_reflexion
 
         derivada = (
@@ -347,7 +409,10 @@ def seguir_linea_hasta_color(
             correccion_max
         )
 
-        velocidad_base = velocidad_actual - abs(error) * k_freno
+        velocidad_base = (
+            velocidad_actual
+            - abs(error) * k_freno
+        )
 
         if velocidad_base < 55:
             velocidad_base = 55
@@ -356,11 +421,19 @@ def seguir_linea_hasta_color(
         potencia_der = velocidad_base + correccion
 
         self.motor_izquierdo.dc(
-            self.limitar(potencia_izq, -100, 100)
+            self.limitar(
+                potencia_izq,
+                -100,
+                100
+            )
         )
 
         self.motor_derecho.dc(
-            self.limitar(potencia_der, -100, 100)
+            self.limitar(
+                potencia_der,
+                -100,
+                100
+            )
         )
 
         error_anterior = error
