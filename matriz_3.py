@@ -11,23 +11,29 @@ import gc
 
 def ejecutar_matriz_3(robot):
     """Ejecuta el recorrido activo de la matriz 3."""
+    robot.establecer_norte()
+
+    robot.avanzar_recto(-10)
+    robot.girar_a_rumbo(89)
+
     robot.motor_garra_delantera.reset_angle(0)
     robot.motor_garra.reset_angle(0)
 
     
     gc.collect()
     #Tomar los primeros dos cementos blancos y verdes ==========
+    wait(400)
     robot.avanzar_cruzando_lineas(cruces_objetivo=3, velocidad=700, distancia_extra_cm=12)
-    robot.mover_garra_principal(velocidad=900, grados=160, esperar=False)
+    robot.mover_garra_principal(velocidad=900, grados=195, esperar=False)
     wait(50)
     robot.girar(-90)
-    robot.mover_garra_delantera(265)
+    robot.mover_garra_delantera(260)
     robot.avanzar_recto(6, 800)
     robot.mover_garra_principal(900, grados=0)
     robot.avanzar_recto(-20)
     #giro para ir por los cementos amarillos ===========
     robot.girar(-90)
-    robot.avanzar_recto(11)
+    robot.avanzar_recto(10.3)
     robot.girar(-90)
 
     gc.collect()
@@ -37,7 +43,7 @@ def ejecutar_matriz_3(robot):
     robot.mover_garra_delantera(0)
     robot.mover_garra_principal(velocidad=900, grados=200, esperar= False)
 
-    robot.avanzar_recto(-5, 800)
+    robot.avanzar_recto(-5.3, 800)
     robot.girar(90)
 
     robot.seguir_linea(
@@ -84,7 +90,7 @@ def ejecutar_matriz_3(robot):
     robot.mover_garra_principal(800, 80, esperar=False)
     robot.seguir_linea(
         sensor_color=robot.seguidor,
-        distancia_cm=29,           
+        distancia_cm=27,           
         velocidad_max=100,         
         lado="izquierda",            
         
@@ -176,4 +182,3 @@ if __name__ == "__main__":
     robot = Base()
     print(robot.Hub.battery.voltage())
     ejecutar_matriz_3(robot)
-
