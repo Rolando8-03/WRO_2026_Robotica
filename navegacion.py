@@ -460,6 +460,7 @@ def girar_hasta_negro(
     lecturas_fuera_negro=2,
     tiempo_max_ms=8000,
     max_intentos_correccion=3,
+    giro_corto_despues_negro=0,
     perfil="encadenado",
     sensor_color=None
 ):
@@ -469,6 +470,11 @@ def girar_hasta_negro(
     Si detecta negro, frena y lo confirma.
     Si al frenar ya se pasó de la línea, gira lentamente en sentido
     contrario hasta volver a encontrar negro.
+
+    giro_corto_despues_negro:
+        Grados extra que gira después de confirmar negro. Es opcional:
+        0 no realiza ningún giro. El giro extra conserva el sentido con el
+        que se encontró finalmente la línea.
     """
 
     if sensor_color is None:
@@ -557,6 +563,25 @@ def girar_hasta_negro(
                     perfil=perfil,
                     modo="hold"
                 )
+
+                # Ajuste fino opcional después de quedar correctamente
+                # sobre negro. El signo se toma de la búsqueda que tuvo
+                # éxito: si corrigió en sentido contrario, también ajusta
+                # en ese sentido y no vuelve a salirse de la línea.
+                if giro_corto_despues_negro != 0:
+                    grados_extra = (
+                        abs(giro_corto_despues_negro)
+                        * signo_actual
+                    )
+
+                    self.girar_corto(
+                        angulo_deg=grados_extra,
+                        potencia_max=35,
+                        potencia_min=20,
+                        tolerancia=1.0,
+                        tiempo_max_ms=500,
+                        perfil=perfil
+                    )
 
                 return True
 
@@ -929,11 +954,10 @@ def girar_corto(
     if angulo_deg == 0:
         return
 
-    # Cada giro se mide desde la posición actual.
-    self.Hub.imu.reset_heading(0)
-    wait(10)
-
-    objetivo = angulo_deg
+    # Cada giro se mide desde la posición actual, sin reiniciar el IMU.
+    # Así no se pierde el norte virtual si después se usa girar_a_rumbo().
+    inicio = self.Hub.imu.heading()
+    objetivo = inicio + angulo_deg
 
     cronometro = StopWatch()
     cronometro.reset()
