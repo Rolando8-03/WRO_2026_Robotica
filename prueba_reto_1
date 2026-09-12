@@ -104,7 +104,7 @@ wait(100)
 robot.girar(angulo_deg=-90, potencia_max=85, perfil="encadenado")
 robot.avanzar_con_torque(
     distancia_cm=39.5,
-    distancia_activacion_torque_cm=13,
+    distancia_activacion_torque_cm=17,
     torque_grados=170
 )
 
