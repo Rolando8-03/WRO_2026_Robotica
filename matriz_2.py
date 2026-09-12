@@ -45,13 +45,15 @@ def ejecutar_matriz_2(robot):
         cruces_objetivo=2,
         velocidad=900,
         escape_inicial_cm=8,
-        retraso_freno_ms=91
+        retraso_freno_ms=78,
+        perfil="seguro",
+        
     )
 
     gc.collect()
     wait(200)
 
-    robot.girar_hasta_negro("izquierda", potencia=60)
+    robot.girar_hasta_negro("izquierda", potencia=60,giro_corto_despues_negro=2)
     
     robot.mover_garra_principal(900, 300, apretar=False, duty_cierre=100)
 
@@ -65,7 +67,7 @@ def ejecutar_matriz_2(robot):
     robot.avanzar_recto(distancia_cm=4.3, velocidad_max=900, perfil="encadenado")
     robot.mover_garra_delantera(290)
 
-    robot.avanzar_recto(distancia_cm=-20.7, velocidad_max=900, perfil="seguro")
+    robot.avanzar_recto(distancia_cm=-21, velocidad_max=900, perfil="seguro")
     wait(200)
 
     robot.girar(
@@ -79,7 +81,7 @@ def ejecutar_matriz_2(robot):
 
     robot.seguir_linea(
         sensor_color=robot.seguidor, 
-        velocidad_max=60, 
+        velocidad_max=50, 
         distancia_cm=8, 
         lado="izquierda", 
         tiempo_acomodo_ms=140, 
@@ -113,8 +115,8 @@ def ejecutar_matriz_2(robot):
     )
 
 
-    robot.mover_garra_delantera(255)
-    robot.mover_garra_principal(900, 140, apretar=False, duty_cierre=100)
+    robot.mover_garra_delantera(250)
+    robot.mover_garra_principal(900, 125, apretar=False, duty_cierre=100)
     wait(200)
 
     robot.avanzar_recto(distancia_cm=12.5, velocidad_max=750, perfil="encadenado")
@@ -127,7 +129,7 @@ def ejecutar_matriz_2(robot):
         apretar=True
     )
 
-    robot.avanzar_recto(distancia_cm=-13, velocidad_max=550, perfil="seguro")
+    robot.avanzar_recto(distancia_cm=-14.5, velocidad_max=550, perfil="seguro")
     wait(200)
 
     robot.girar(
@@ -142,7 +144,7 @@ def ejecutar_matriz_2(robot):
     robot.seguir_linea(
         sensor_color=robot.seguidor, 
         velocidad_max=90, 
-        distancia_cm=12, 
+        distancia_cm=14, 
         lado="derecha", 
         tiempo_acomodo_ms=140, 
         tiempo_aceleracion_ms=140, 
@@ -162,7 +164,7 @@ def ejecutar_matriz_2(robot):
     wait(200)
 
     robot.girar(
-        90,
+        92,
         potencia_max=90,
         potencia_min=35,
         kp_base=5.0,
@@ -184,7 +186,7 @@ def ejecutar_matriz_2(robot):
     robot.seguir_linea(
         sensor_color=robot.seguidor, 
         velocidad_max=80, 
-        distancia_cm=23, 
+        distancia_cm=25, 
         lado="izquierda", 
         tiempo_acomodo_ms=140, 
         tiempo_aceleracion_ms=140, 
@@ -201,7 +203,7 @@ def ejecutar_matriz_2(robot):
     )
 
     gc.collect()
-    wait(300)
+    wait(200)
 
     robot.girar(
         -90,
@@ -225,7 +227,7 @@ def ejecutar_matriz_2(robot):
     robot.seguir_linea(
         sensor_color=robot.seguidor, 
         velocidad_max=60, 
-        distancia_cm=7, 
+        distancia_cm=8, 
         lado="derecha", 
         tiempo_acomodo_ms=140, 
         tiempo_aceleracion_ms=140, 
@@ -243,7 +245,7 @@ def ejecutar_matriz_2(robot):
 
     gc.collect()
 
-    robot.avanzar_recto(distancia_cm=23, velocidad_max=350, perfil="seguro")
+    robot.avanzar_recto(distancia_cm=24, velocidad_max=300, perfil="seguro")
 
     robot.mover_garra_delantera(300)
     robot.avanzar_recto(distancia_cm=-28, velocidad_max=600, perfil="seguro")
@@ -259,7 +261,7 @@ def ejecutar_matriz_2(robot):
     robot.seguir_linea(
         sensor_color=robot.seguidor, 
         velocidad_max=70, 
-        distancia_cm=13, 
+        distancia_cm=14, 
         lado="izquierda", 
         tiempo_acomodo_ms=140, 
         tiempo_aceleracion_ms=140, 
@@ -280,7 +282,7 @@ def ejecutar_matriz_2(robot):
 
     robot.girar(
         90,
-        potencia_max=90,
+        potencia_max=80,
         potencia_min=35,
         kp_base=5.0,
         tolerancia_fin=1.0,
@@ -319,10 +321,10 @@ def ejecutar_matriz_2(robot):
         tolerancia_fin=1.0,
         perfil="encadenado"
     )
-    robot.avanzar_recto(distancia_cm=-18, velocidad_max=600, perfil="seguro")
+    robot.avanzar_recto(distancia_cm=-17, velocidad_max=600, perfil="seguro")
 
     robot.mover_torque(
-        grados_torque=-175,
+        grados_torque=-170,
         velocidad_torque=900,
         esperar=False
     )
