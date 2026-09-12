@@ -53,24 +53,9 @@ def _realizar_lectura_estatica(
 
 # -----------------------------------------------------------------------------
 # escanear_matriz
-# Lee únicamente la fila que el robot tiene frente al sensor:
-#
-#     |  1 |  4 |  7 | 10 |
-#     |  2 |  5 |  8 | 11 |  <- fila de detección
-#     |  3 |  6 |  9 | 12 |
-#
-# El robot entra por el lado del bloque 11, por lo que la primera lectura es
-# 11. El orden de las cinco matrices proporcionadas es:
-#
-#   Matriz 1: 11=VERDE,    8=VERDE
-#   Matriz 2: 11=AMARILLO
-#   Matriz 3: 11=BLANCO
-#   Matriz 4: 11=VERDE,    8=AMARILLO
-#   Matriz 5: 11=AZUL
-#
-# Por eso VERDE no puede decidirse con una sola lectura: se avanza al bloque 8
-# y se toma la segunda lectura. Cualquier combinación distinta se rechaza para
-# no iniciar un recorrido equivocado por una lectura errónea.
+# Realiza una primera lectura de color y devuelve el número de matriz.
+# Cuando detecta verde, avanza para hacer una segunda lectura y diferenciar
+# entre la matriz 1 y la matriz 4.
 # -----------------------------------------------------------------------------
 def escanear_matriz(self):
     primer_color = self._realizar_lectura_estatica()
@@ -79,27 +64,22 @@ def escanear_matriz(self):
         return None
 
     if primer_color == Color.GREEN:
-        # Mantener este avance: lleva el sensor de la posición 11 a la 8.
+        # Distancia conservada: solo se optimiza el uso de la rutina existente.
         self.avanzar_recto(
             distancia_cm=4,
             velocidad_max=300,
             perfil="rapido"
         )
         segundo_color = self._realizar_lectura_estatica()
-
-        if segundo_color == Color.GREEN:
-            matriz_detectada = 1
-        elif segundo_color == Color.YELLOW:
-            matriz_detectada = 4
-        else:
-            matriz_detectada = None
-            print("Segunda lectura invalida para verde:", segundo_color)
+        matriz_detectada = 4 if segundo_color == Color.YELLOW else 1
 
     elif primer_color == Color.YELLOW:
         matriz_detectada = 2
-    elif primer_color == Color.WHITE:
-        matriz_detectada = 3
     elif primer_color == Color.BLUE:
+        matriz_detectada = 3
+    elif primer_color == Color.RED:
+        matriz_detectada = 4
+    elif primer_color == Color.WHITE:
         matriz_detectada = 5
     else:
         matriz_detectada = None
@@ -113,7 +93,7 @@ def dejar_bloques_matriz(robot):
     robot.seguir_linea(
         sensor_color=robot.seguidor,
         velocidad_max=65,
-        distancia_cm=15,
+        distancia_cm=16,
         lado="derecha",
         tiempo_acomodo_ms=140,
         tiempo_aceleracion_ms=140,
@@ -132,7 +112,7 @@ def dejar_bloques_matriz(robot):
     robot.mover_garra_delantera(230)
 
     robot.avanzar_recto(
-        distancia_cm=-14,
+        distancia_cm=-15,
         velocidad_max=400,
         perfil="seguro"
     )
@@ -170,9 +150,9 @@ def dejar_bloques_matriz(robot):
     )
 
     wait(400)
-    robot.girar_corto(-10)
+    robot.girar_corto(-11)
     robot.avanzar_recto(
-        distancia_cm=12.5,
+        distancia_cm=11.5,
         velocidad_max=650,
         perfil="encadenado"
     )
@@ -187,15 +167,15 @@ def dejar_bloques_matriz(robot):
     )
     robot.mover_garra_delantera(290)
     robot.avanzar_recto(
-        distancia_cm=1.3,
+        distancia_cm=1.7,
         velocidad_max=650,
         zona_rampa_cm=0.1,
         perfil="encadenado"
     )
 
     for _ in range(3):
-        robot.girar_corto(9, potencia_max=70, potencia_min=40)
-        robot.girar_corto(-9, potencia_max=70, potencia_min=40)
+        robot.girar_corto(9, potencia_max=60, potencia_min=40)
+        robot.girar_corto(-9, potencia_max=60, potencia_min=40)
 
     robot.avanzar_recto(
         distancia_cm=-1.3,
@@ -209,19 +189,20 @@ def dejar_bloques_matriz(robot):
         velocidad_max=500,
         perfil="seguro"
     )
-    robot.girar_hasta_negro("derecha", potencia=75, potencia_correccion=32)
+    robot.girar_hasta_negro("izquierda", potencia=70)
 
 
+# Aquí termina la sección de movimientos para entrar en la matriz.
 def dejar_bloques_matriz2(robot):
     """Secuencia correspondiente al recorrido auxiliar de matriz 2."""
     robot.avanzar_cruzando_lineas(
-        cruces_objetivo=1,
-        velocidad=900,
-        escape_inicial_cm=8,
-        retraso_freno_ms=90
-    )
+    cruces_objetivo=1,
+    velocidad=900,
+    escape_inicial_cm=8,
+    retraso_freno_ms=95
+    )  
     robot.girar(
-        95,
+        90,
         potencia_max=85,
         potencia_min=35,
         kp_base=5.0,
@@ -282,9 +263,9 @@ def dejar_bloques_matriz2(robot):
     )
 
     wait(200)
-    robot.girar_corto(-11.5)
+    robot.girar_corto(-11)
     robot.avanzar_recto(
-        distancia_cm=3,
+        distancia_cm=2.5,
         velocidad_max=650,
         zona_rampa_cm=0.1,
         perfil="encadenado"
@@ -330,7 +311,7 @@ def dejar_bloques_matriz2(robot):
         perfil="encadenado"
     )
     robot.avanzar_recto(
-        distancia_cm=-21,
+        distancia_cm=-19.5,
         velocidad_max=900,
         zona_rampa_cm=0.1,
         perfil="encadenado"
