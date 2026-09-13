@@ -321,10 +321,13 @@ def dejar_bloques_matriz2(robot):
 # NO MODIFICAR: dejar_bloques_matriz3
 # Se mantiene exactamente con la lógica de la rama oficial_v1-2.
 def dejar_bloques_matriz3(robot, distancia_entrada=0):
-    robot.mover_garra_delantera(80)
-    robot.avanzar_recto(-8)
-    robot.mover_garra_principal(100, grados=180, esperar=False)
-    robot.mover_garra_delantera(275)
+
+    #robot.mover_garra_delantera(80)
+    #robot.avanzar_recto(-8)
+    #robot.mover_garra_principal(100, grados=190, esperar=False)
+    #robot.mover_garra_delantera(275)
+    
+
     robot.seguir_linea(
         sensor_color=robot.seguidor,
         velocidad_max=100,
@@ -343,28 +346,34 @@ def dejar_bloques_matriz3(robot, distancia_entrada=0):
         kp_captura=2.5,
         perfil_salida="encadenado"
     )
+
     robot.mover_garra_principal(
         300,
-        grados=50,
+        grados=55,
         esperar=False,
-        potencia_apriete=180,
+        potencia_apriete=190,
         apretar=True
     )
+
     robot.mover_garra_delantera(100)
+
     robot.seguir_linea_hasta_color(
         color_objetivo=Color.BLUE,
         velocidad_max=100,
         lado="derecha"
     )
-    wait(400)
-    robot.girar_corto(-10.5)
+
+    wait(200)
+    robot.girar_corto(-11.5)
+
     robot.avanzar_recto(
         distancia_cm=distancia_entrada,
         velocidad_max=650,
+        zona_rampa_cm=0.1,
         perfil="encadenado"
     )
-    robot.mover_garra_delantera(220)
-    robot.mover_garra_rapida(125)
+    robot.mover_garra_delantera(230)
+    robot.mover_garra_rapida(130)
     robot.avanzar_recto(
         distancia_cm=-0.6,
         velocidad_max=650,
@@ -373,29 +382,31 @@ def dejar_bloques_matriz3(robot, distancia_entrada=0):
     )
     robot.mover_garra_delantera(290)
     robot.avanzar_recto(
-        distancia_cm=2,
-        velocidad_max=650,
+        distancia_cm=1.8,
+        velocidad_max=750,
         zona_rampa_cm=0.1,
         perfil="encadenado"
     )
-    for _ in range(4):
-        robot.girar_corto(8, potencia_max=75, potencia_min=45)
-        robot.girar_corto(-8, potencia_max=75, potencia_min=45)
+    for _ in range(3):
+        robot.girar_corto(9, potencia_max=70, potencia_min=40)
+        robot.girar_corto(-9, potencia_max=70, potencia_min=40)
+
     robot.avanzar_recto(
-        distancia_cm=-1,
-        velocidad_max=500,
-        zona_rampa_cm=0.5,
-        perfil="seguro"
+        distancia_cm=-2,
+        velocidad_max=900,
+        zona_rampa_cm=0.1,
+        perfil="encadenado"
     )
-    robot.mover_garra_delantera(190)
+    robot.mover_garra_delantera(0)
     robot.avanzar_recto(
-        distancia_cm=-18,
-        velocidad_max=500,
-        perfil="seguro"
+        distancia_cm=-15,
+        velocidad_max=900,
+        zona_rampa_cm=0.1,
+        perfil="encadenado"
     )
     robot.girar(
-        180,
-        potencia_max=90,
+        182,
+        potencia_max=85,
         potencia_min=35,
         kp_base=5.0,
         tolerancia_fin=1.0,
