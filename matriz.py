@@ -212,7 +212,7 @@ def dejar_bloques_matriz2(robot):
     robot.seguir_linea(
         sensor_color=robot.seguidor,
         velocidad_max=50,
-        distancia_cm=7,
+        distancia_cm=9,
         lado="derecha",
         tiempo_acomodo_ms=140,
         tiempo_aceleracion_ms=140,
@@ -229,12 +229,12 @@ def dejar_bloques_matriz2(robot):
     )
     robot.mover_garra_principal(900, 230, apretar=False, duty_cierre=60)
     robot.mover_garra_delantera(230)
-    robot.avanzar_recto(distancia_cm=-17, velocidad_max=400, perfil="seguro")
+    robot.avanzar_recto(distancia_cm=-19, velocidad_max=400, perfil="seguro")
     robot.mover_garra_delantera(270)
     robot.seguir_linea(
         sensor_color=robot.seguidor,
         velocidad_max=100,
-        distancia_cm=16,
+        distancia_cm=18,
         lado="derecha",
         tiempo_acomodo_ms=140,
         tiempo_aceleracion_ms=140,
@@ -311,12 +311,15 @@ def dejar_bloques_matriz2(robot):
         perfil="encadenado"
     )
     robot.avanzar_recto(
-        distancia_cm=-19.5,
+        distancia_cm=-23,
         velocidad_max=900,
         zona_rampa_cm=0.1,
         perfil="encadenado"
     )
 
+
+# NO MODIFICAR: dejar_bloques_matriz3
+# Se mantiene exactamente con la lógica de la rama oficial_v1-2.
 def dejar_bloques_matriz3(robot, distancia_entrada=0):
     robot.mover_garra_delantera(80)
     robot.avanzar_recto(-8)
