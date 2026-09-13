@@ -45,7 +45,7 @@ def ejecutar_matriz_2(robot):
         cruces_objetivo=2,
         velocidad=900,
         escape_inicial_cm=8,
-        retraso_freno_ms=78,
+        retraso_freno_ms=80,
         perfil="seguro",
         
     )
@@ -53,7 +53,7 @@ def ejecutar_matriz_2(robot):
     gc.collect()
     wait(200)
 
-    robot.girar_hasta_negro("izquierda", potencia=60,giro_corto_despues_negro=2)
+    robot.girar_hasta_negro("izquierda", potencia=65)
     
     robot.mover_garra_principal(900, 300, apretar=False, duty_cierre=100)
 
@@ -129,7 +129,7 @@ def ejecutar_matriz_2(robot):
         apretar=True
     )
 
-    robot.avanzar_recto(distancia_cm=-14.5, velocidad_max=550, perfil="seguro")
+    robot.avanzar_recto(distancia_cm=-14, velocidad_max=550, perfil="seguro")
     wait(200)
 
     robot.girar(
@@ -247,7 +247,7 @@ def ejecutar_matriz_2(robot):
 
     robot.avanzar_recto(distancia_cm=24, velocidad_max=300, perfil="seguro")
 
-    robot.mover_garra_delantera(300)
+    robot.mover_garra_delantera(300, velocidad=700)
     robot.avanzar_recto(distancia_cm=-28, velocidad_max=600, perfil="seguro")
     robot.girar(
         -90,
@@ -292,7 +292,7 @@ def ejecutar_matriz_2(robot):
     robot.mover_garra_principal(900, 150, apretar=False, duty_cierre=60)
     wait(300)
 
-    robot.avanzar_recto(distancia_cm=12.5, velocidad_max=750, perfil="encadenado")
+    robot.avanzar_recto(distancia_cm=12, velocidad_max=750, perfil="encadenado")
     robot.mover_garra_delantera(275)
 
     robot.mover_garra_principal(
@@ -305,7 +305,7 @@ def ejecutar_matriz_2(robot):
 
     gc.collect()
 
-    robot.avanzar_recto(distancia_cm=16, velocidad_max=350, perfil="seguro")
+    robot.avanzar_recto(distancia_cm=16.5, velocidad_max=350, perfil="seguro")
     robot.mover_garra_delantera(260)
 
     robot.avanzar_recto(distancia_cm=-38.5, velocidad_max=600, perfil="seguro")
