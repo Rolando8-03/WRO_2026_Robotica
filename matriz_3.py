@@ -102,11 +102,11 @@ def ejecutar_matriz_3(robot):
 
     #Secuencia para ir por los cementos amarillos ==========
     robot.girar_corto(-10, potencia_max=50, potencia_min=34)
-    robot.mover_garra_principal(velocidad=1000, grados=160, esperar=True, limite_apertura=230)
+    robot.mover_garra_principal(velocidad=1000, grados=160, esperar=True)
     robot.girar_corto(7.5, potencia_max=50, potencia_min=34)
     robot.avanzar_recto(15, 600)
 
-    robot.mover_garra_principal(velocidad=1000, grados=0, esperar=True, limite_apertura=230)
+    robot.mover_garra_principal(velocidad=1000, grados=0, esperar=True)
     robot.avanzar_recto(-18, 750) ###
 
     
@@ -329,7 +329,7 @@ def ejecutar_matriz_3(robot):
     """
 
 
-    
+
 if __name__ == "__main__":
     robot = Base()
     print(robot.Hub.battery.voltage())
