@@ -453,28 +453,24 @@ def girar(
 def girar_hasta_negro(
     self,
     direccion,
-    potencia=60,
+    potencia=55,
     potencia_correccion=22,
     objetivo_reflexion=15,
-    lecturas_confirmacion=3,
+    lecturas_confirmacion=2,
     lecturas_fuera_negro=2,
     tiempo_max_ms=8000,
-    max_intentos_correccion=3,
-    giro_corto_despues_negro=0,
+    max_intentos_correccion=2,
     perfil="encadenado",
-    sensor_color=None
+    sensor_color=None,
+    giro_corto_despues_negro=0
 ):
     """
-    Gira hacia derecha o izquierda hasta detectar negro.
+    Gira hasta detectar negro.
 
-    Si detecta negro, frena y lo confirma.
-    Si al frenar ya se pasó de la línea, gira lentamente en sentido
-    contrario hasta volver a encontrar negro.
-
-    giro_corto_despues_negro:
-        Grados extra que gira después de confirmar negro. Es opcional:
-        0 no realiza ningún giro. El giro extra conserva el sentido con el
-        que se encontró finalmente la línea.
+    Al detectar negro:
+    - Frena inmediatamente.
+    - Confirma que quedó sobre negro.
+    - Aplica un giro corto fijo opcional.
     """
 
     if sensor_color is None:
@@ -483,17 +479,14 @@ def girar_hasta_negro(
     direccion = direccion.lower()
 
     if direccion not in ("derecha", "izquierda"):
-        raise ValueError(
-            'La direccion debe ser "derecha" o "izquierda".'
-        )
+        raise ValueError('La direccion debe ser "derecha" o "izquierda".')
 
-    # En el robot: signo positivo gira hacia la derecha.
     signo_inicial = 1 if direccion == "derecha" else -1
     signo_actual = signo_inicial
 
     potencia = int(self.limitar(abs(potencia), 20, 100))
     potencia_correccion = int(
-        self.limitar(abs(potencia_correccion), 15, 50)
+        self.limitar(abs(potencia_correccion), 15, 45)
     )
 
     self.preparar_movimiento(
@@ -509,29 +502,23 @@ def girar_hasta_negro(
     cronometro = StopWatch()
     cronometro.reset()
 
-    contador_fuera_negro = 0
     listo_para_buscar = False
-
+    contador_fuera_negro = 0
+    confirmaciones_negro = 0
     potencia_actual = potencia
     intentos_correccion = 0
 
     while True:
 
-        # Seguridad: si nunca encuentra negro, deja de girar.
         if cronometro.time() >= tiempo_max_ms:
-            self.terminar_movimiento(
-                perfil=perfil,
-                modo="brake"
-            )
-
+            self.terminar_movimiento(perfil=perfil, modo="brake")
             print("No se encontró negro durante el giro.")
             return False
 
         reflexion = sensor_color.reflection()
 
-        # Si comenzó encima de negro, primero debe salir de él.
+        # Si inició sobre negro, primero sale de esa línea.
         if not listo_para_buscar:
-
             if reflexion > objetivo_reflexion:
                 contador_fuera_negro += 1
             else:
@@ -540,79 +527,55 @@ def girar_hasta_negro(
             if contador_fuera_negro >= lecturas_fuera_negro:
                 listo_para_buscar = True
 
-        # Ya está fuera del negro: ahora busca la siguiente línea negra.
-        elif reflexion <= objetivo_reflexion:
+        # Ya salió del negro inicial: busca la siguiente línea.
+        else:
+            if reflexion <= objetivo_reflexion:
+                confirmaciones_negro += 1
+            else:
+                confirmaciones_negro = 0
 
-            # Detectó negro: frena inmediatamente.
-            self.motor_izquierdo.brake()
-            self.motor_derecho.brake()
-            wait(25)
+            # Apenas confirma negro, frena.
+            if confirmaciones_negro >= lecturas_confirmacion:
+                self.motor_izquierdo.brake()
+                self.motor_derecho.brake()
+                wait(12)
 
-            # Confirma que realmente quedó sobre negro.
-            confirmaciones = 0
+                # Confirma que el sensor no se pasó por inercia.
+                confirmaciones_finales = 0
 
-            for _ in range(lecturas_confirmacion):
-                if sensor_color.reflection() <= objetivo_reflexion:
-                    confirmaciones += 1
+                for _ in range(lecturas_confirmacion):
+                    if sensor_color.reflection() <= objetivo_reflexion:
+                        confirmaciones_finales += 1
 
-                wait(5)
+                    wait(5)
 
-            # Se detuvo correctamente sobre negro.
-            if confirmaciones >= lecturas_confirmacion:
-                self.terminar_movimiento(
-                    perfil=perfil,
-                    modo="hold"
-                )
+                # Sí quedó sobre negro: termina y hace ajuste manual opcional.
+                if confirmaciones_finales >= lecturas_confirmacion:
+                    self.terminar_movimiento(perfil=perfil, modo="hold")
 
-                # Ajuste fino opcional después de quedar correctamente
-                # sobre negro. El signo se toma de la búsqueda que tuvo
-                # éxito: si corrigió en sentido contrario, también ajusta
-                # en ese sentido y no vuelve a salirse de la línea.
-                if giro_corto_despues_negro != 0:
-                    grados_extra = (
-                        abs(giro_corto_despues_negro)
-                        * signo_actual
-                    )
+                    if giro_corto_despues_negro != 0:
+                        self.girar_corto(
+                            giro_corto_despues_negro,
+                            potencia_max=potencia_correccion,
+                            potencia_min=15
+                        )
 
-                    self.girar_corto(
-                        angulo_deg=grados_extra,
-                        potencia_max=35,
-                        potencia_min=20,
-                        tolerancia=1.0,
-                        tiempo_max_ms=500,
-                        perfil=perfil
-                    )
+                    return True
 
-                return True
+                # Se pasó de la línea: vuelve lento en sentido contrario.
+                intentos_correccion += 1
 
-            # Si después de frenar ya ve blanco, se pasó de la línea.
-            # Cambia al sentido contrario y busca negro lentamente.
-            intentos_correccion += 1
+                if intentos_correccion > max_intentos_correccion:
+                    self.terminar_movimiento(perfil=perfil, modo="brake")
+                    print("Se pasó del negro y no pudo corregirse.")
+                    return False
 
-            if intentos_correccion > max_intentos_correccion:
-                self.terminar_movimiento(
-                    perfil=perfil,
-                    modo="brake"
-                )
+                signo_actual = -signo_actual
+                potencia_actual = potencia_correccion
+                confirmaciones_negro = 0
 
-                print("No se pudo corregir el giro sobre negro.")
-                return False
-
-            signo_actual = -signo_actual
-            potencia_actual = potencia_correccion
-
-            print(
-                "Se pasó del negro. Corrigiendo en sentido contrario..."
-            )
-
-        # Giro sobre el centro.
-        self.motor_izquierdo.dc(
-            signo_actual * potencia_actual
-        )
-
-        self.motor_derecho.dc(
-            -signo_actual * potencia_actual
-        )
+        self.motor_izquierdo.dc(signo_actual * potencia_actual)
+        self.motor_derecho.dc(-signo_actual * potencia_actual)
 
         wait(2)
 # -----------------------------------------------------------------------------
