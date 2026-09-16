@@ -485,3 +485,9 @@ def avanzar_hibrido(
     self.motor_izquierdo.hold()
     self.motor_derecho.hold()
     wait(20)
+    
+def comprobar_reflexion_negro(self):
+    while True:
+        reflexion = self.seguidor.reflection()
+        print("Reflexion:", reflexion)
+        wait(100)
