@@ -162,4 +162,6 @@ class Base:
 
     # Establece la orientación actual como referencia.
     establecer_norte = navegacion.establecer_norte
+
+    dejar_bloques_matriz3 = matriz.dejar_bloques_matriz3
     
