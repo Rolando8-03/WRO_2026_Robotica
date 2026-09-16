@@ -5,6 +5,7 @@ from deteccion_color import HSV_RANGOS
 from pybricks.parameters import Color
 from pybricks.tools import wait
 import gc
+
 from matriz_1 import ejecutar_matriz_1
 from matriz_2 import ejecutar_matriz_2
 from matriz_3 import ejecutar_matriz_3
@@ -138,7 +139,7 @@ robot.avanzar_recto(14, 700)
 
 matriz_detectada = robot.escanear_matriz()
 
-robot.girar_corto(-6, potencia_max=54, potencia_min=34)
+robot.girar_corto(-5, potencia_max=60, potencia_min=34)
 
 robot.avanzar_recto(distancia_cm=-37.5, velocidad_max=900, perfil="seguro")
 robot.girar(angulo_deg=-180, potencia_max=90, perfil="encadenado")
@@ -269,7 +270,12 @@ robot.mover_garra_principal(
     duty_cierre=35
 )
 
+
 gc.collect()
+
+ejecutar_matriz_3(robot)
+
+"""
 
 # Ejecuta la matriz detectada.
 if matriz_detectada == 1:
@@ -291,3 +297,4 @@ else:
     # Si no pudo leer la matriz, ejecuta Matriz 2 por defecto.
     print("Lectura inválida. Ejecutando Matriz 2 predeterminada.")
     ejecutar_matriz_2(robot)
+"""
