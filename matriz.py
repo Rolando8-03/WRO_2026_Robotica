@@ -1,18 +1,6 @@
-"""Funciones para identificar la matriz de colores.
-
-Este archivo contiene la lectura estática por votación y la lógica que asigna
-un número de matriz según los colores observados por el sensor.
-"""
-
 from pybricks.parameters import Color
 from pybricks.tools import wait
 
-
-# -----------------------------------------------------------------------------
-# _realizar_lectura_estatica
-# Detiene el robot, toma varias lecturas del sensor y devuelve el color con
-# mayor cantidad de votos si alcanza el nivel mínimo de confianza.
-# -----------------------------------------------------------------------------
 def _realizar_lectura_estatica(
     self,
     cantidad_lecturas=12,
@@ -23,21 +11,22 @@ def _realizar_lectura_estatica(
     self.frenar()
     wait(espera_inicial_ms)
 
-    # Conteo directo: evita crear una lista y hacer .count() repetidamente.
     conteos = {
         Color.GREEN: 0,
         Color.YELLOW: 0,
         Color.BLUE: 0,
-        Color.RED: 0,
         Color.WHITE: 0
     }
 
     lecturas_validas = 0
+
     for _ in range(cantidad_lecturas):
         color = self.seguidor.color()
+
         if color in conteos:
             conteos[color] += 1
             lecturas_validas += 1
+
         wait(intervalo_lecturas_ms)
 
     if lecturas_validas == 0:
@@ -51,48 +40,56 @@ def _realizar_lectura_estatica(
     return color_ganador
 
 
-# -----------------------------------------------------------------------------
-# escanear_matriz
-# Realiza una primera lectura de color y devuelve el número de matriz.
-# Cuando detecta verde, avanza para hacer una segunda lectura y diferenciar
-# entre la matriz 1 y la matriz 4.
-# -----------------------------------------------------------------------------
 def escanear_matriz(self):
     primer_color = self._realizar_lectura_estatica()
+
     if primer_color is None:
-        print("No se detecto un color de matriz valido.")
+        print("No se detectó un color de matriz válido.")
         return None
 
+    # Matriz 1 y 4 empiezan con verde.
+    # Se avanza para leer el segundo color y diferenciarlas.
     if primer_color == Color.GREEN:
-        # Distancia conservada: solo se optimiza el uso de la rutina existente.
         self.avanzar_recto(
             distancia_cm=4,
             velocidad_max=300,
             perfil="rapido"
         )
+
         segundo_color = self._realizar_lectura_estatica()
-        matriz_detectada = 4 if segundo_color == Color.YELLOW else 1
+
+        if segundo_color == Color.GREEN:
+            matriz_detectada = 1
+
+        elif segundo_color == Color.YELLOW:
+            matriz_detectada = 4
+
+        else:
+            print("Segundo color verde no válido:", segundo_color)
+            return None
 
     elif primer_color == Color.YELLOW:
         matriz_detectada = 2
-    elif primer_color == Color.BLUE:
-        matriz_detectada = 3
-    elif primer_color == Color.RED:
-        matriz_detectada = 4
+
     elif primer_color == Color.WHITE:
+        matriz_detectada = 3
+
+    elif primer_color == Color.BLUE:
         matriz_detectada = 5
+
     else:
-        matriz_detectada = None
+        print("Color no válido:", primer_color)
+        return None
 
     self.matriz_detectada = matriz_detectada
     print("Matriz detectada:", matriz_detectada)
-    return matriz_detectada
 
+    return matriz_detectada
 
 def dejar_bloques_matriz(robot):
     robot.seguir_linea(
         sensor_color=robot.seguidor,
-        velocidad_max=65,
+        velocidad_max=75,
         distancia_cm=16,
         lado="derecha",
         tiempo_acomodo_ms=140,
@@ -108,7 +105,7 @@ def dejar_bloques_matriz(robot):
         kp_captura=2.5,
         perfil_salida="encadenado"
     )
-    robot.mover_garra_principal(900, 230, apretar=False, duty_cierre=60)
+    robot.mover_garra_principal(900, 230, apretar=False, duty_cierre=100)
     robot.mover_garra_delantera(230)
 
     robot.avanzar_recto(
@@ -117,7 +114,7 @@ def dejar_bloques_matriz(robot):
         perfil="seguro"
     )
 
-    robot.mover_garra_delantera(270)
+    robot.mover_garra_delantera(270, simultaneo=True, velocidad=800)
     robot.seguir_linea(
         sensor_color=robot.seguidor,
         velocidad_max=100,
@@ -143,13 +140,14 @@ def dejar_bloques_matriz(robot):
         apretar=True
     )
     robot.mover_garra_delantera(100)
+
     robot.seguir_linea_hasta_color(
-        color_objetivo=Color.BLUE,
-        velocidad_max=100,
-        lado="derecha"
+    color_objetivo=Color.BLUE,
+    velocidad_max=85,
+    lado="derecha"
     )
 
-    wait(400)
+    wait(200)
     robot.girar_corto(-11)
     robot.avanzar_recto(
         distancia_cm=11.5,
@@ -165,7 +163,7 @@ def dejar_bloques_matriz(robot):
         zona_rampa_cm=0.1,
         perfil="encadenado"
     )
-    robot.mover_garra_delantera(290)
+    robot.mover_garra_delantera(290, simultaneo=True)
     robot.avanzar_recto(
         distancia_cm=1.7,
         velocidad_max=650,
@@ -174,8 +172,8 @@ def dejar_bloques_matriz(robot):
     )
 
     for _ in range(3):
-        robot.girar_corto(9, potencia_max=60, potencia_min=40)
-        robot.girar_corto(-9, potencia_max=60, potencia_min=40)
+        robot.girar_corto(9, potencia_max=70, potencia_min=40)
+        robot.girar_corto(-9, potencia_max=70, potencia_min=40)
 
     robot.avanzar_recto(
         distancia_cm=-1.3,
@@ -183,13 +181,13 @@ def dejar_bloques_matriz(robot):
         zona_rampa_cm=0.5,
         perfil="seguro"
     )
-    robot.mover_garra_delantera(100)
+    robot.mover_garra_delantera(100, simultaneo=True)
     robot.avanzar_recto(
         distancia_cm=-17,
         velocidad_max=500,
         perfil="seguro"
     )
-    robot.girar_hasta_negro("izquierda", potencia=70)
+    robot.girar_hasta_negro("izquierda", potencia=65, potencia_correccion=25)
 
 
 # Aquí termina la sección de movimientos para entrar en la matriz.
