@@ -35,20 +35,34 @@ def ejecutar_matriz_2(robot):
 
     # Cruza las dos líneas negras de entrada. El retraso de 80 ms está probado y se mantiene.
     robot.avanzar_cruzando_lineas(cruces_objetivo=2, velocidad=900, escape_inicial_cm=8, retraso_freno_ms=80, perfil="seguro")
+    
+    # Deja que el chasis se asiente.
+    wait(200)
+
+    # NO uses girar(-90): busca el negro y queda alineado con él.
+    robot.girar_hasta_negro(
+        "izquierda",
+        potencia=67,
+        potencia_correccion=22
+    )
 
     # El chasis debe asentarse antes de girar usando la línea negra como referencia.
     wait(200)
-
+     
+    '''
     # Gira hasta encontrar negro para alinear el robot con la entrada de los bloques.
     robot.girar(-90, potencia_max=75, potencia_min=35, kp_base=5.0, tolerancia_fin=1.0, perfil="encadenado")
+    '''
+    '''
     robot.avanzar_recto(distancia_cm=-6, velocidad_max=900)
     robot.seguir_linea(sensor_color=robot.seguidor, velocidad_max=50, distancia_cm=7, lado="izquierda", tiempo_acomodo_ms=140, tiempo_aceleracion_ms=140, kp=1.25, kd=2.7, k_freno=0.16, correccion_max=100, objetivo_reflexion=27, captura_inicial=True, tiempo_captura_ms=280, potencia_captura=60, kp_captura=2.5, perfil_salida="encadenado")
-
+    '''
+    
     # Abre/prepara la garra principal antes de entrar al grupo de cuatro azules.
     robot.mover_garra_principal(900, 300, apretar=False, duty_cierre=100)
 
     # Sale de la línea negra para no quedarse detenido sobre ella.
-    robot.avanzar_hasta_salir_negro(velocidad_max=900, velocidad_min=200, objetivo_reflexion=15, lecturas_salida=4)
+    robot.avanzar_hasta_salir_negro(velocidad_max=800, velocidad_min=200, objetivo_reflexion=15, lecturas_salida=4)
 
     # Entra hasta la posición de toma de los primeros cuatro bloques.
     robot.avanzar_recto(distancia_cm=4.3, velocidad_max=900, perfil="encadenado")
@@ -57,7 +71,7 @@ def ejecutar_matriz_2(robot):
     robot.mover_garra_delantera(290)
 
     # Sale del grupo azul y vuelve al pasillo central.
-    robot.avanzar_recto(distancia_cm=-21, velocidad_max=900, perfil="seguro")
+    robot.avanzar_recto(distancia_cm=-20, velocidad_max=900, perfil="seguro")
 
     # Se conserva antes del giro para evitar que el chasis arranque inclinado.
     wait(200)
@@ -145,7 +159,7 @@ def ejecutar_matriz_2(robot):
     robot.mover_garra_principal(900, 250, apretar=False, duty_cierre=60)
 
     # Retroceso hacia el corredor principal con la segunda tanda.
-    robot.avanzar_recto(distancia_cm=-27, velocidad_max=600, perfil="seguro")
+    robot.avanzar_recto(distancia_cm=-26, velocidad_max=600, perfil="seguro")
 
     # Giro y seguidor hacia la fila final de bloques.
     robot.girar(-90, potencia_max=90, potencia_min=35, kp_base=5.0, tolerancia_fin=1.0, perfil="encadenado")
