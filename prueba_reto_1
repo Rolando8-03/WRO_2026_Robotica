@@ -135,7 +135,7 @@ robot.seguir_linea_hasta_color(
 )
 
 robot.girar_corto(6, potencia_max=54, potencia_min=34)
-robot.avanzar_recto(14, 700)
+robot.avanzar_recto(14, 600)
 
 matriz_detectada = robot.escanear_matriz()
 
@@ -267,15 +267,11 @@ robot.mover_garra_principal(
     velocidad=300,
     grados=0,
     esperar=True,
-    duty_cierre=35
+    duty_cierre=100
 )
 
 
 gc.collect()
-
-ejecutar_matriz_3(robot)
-
-"""
 
 # Ejecuta la matriz detectada.
 if matriz_detectada == 1:
@@ -297,4 +293,3 @@ else:
     # Si no pudo leer la matriz, ejecuta Matriz 2 por defecto.
     print("Lectura inválida. Ejecutando Matriz 2 predeterminada.")
     ejecutar_matriz_2(robot)
-"""
