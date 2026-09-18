@@ -108,7 +108,7 @@ wait(100)
 robot.girar(angulo_deg=-90, potencia_max=85, perfil="encadenado")
 robot.avanzar_con_torque(
     distancia_cm=39.5,
-    distancia_activacion_torque_cm=17,
+    distancia_activacion_torque_cm=22,
     torque_grados=170
 )
 
@@ -135,7 +135,7 @@ robot.seguir_linea_hasta_color(
 )
 
 robot.girar_corto(6, potencia_max=54, potencia_min=34)
-robot.avanzar_recto(14, 600)
+robot.avanzar_recto(14, 700)
 
 matriz_detectada = robot.escanear_matriz()
 
@@ -258,7 +258,9 @@ robot.seguir_linea_y_mover_torque(
     perfil_salida="encadenado",
     distancia_torque_cm=67,
     grados_torque=170,
-    velocidad_torque=450
+    velocidad_torque=450,
+    zona_desaceleracion_cm=10,
+    velocidad_fin_rampa=75
 )
 
 robot.mover_garra_delantera(posicion=0, simultaneo=True)
@@ -267,11 +269,15 @@ robot.mover_garra_principal(
     velocidad=300,
     grados=0,
     esperar=True,
-    duty_cierre=100
+    duty_cierre=35
 )
 
 
 gc.collect()
+
+ejecutar_matriz_3(robot)
+
+"""
 
 # Ejecuta la matriz detectada.
 if matriz_detectada == 1:
@@ -293,3 +299,4 @@ else:
     # Si no pudo leer la matriz, ejecuta Matriz 2 por defecto.
     print("Lectura inválida. Ejecutando Matriz 2 predeterminada.")
     ejecutar_matriz_2(robot)
+"""
