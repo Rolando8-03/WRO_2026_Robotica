@@ -272,9 +272,9 @@ def ejecutar_matriz_3(robot):
     )
     robot.mover_garra_delantera(0, simultaneo=False)
 
-    robot.avanzar_recto(20, 600) #Avanzar para meter en los compartimentos los verdes
+    robot.avanzar_recto(19, 600) #Avanzar para meter en los compartimentos los verdes
     robot.mover_garra_delantera(260, simultaneo=False)
-    robot.avanzar_recto(-21)
+    robot.avanzar_recto(-20)
     robot.girar(
         90,
         potencia_max=80,
@@ -327,17 +327,17 @@ def ejecutar_matriz_3(robot):
     robot.mover_garra_principal(800, grados=0) #Aqui toma los blancos
     robot.girar_corto(-10.5, potencia_max=50, potencia_min=34)
 
-    robot.avanzar_recto(-23)
+    robot.avanzar_recto(-21)
     wait(100)
     robot.girar(
         -90,
         potencia_max=80,
-        potencia_min=45,
+        potencia_min=50,
         kp_base=6.2,
         kd_base=3.5,
         tiempo_curva_s_ms=90,
         tolerancia_fin=1.0,
-        perfil="encadenado"
+        perfil="seguro"
     )
     robot.avanzar_recto(20)
     
@@ -355,7 +355,7 @@ def ejecutar_matriz_3(robot):
     )
     wait(100)
 
-    robot.avanzar_recto(distancia_cm=-34, velocidad_max=600, perfil="seguro")
+    robot.avanzar_recto(distancia_cm=-37, velocidad_max=600, perfil="seguro")
 
     robot.mover_torque(
         grados_torque=-170,
