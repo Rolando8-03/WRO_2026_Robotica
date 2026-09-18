@@ -1,228 +1,388 @@
-def ejecutar_matriz_3(robot):
-    print("Ejecutando recorrido de matriz 3")
-    pass
+"""Recorrido adaptado para la matriz 3.
 
-from robot_control_rapidez import Base
+Todas as llamadas usan las funciones del proyecto organizado.
+"""
+
+from control_drivebase import Base
+from pybricks.parameters import Color
+from pybricks.tools import wait
 import gc
-
-robot = Base()
-print(robot.Hub.battery.voltage()) 
-
-# SECCION DE MOVIMIENTO PARA LOS VERDES ------------------------------------
-# seguir la linea hasta llegar a los verdes
-robot.seguir_linea_extremo(
-    sensor_color=robot.seguidor,
-    velocidad_max=100,
-    distancia_cm=45.5,
-    lado="derecha",
-    tiempo_acomodo_ms=140,
-    tiempo_aceleracion_ms=140,
-    kp=1.25,
-    kd=2.7,
-    k_freno=0.16,
-    correccion_max=100,
-    objetivo_reflexion=27,
-    captura_inicial=True,
-    tiempo_captura_ms=280,
-    potencia_captura=60,
-    kp_captura=2.5,
-    perfil_salida="encadenado"
-)
-
-# el robot gira para agarrar los cementos verdes
-robot.girar_modo_bestia_elite(
-    angulo_deg=-90,          
-    potencia_max=100,       
-    potencia_min=18,
-    kp_base=2.2,
-    kd_base=1.8,
-    tolerancia_fin=2.0 
-)
-robot.mover_garra_rapida(potencia=300, grados=39, abrir=True) # abrir la garra
-robot.mover_garra_delantera(850, 276) # bajar la garra
-robot.mover_recto_supremo(distancia_cm=12) # avanzar un poco para agarrar los cementos
-robot.mover_garra_rapida(potencia=300, grados=-38, abrir=False) # cerrar la garra para tomar los verdes
-
-robot.mover_recto_supremo(distancia_cm=-8.5) # RETROCESO PARA AGARRAR LA LINEA DESPUES DE TOMAR LOS VERDES
-robot.girar_modo_bestia_elite(
-    angulo_deg=-90,          
-    potencia_max=100,       
-    potencia_min=18,
-    kp_base=2.2,
-    kd_base=1.8,
-    tolerancia_fin=2.0 
-) # giro sobre la linea
-
-robot.mover_garra_rapida(potencia=300, grados=50, abrir=True) # abrir la garra
-robot.mover_garra_delantera(850, -285) # subir la garra 
-
-robot.esperar(100)
-robot.mover_recto_supremo(distancia_cm=-3) # retroceder un poco antes de acomodar los verdes
-robot.esperar(100)
-
-# Seguir la linea para acomodar los verdes
-robot.seguir_linea_extremo(
-    sensor_color=robot.seguidor,
-    velocidad_max=100,
-    distancia_cm=33.2,
-    lado="derecha",
-    tiempo_acomodo_ms=140,
-    tiempo_aceleracion_ms=140,
-    kp=1.25,
-    kd=2.7,
-    k_freno=0.16,
-    correccion_max=100,
-    objetivo_reflexion=27.1,
-    captura_inicial=True,
-    tiempo_captura_ms=280,
-    potencia_captura=60,
-    kp_captura=2.5,
-    perfil_salida="encadenado"
-) 
+from matriz import dejar_bloques_matriz2
 
 
-# SECCION PARA AGARRAR LOS CEMENTOS AMARILLOS----------------------------------------
-# giro para agarrar los blancos
-robot.girar_modo_bestia_elite(
-    angulo_deg=92,          
-    potencia_max=100,       
-    potencia_min=18,
-    kp_base=2.2,
-    kd_base=1.8,
-    tolerancia_fin=2.0 
-)
-robot.mover_garra_rapida(potencia=300, grados=12, abrir=True) # abrir la garra
-robot.mover_garra_delantera(850, 285) # bajar la garra
-robot.mover_recto_supremo(distancia_cm=11) # mover recto para tomar los amarillos
-robot.mover_garra_rapida(potencia=300, grados=-38, abrir=False) # cerrar la garra
+def ejecutar_matriz_3(robot):
+    """Ejecuta el recorrido activo de la matriz 3."""
+    
+    
+    robot.motor_garra_delantera.reset_angle(0)
+    robot.motor_garra.reset_angle(0)
+    robot.establecer_norte()
 
-robot.mover_recto_supremo(distancia_cm=-15.5) # Retroceder despues de agarrar los amarillos
+    wait(100)
 
-# girar para tomar la linea con los amarillos
-robot.girar_modo_bestia_elite(
-    angulo_deg=92,          
-    potencia_max=100,       
-    potencia_min=18,
-    kp_base=2.2,
-    kd_base=1.8,
-    tolerancia_fin=2.0 
-)
-robot.esperar(100)
+    robot.avanzar_recto(distancia_cm=-6.5, velocidad_max=900)
+    robot.girar_a_rumbo(90)
 
 
-robot.mover_recto_supremo(distancia_cm=-16.8) # retroceder para acomodar los amarillos
-robot.mover_garra_rapida(potencia=300, grados=50, abrir=True) # Soltar la garra
-robot.mover_garra_delantera(850, -285) # subir la garra
+    wait(200)
+    gc.collect()
 
-# seguir la linea para acomodar la amarillos
-robot.seguir_linea_extremo(
-    sensor_color=robot.seguidor,
-    velocidad_max=100,
-    distancia_cm=55.3,
-    lado="izquierda",
-    tiempo_acomodo_ms=140,
-    tiempo_aceleracion_ms=140,
-    kp=1.25,
-    kd=2.7,
-    k_freno=0.16,
-    correccion_max=100,
-    objetivo_reflexion=27.1,
-    captura_inicial=True,
-    tiempo_captura_ms=280,
-    potencia_captura=60,
-    kp_captura=2.5,
-    perfil_salida="encadenado"
-)
+    #Tomar los primeros dos cementos blancos y verdes ==========
+    wait(400)
+    robot.avanzar_cruzando_lineas(cruces_objetivo=3, velocidad=700, distancia_extra_cm=11.5)
+    robot.mover_garra_principal(velocidad=900, grados=180, esperar=False)
+    wait(100)
+    robot.girar(
+        -90,
+        potencia_max=80,
+        potencia_min=45,
+        kp_base=6.2,
+        kd_base=3.5,
+        tiempo_curva_s_ms=90,
+        tolerancia_fin=1.0,
+        perfil="encadenado"
+    )
+    wait(400)
+    robot.avanzar_cruzando_lineas(cruces_objetivo=1, velocidad=-500)
+    robot.mover_garra_delantera(263, simultaneo=True)
 
-# SECCION DE AGARRAR LOS BLANCOS -----------------------------------------------------
+    robot.avanzar_recto(22, 800)
+    robot.mover_garra_principal(900, grados=75)
+    robot.avanzar_recto(-16.5)
+    #giro para ir por los cementos amarillos ===========
+    robot.girar(
+        -89,
+        potencia_max=80,
+        potencia_min=45,
+        kp_base=6.2,
+        kd_base=3.5,
+        tiempo_curva_s_ms=90,
+        tolerancia_fin=1.0,
+        perfil="encadenado"
+    )
+    #ir por los cementos amarillos
 
-# bajar la garra antes de girar por los blancos
-robot.mover_garra_delantera(850, 285)
-robot.mover_recto_supremo(distancia_cm=2) # avanzar para tomar los cementos blancos
-
-# girar para tomar los cementos blancos
-robot.girar_modo_bestia_elite(
-    angulo_deg=-92,          
-    potencia_max=100,       
-    potencia_min=18,
-    kp_base=2.2,
-    kd_base=1.8,
-    tolerancia_fin=2.0 
-)
-
-robot.mover_garra_rapida(potencia=300, grados=13, abrir=True) # abrir la garra
-robot.mover_recto_supremo(distancia_cm=13) # avanzar para tomar los cementos blancos
-
-robot.mover_garra_rapida(potencia=300, grados=-43, abrir=False) # cerrar la garra para tomar los blancos
-robot.mover_garra_delantera(850, -10) # subir un poco la garra
-
-robot.mover_recto_supremo(distancia_cm=-14) # retroceder con los blancos
-
-
-robot.esperar(300)
-# girar para seguir la linea con los blancos
-robot.girar_modo_bestia_elite(
-    angulo_deg=-96.3,          
-    potencia_max=100,       
-    potencia_min=18,
-    kp_base=2.2,
-    kd_base=1.8,
-    tolerancia_fin=2.0 
-)
-
-robot.mover_garra_rapida(potencia=300, grados=45, abrir=True) # soltar los blancos de la garra
-robot.mover_garra_delantera(850, -290) # subir la garra
-
-robot.mover_recto_supremo(distancia_cm=-25) # retroceder para acomodar los amarillos
-
-robot.mover_garra_rapida(potencia=300, grados=53, abrir=True) # abrir por completo la garra
-robot.mover_garra_delantera(850, 291) # bajar la garra
-
-robot.esperar(300)
-# SECCION DE ACOMODO DE LOS CEMENTOS----------------------------------------------------
-robot.mover_recto_supremo(
-    distancia_cm=40, 
-    velocidad_max=700,     # Velocidad de tortuga
-    velocidad_min=20,      # Apenas lo suficiente para romper inercia
-    kp_gyro=0.0,           # ¡La clave! Relajamos al dictador espacial
-    zona_rampa_cm=2        # Rampa cortita para 4 cm
-)
+    robot.seguir_linea(
+        sensor_color=robot.seguidor,
+        distancia_cm=43.3,           
+        velocidad_max=100,         
+        lado="izquierda",            
+        
+        tiempo_acomodo_ms=50,      
+        tiempo_aceleracion_ms=80,  
+        
+        #CEREBRO PREDICTIVO (PID):
+        kp=1.15,                   
+        kd=3.8,                    
+        k_freno=0.05,              
+        
+        correccion_max=100,
+        objetivo_reflexion=27,     
+        
+        captura_inicial=True,
+        tiempo_captura_ms=280,
+        potencia_captura=60,
+        kp_captura=2.5,
+        perfil_salida="encadenado"
+    )
+    
+    robot.girar(
+        90,
+        potencia_max=80,
+        potencia_min=50,
+        kp_base=6.2,
+        kd_base=3.5,
+        tiempo_curva_s_ms=90,
+        tolerancia_fin=1.0,
+        perfil="encadenado"
+    )
 
 
-robot.esperar(100)
-robot.mover_recto_supremo(distancia_cm=-1) 
+    gc.collect()
+    wait(100)
 
-robot.mover_garra_rapida(potencia=300, grados=-55, abrir=False) # Cerrar la garra
-robot.mover_garra_delantera(850, -25) # bajar la garra
-robot.girar_modo_bestia_elite(
-    angulo_deg=-91,          
-    potencia_max=100,       
-    potencia_min=18,
-    kp_base=2.2,
-    kd_base=1.8,
-    tolerancia_fin=2.0 
-)
+    #Secuencia para ir por los cementos amarillos ==========
+    robot.girar_corto(-10, potencia_max=50, potencia_min=34)
+    robot.mover_garra_principal(velocidad=1000, grados=160, esperar=True)
+    robot.girar_corto(8.5, potencia_max=50, potencia_min=34)
+    robot.avanzar_recto(15, 600)
+
+    robot.mover_garra_principal(velocidad=1000, grados=0, esperar=True)
+    robot.avanzar_recto(-18, 750) ###
+
+    
+    robot.girar(
+        90,
+        potencia_max=80,
+        potencia_min=45,
+        kp_base=6.2,
+        kd_base=3.5,
+        tiempo_curva_s_ms=90,
+        tolerancia_fin=1.0,
+        perfil="encadenado"
+    )
+    wait(100)
+    robot.avanzar_cruzando_lineas(cruces_objetivo=1, velocidad=400, escape_inicial_cm=5, distancia_extra_cm=4)
+    wait(100)
+
+    robot.girar(
+        89,
+        potencia_max=90,
+        potencia_min=55,
+        kp_base=6.2,
+        kd_base=3.5,
+        tiempo_curva_s_ms=90,
+        tolerancia_fin=1.0,
+        perfil="encadenado"
+    )
+
+    #Acomodar los bloques
+    robot.dejar_bloques_matriz3(distancia_entrada=11.8)
+
+    #INICIO DE LA SEGUNDA PORCION DE LA MATRIZ ==============================================================================
+
+    
+    wait(30)
+    robot.mover_garra_principal(800, 50, esperar=False)
+    robot.seguir_linea(
+        sensor_color=robot.seguidor,
+        distancia_cm=31,           
+        velocidad_max=100,         
+        lado="izquierda",            
+        
+        tiempo_acomodo_ms=50,      
+        tiempo_aceleracion_ms=80,  
+        
+        #CEREBRO PREDICTIVO (PID):
+        kp=1.15,                   
+        kd=3.8,                    
+        k_freno=0.05,              
+        
+        correccion_max=100,
+        objetivo_reflexion=27,     
+        
+        captura_inicial=True,
+        tiempo_captura_ms=280,
+        potencia_captura=60,
+        kp_captura=2.5,
+        perfil_salida="encadenado"
+    )
+    robot.girar(
+        -90,
+        potencia_max=80,
+        potencia_min=45,
+        kp_base=6.2,
+        kd_base=3.5,
+        tiempo_curva_s_ms=90,
+        tolerancia_fin=1.0,
+        perfil="encadenado"
+    )
+    wait(30)
+    robot.seguir_linea(
+        sensor_color=robot.seguidor,
+        distancia_cm=16,           
+        velocidad_max=100,         
+        lado="izquierda",            
+        
+        tiempo_acomodo_ms=50,      
+        tiempo_aceleracion_ms=80,  
+        
+        #CEREBRO PREDICTIVO (PID):
+        kp=1.15,                   
+        kd=3.8,                    
+        k_freno=0.05,              
+        
+        correccion_max=100,
+        objetivo_reflexion=27,     
+        
+        captura_inicial=True,
+        tiempo_captura_ms=280,
+        potencia_captura=60,
+        kp_captura=2.5,
+        perfil_salida="encadenado"
+    )
+
+    robot.girar(
+        89,
+        potencia_max=80,
+        potencia_min=45,
+        kp_base=6.2,
+        kd_base=3.5,
+        tiempo_curva_s_ms=90,
+        tolerancia_fin=1.0,
+        perfil="encadenado"
+    )
+    robot.mover_garra_delantera(265, simultaneo=True)
+    robot.avanzar_recto(12.5)
+    robot.mover_garra_principal(800, grados=0) #Aqui toma los amarillos
+
+    robot.avanzar_cruzando_lineas(cruces_objetivo=1, velocidad=-500, distancia_extra_cm=12)
+    robot.girar(
+        100,
+        potencia_max=80,
+        potencia_min=45,
+        kp_base=6.2,
+        kd_base=3.5,
+        tiempo_curva_s_ms=90,
+        tolerancia_fin=1.0,
+        perfil="encadenado"
+    )
+    robot.mover_garra_principal(800, 100)
+    robot.mover_garra_delantera(0, simultaneo=True)
+    robot.girar_corto(-15)
+
+    robot.mover_garra_delantera(240, simultaneo=True)
+    robot.seguir_linea(
+        sensor_color=robot.seguidor,
+        distancia_cm=27,           
+        velocidad_max=100,         
+        lado="izquierda0",            
+        
+        tiempo_acomodo_ms=80,      
+        tiempo_aceleracion_ms=80,  
+        
+        #CEREBRO PREDICTIVO (PID):
+        kp=1.15,                   
+        kd=3.8,                    
+        k_freno=0.05,              
+        
+        correccion_max=100,
+        objetivo_reflexion=27,     
+        
+        captura_inicial=True,
+        tiempo_captura_ms=280,
+        potencia_captura=60,
+        kp_captura=2.5,
+        perfil_salida="encadenado",
+        zona_desaceleracion_cm=10,
+        velocidad_fin_rampa=60
+    )
+    #robot.avanzar_recto(24.5) #Ir por los cmentos verdes
+    robot.mover_garra_principal(velocidad=900, grados=200, esperar= True)
+    wait(100)
+    robot.girar(
+        -90,
+        potencia_max=80,
+        potencia_min=45,
+        kp_base=6.2,
+        kd_base=3.5,
+        tiempo_curva_s_ms=90,
+        tolerancia_fin=1.0,
+        perfil="encadenado"
+    )
+    robot.mover_garra_delantera(0, simultaneo=False)
+
+    robot.avanzar_recto(20, 600) #Avanzar para meter en los compartimentos los verdes
+    robot.mover_garra_delantera(260, simultaneo=False)
+    robot.avanzar_recto(-21)
+    robot.girar(
+        90,
+        potencia_max=80,
+        potencia_min=45,
+        kp_base=6.2,
+        kd_base=3.5,
+        tiempo_curva_s_ms=90,
+        tolerancia_fin=1.0,
+        perfil="encadenado"
+    )
+
+    #ir por los cementos blancos
+    robot.seguir_linea(
+        sensor_color=robot.seguidor,
+        distancia_cm=12,           
+        velocidad_max=100,         
+        lado="derecha",            
+        
+        tiempo_acomodo_ms=50,      
+        tiempo_aceleracion_ms=80,  
+        
+        #CEREBRO PREDICTIVO (PID):
+        kp=1.15,                   
+        kd=3.8,                    
+        k_freno=0.05,              
+        
+        correccion_max=100,
+        objetivo_reflexion=27,     
+        
+        captura_inicial=True,
+        tiempo_captura_ms=280,
+        potencia_captura=60,
+        kp_captura=2.5,
+        perfil_salida="encadenado"
+    )
+    robot.girar(
+        -90,
+        potencia_max=80,
+        potencia_min=45,
+        kp_base=6.2,
+        kd_base=3.5,
+        tiempo_curva_s_ms=90,
+        tolerancia_fin=1.0,
+        perfil="encadenado"
+    )
+
+    robot.mover_garra_principal(velocidad=900, grados=130, esperar= True)
+    robot.girar_corto(13, potencia_max=50, potencia_min=34)
+    robot.avanzar_recto(14)
+    robot.mover_garra_principal(800, grados=0) #Aqui toma los blancos
+    robot.girar_corto(-10.5, potencia_max=50, potencia_min=34)
+
+    robot.avanzar_recto(-23)
+    wait(100)
+    robot.girar(
+        -90,
+        potencia_max=80,
+        potencia_min=45,
+        kp_base=6.2,
+        kd_base=3.5,
+        tiempo_curva_s_ms=90,
+        tolerancia_fin=1.0,
+        perfil="encadenado"
+    )
+    robot.avanzar_recto(20)
+    
+
+    wait(200)
+    robot.girar(
+        -180,
+        potencia_max=80,
+        potencia_min=50,
+        kp_base=6.2,
+        kd_base=3.5,
+        tiempo_curva_s_ms=90,
+        tolerancia_fin=1.0,
+        perfil="seguro"
+    )
+    wait(100)
+
+    robot.avanzar_recto(distancia_cm=-34, velocidad_max=600, perfil="seguro")
+
+    robot.mover_torque(
+        grados_torque=-170,
+        velocidad_torque=900,
+        esperar=False
+    )
+
+    gc.collect()
+
+    dejar_bloques_matriz2(robot)
+
+    """
+    robot.mover_garra_principal(velocidad=900, grados=0)
+    robot.mover_garra_delantera(posicion=0, velocidad=700)
+
+    robot.avanzar_recto(-20)
+    robot.mover_garra_principal(velocidad=900, grados=200, esperar=False)
+    robot.mover_garra_delantera(posicion=260, velocidad=700)
 
 
-robot.seguir_linea_extremo(
-    sensor_color=robot.seguidor,
-    velocidad_max=90,
-    distancia_cm=20,
-    lado="izquierda",
-    tiempo_acomodo_ms=140,
-    tiempo_aceleracion_ms=140,
-    kp=1.25,
-    kd=2.7,
-    k_freno=0.16,
-    correccion_max=100,
-    objetivo_reflexion=27.1,
-    captura_inicial=True,
-    tiempo_captura_ms=280,
-    potencia_captura=60,
-    kp_captura=2.5,
-    perfil_salida="encadenado"
-)
 
-robot.mover_garra_delantera(850, -70) # subir la garra
+    robot.dejar_bloques_matriz3(distancia_entrada=3)
+    """
 
-robot.mover_recto(30, 750)
+
+
+if __name__ == "__main__":
+    robot = Base()
+    print(robot.Hub.battery.voltage())
+    ejecutar_matriz_3(robot)
