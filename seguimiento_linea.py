@@ -35,7 +35,9 @@ def seguir_linea(
     potencia_captura=55,
     kp_captura=2.4,
     margen_captura=5,
-    lecturas_estables_captura=2
+    lecturas_estables_captura=2,
+    zona_desaceleracion_cm=0,
+    velocidad_fin_rampa=75
 ):
     if sensor_color is None:
         sensor_color = self.seguidor
@@ -49,7 +51,19 @@ def seguir_linea(
     else:
         grados_margen = 0
 
-    grados_objetivo_real = max(0, grados_objetivo - grados_margen)
+    grados_objetivo_real = max(
+        0,
+        grados_objetivo - grados_margen
+    )
+
+    # Convertimos la zona de desaceleración de cm a grados de rueda.
+    if zona_desaceleracion_cm > 0:
+        grados_desaceleracion = (
+            zona_desaceleracion_cm / circunferencia_cm
+        ) * 360
+    else:
+        grados_desaceleracion = 0
+
     multiplicador_lado = 1 if lado == "derecha" else -1
 
     self.reset_motores()
@@ -75,24 +89,40 @@ def seguir_linea(
             else:
                 estables = 0
 
-            correccion = error * kp_captura * multiplicador_lado
+            correccion = (
+                error
+                * kp_captura
+                * multiplicador_lado
+            )
+
             correccion = self.limitar(
                 correccion,
                 -correccion_max,
                 correccion_max
             )
 
-            velocidad_base = 28 if abs(error) > 22 else potencia_captura
+            velocidad_base = (
+                28 if abs(error) > 22
+                else potencia_captura
+            )
 
             potencia_izq = velocidad_base - correccion
             potencia_der = velocidad_base + correccion
 
             self.motor_izquierdo.dc(
-                self.limitar(potencia_izq, -100, 100)
+                self.limitar(
+                    potencia_izq,
+                    -100,
+                    100
+                )
             )
 
             self.motor_derecho.dc(
-                self.limitar(potencia_der, -100, 100)
+                self.limitar(
+                    potencia_der,
+                    -100,
+                    100
+                )
             )
 
             wait(2)
@@ -101,7 +131,8 @@ def seguir_linea(
         self.motor_derecho.brake()
         wait(8)
 
-        # La distancia recorrida durante la captura no cuenta como trayecto.
+        # La distancia recorrida durante la captura
+        # no cuenta como trayecto.
         self.reset_motores()
 
     # =====================================================================
@@ -122,22 +153,68 @@ def seguir_linea(
 
         tiempo_actual = cronometro.time()
 
+        # ================================================================
+        # RAMPA DE ACELERACIÓN INICIAL
+        # ================================================================
         if tiempo_actual < tiempo_acomodo_ms:
             velocidad_actual = velocidad_minima
 
-        elif tiempo_actual < tiempo_acomodo_ms + tiempo_aceleracion_ms:
+        elif (
+            tiempo_actual
+            < tiempo_acomodo_ms + tiempo_aceleracion_ms
+        ):
             progreso = (
                 tiempo_actual - tiempo_acomodo_ms
             ) / tiempo_aceleracion_ms
 
             velocidad_actual = (
                 velocidad_minima
-                + (velocidad_max - velocidad_minima) * progreso
+                + (velocidad_max - velocidad_minima)
+                * progreso
             )
 
         else:
             velocidad_actual = velocidad_max
 
+        # ================================================================
+        # RAMPA DE DESACELERACIÓN FINAL
+        #
+        # Cuando el robot entra en los últimos
+        # "zona_desaceleracion_cm", empieza a reducir progresivamente
+        # su velocidad hasta "velocidad_fin_rampa".
+        # ================================================================
+        if grados_desaceleracion > 0:
+            grados_restantes = (
+                grados_objetivo_real - grados_actuales
+            )
+
+            if grados_restantes <= grados_desaceleracion:
+
+                progreso_freno = 1 - (
+                    grados_restantes
+                    / grados_desaceleracion
+                )
+
+                # Seguridad por si existe alguna pequeña
+                # variación en las mediciones.
+                progreso_freno = self.limitar(
+                    progreso_freno,
+                    0,
+                    1
+                )
+
+                velocidad_actual = (
+                    velocidad_actual
+                    + (
+                        velocidad_fin_rampa
+                        - velocidad_actual
+                    )
+                    * progreso_freno
+                )
+
+        # ================================================================
+        # CONTROL PD DEL SEGUIDOR
+        # ================================================================
         lectura = sensor_color.reflection()
         error = lectura - objetivo_reflexion
 
@@ -157,20 +234,36 @@ def seguir_linea(
             correccion_max
         )
 
-        velocidad_base = velocidad_actual - abs(error) * k_freno
+        velocidad_base = (
+            velocidad_actual
+            - abs(error) * k_freno
+        )
 
         if velocidad_base < 55:
             velocidad_base = 55
 
-        potencia_izq = velocidad_base - correccion
-        potencia_der = velocidad_base + correccion
+        potencia_izq = (
+            velocidad_base - correccion
+        )
+
+        potencia_der = (
+            velocidad_base + correccion
+        )
 
         self.motor_izquierdo.dc(
-            self.limitar(potencia_izq, -100, 100)
+            self.limitar(
+                potencia_izq,
+                -100,
+                100
+            )
         )
 
         self.motor_derecho.dc(
-            self.limitar(potencia_der, -100, 100)
+            self.limitar(
+                potencia_der,
+                -100,
+                100
+            )
         )
 
         error_anterior = error
@@ -178,6 +271,9 @@ def seguir_linea(
 
         wait(2)
 
+    # =====================================================================
+    # FINALIZACIÓN
+    # =====================================================================
     self.terminar_movimiento(
         perfil=perfil_salida,
         modo="brake"
@@ -441,6 +537,9 @@ def seguir_linea_hasta_color(
 
         wait(2)
 
+
+#=================SEGUIR LINEA Y MOVER TORQUE ==============================================
+
 def seguir_linea_y_mover_torque(
     self,
     sensor_color=None,
@@ -462,51 +561,78 @@ def seguir_linea_y_mover_torque(
     kp_captura=2.4,
     margen_captura=5,
     lecturas_estables_captura=2,
+    zona_desaceleracion_cm=0,
+    velocidad_fin_rampa=75,
     distancia_torque_cm=None,
     grados_torque=0,
     velocidad_torque=180,
     modo_final_torque=Stop.HOLD
 ):
     """
-    Combina seguir_linea() + mover_torque() en un solo recorrido:
+    Combina seguir_linea() + mover_torque() en un solo recorrido.
 
-    - Sigue la línea exactamente igual que seguir_linea() (misma fase de
-      captura inicial y mismo PID de seguimiento por distancia).
+    - Sigue la línea mediante el mismo control de seguir_linea().
     - Al superar distancia_torque_cm dentro del recorrido, dispara
-      mover_torque() en modo NO bloqueante (esperar=False). Eso hace que
-      motor_torque.run_angle() arranque y el control vuelva de inmediato
-      al bucle principal: el robot NUNCA deja de seguir la línea mientras
-      el motor de torque se mueve en paralelo.
+      mover_torque() en modo NO bloqueante.
+    - Incluye la misma rampa de desaceleración final de seguir_linea().
+    - El robot continúa siguiendo la línea mientras el torque se mueve
+      en paralelo.
 
     Si distancia_torque_cm es None o grados_torque es 0, el torque
-    simplemente no se activa y la función se comporta como seguir_linea().
+    simplemente no se activa.
     """
+
     if sensor_color is None:
         sensor_color = self.seguidor
 
     diametro_rueda_cm = self.diametro_rueda / 10
     circunferencia_cm = 3.14159 * diametro_rueda_cm
-    grados_objetivo = (distancia_cm / circunferencia_cm) * 360
+
+    grados_objetivo = (
+        distancia_cm / circunferencia_cm
+    ) * 360
 
     if margen_cm > 0:
-        grados_margen = (margen_cm / circunferencia_cm) * 360
+        grados_margen = (
+            margen_cm / circunferencia_cm
+        ) * 360
     else:
         grados_margen = 0
 
-    grados_objetivo_real = max(0, grados_objetivo - grados_margen)
-    multiplicador_lado = 1 if lado == "derecha" else -1
+    grados_objetivo_real = max(
+        0,
+        grados_objetivo - grados_margen
+    )
+
+    # =====================================================================
+    # CONVERSIÓN DE ZONA DE DESACELERACIÓN DE CM A GRADOS
+    # =====================================================================
+
+    if zona_desaceleracion_cm > 0:
+        grados_desaceleracion = (
+            zona_desaceleracion_cm / circunferencia_cm
+        ) * 360
+    else:
+        grados_desaceleracion = 0
+
+    multiplicador_lado = (
+        1 if lado == "derecha"
+        else -1
+    )
 
     self.reset_motores()
 
     # =====================================================================
-    # FASE 1: CAPTURA INICIAL DE LA LÍNEA (igual que en seguir_linea)
+    # FASE 1: CAPTURA INICIAL DE LA LÍNEA
     # =====================================================================
+
     if captura_inicial:
         reloj_captura = StopWatch()
         reloj_captura.reset()
         estables = 0
 
         while reloj_captura.time() < tiempo_captura_ms:
+
             lectura = sensor_color.reflection()
             error = lectura - objetivo_reflexion
 
@@ -518,91 +644,191 @@ def seguir_linea_y_mover_torque(
             else:
                 estables = 0
 
-            correccion = error * kp_captura * multiplicador_lado
+            correccion = (
+                error
+                * kp_captura
+                * multiplicador_lado
+            )
+
             correccion = self.limitar(
                 correccion,
                 -correccion_max,
                 correccion_max
             )
 
-            velocidad_base = 28 if abs(error) > 22 else potencia_captura
+            velocidad_base = (
+                28
+                if abs(error) > 22
+                else potencia_captura
+            )
 
-            potencia_izq = velocidad_base - correccion
-            potencia_der = velocidad_base + correccion
+            potencia_izq = (
+                velocidad_base - correccion
+            )
+
+            potencia_der = (
+                velocidad_base + correccion
+            )
 
             self.motor_izquierdo.dc(
-                self.limitar(potencia_izq, -100, 100)
+                self.limitar(
+                    potencia_izq,
+                    -100,
+                    100
+                )
             )
 
             self.motor_derecho.dc(
-                self.limitar(potencia_der, -100, 100)
+                self.limitar(
+                    potencia_der,
+                    -100,
+                    100
+                )
             )
 
             wait(2)
 
         self.motor_izquierdo.brake()
         self.motor_derecho.brake()
+
         wait(8)
 
-        # La distancia recorrida durante la captura no cuenta como trayecto.
+        # La distancia recorrida durante la captura
+        # no cuenta como trayecto.
         self.reset_motores()
 
     # =====================================================================
-    # FASE 2: SEGUIMIENTO DE LÍNEA POR DISTANCIA + DISPARO DE TORQUE
+    # FASE 2: SEGUIMIENTO DE LÍNEA + TORQUE
     # =====================================================================
+
     cronometro = StopWatch()
     cronometro.reset()
 
     velocidad_minima = 75
+
     error_anterior = 0
     derivada_anterior = 0
+
     torque_aplicado = False
 
     while True:
-        grados_actuales = self.distancia_promedio_grados()
+
+        # -------------------------------------------------------------
+        # DISTANCIA RECORRIDA
+        # -------------------------------------------------------------
+
+        grados_actuales = (
+            self.distancia_promedio_grados()
+        )
 
         if grados_actuales >= grados_objetivo_real:
             break
 
-        distancia_actual_cm = (grados_actuales / 360) * circunferencia_cm
+        distancia_actual_cm = (
+            grados_actuales / 360
+        ) * circunferencia_cm
 
-        # --- Disparo del torque sin detener el recorrido ---
-        # esperar=False hace que mover_torque() no bloquee: arranca el
-        # motor_torque y el bucle de seguimiento sigue corriendo normal.
+        # -------------------------------------------------------------
+        # DISPARO DEL TORQUE
+        # -------------------------------------------------------------
+
         if (
             not torque_aplicado
             and distancia_torque_cm is not None
             and grados_torque != 0
             and distancia_actual_cm >= distancia_torque_cm
         ):
+
             self.mover_torque(
                 grados_torque,
                 velocidad_torque=velocidad_torque,
                 esperar=False,
                 modo_final=modo_final_torque
             )
+
             torque_aplicado = True
+
+        # -------------------------------------------------------------
+        # RAMPA DE ACELERACIÓN INICIAL
+        # -------------------------------------------------------------
 
         tiempo_actual = cronometro.time()
 
         if tiempo_actual < tiempo_acomodo_ms:
+
             velocidad_actual = velocidad_minima
 
-        elif tiempo_actual < tiempo_acomodo_ms + tiempo_aceleracion_ms:
+        elif (
+            tiempo_actual
+            < tiempo_acomodo_ms + tiempo_aceleracion_ms
+        ):
+
             progreso = (
                 tiempo_actual - tiempo_acomodo_ms
             ) / tiempo_aceleracion_ms
 
             velocidad_actual = (
                 velocidad_minima
-                + (velocidad_max - velocidad_minima) * progreso
+                + (
+                    velocidad_max
+                    - velocidad_minima
+                ) * progreso
             )
 
         else:
+
             velocidad_actual = velocidad_max
 
+        # -------------------------------------------------------------
+        # RAMPA DE DESACELERACIÓN FINAL
+        # -------------------------------------------------------------
+        #
+        # Cuando el robot entra en los últimos
+        # "zona_desaceleracion_cm", comienza a reducir
+        # progresivamente la velocidad hasta
+        # "velocidad_fin_rampa".
+        # -------------------------------------------------------------
+
+        if grados_desaceleracion > 0:
+
+            grados_restantes = (
+                grados_objetivo_real
+                - grados_actuales
+            )
+
+            if grados_restantes <= grados_desaceleracion:
+
+                progreso_freno = 1 - (
+                    grados_restantes
+                    / grados_desaceleracion
+                )
+
+                # Seguridad ante pequeñas variaciones
+                # en las mediciones.
+                progreso_freno = self.limitar(
+                    progreso_freno,
+                    0,
+                    1
+                )
+
+                velocidad_actual = (
+                    velocidad_actual
+                    + (
+                        velocidad_fin_rampa
+                        - velocidad_actual
+                    ) * progreso_freno
+                )
+
+        # -------------------------------------------------------------
+        # CONTROL PD DEL SEGUIDOR
+        # -------------------------------------------------------------
+
         lectura = sensor_color.reflection()
-        error = lectura - objetivo_reflexion
+
+        error = (
+            lectura
+            - objetivo_reflexion
+        )
 
         derivada = (
             (error - error_anterior) * 0.82
@@ -620,26 +846,56 @@ def seguir_linea_y_mover_torque(
             correccion_max
         )
 
-        velocidad_base = velocidad_actual - abs(error) * k_freno
+        # -------------------------------------------------------------
+        # FRENO SEGÚN ERROR DEL SENSOR
+        # -------------------------------------------------------------
+
+        velocidad_base = (
+            velocidad_actual
+            - abs(error) * k_freno
+        )
 
         if velocidad_base < 55:
             velocidad_base = 55
 
-        potencia_izq = velocidad_base - correccion
-        potencia_der = velocidad_base + correccion
+        # -------------------------------------------------------------
+        # POTENCIA DE MOTORES
+        # -------------------------------------------------------------
+
+        potencia_izq = (
+            velocidad_base
+            - correccion
+        )
+
+        potencia_der = (
+            velocidad_base
+            + correccion
+        )
 
         self.motor_izquierdo.dc(
-            self.limitar(potencia_izq, -100, 100)
+            self.limitar(
+                potencia_izq,
+                -100,
+                100
+            )
         )
 
         self.motor_derecho.dc(
-            self.limitar(potencia_der, -100, 100)
+            self.limitar(
+                potencia_der,
+                -100,
+                100
+            )
         )
 
         error_anterior = error
         derivada_anterior = derivada
 
         wait(2)
+
+    # =====================================================================
+    # FINALIZACIÓN
+    # =====================================================================
 
     self.terminar_movimiento(
         perfil=perfil_salida,
