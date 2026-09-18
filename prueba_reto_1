@@ -256,7 +256,7 @@ robot.seguir_linea_y_mover_torque(
     potencia_captura=55,
     kp_captura=3.8,
     perfil_salida="encadenado",
-    distancia_torque_cm=67,
+    distancia_torque_cm=69,
     grados_torque=170,
     velocidad_torque=450,
     zona_desaceleracion_cm=10,
