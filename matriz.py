@@ -261,7 +261,7 @@ def dejar_bloques_matriz2(robot):
     )
 
     wait(200)
-    robot.girar_corto(-11)
+    robot.girar_corto(-11.5)
     robot.avanzar_recto(
         distancia_cm=2.5,
         velocidad_max=650,
@@ -315,7 +315,6 @@ def dejar_bloques_matriz2(robot):
         perfil="encadenado"
     )
 
-
 # NO MODIFICAR: dejar_bloques_matriz3
 # Se mantiene exactamente con la lógica de la rama oficial_v1-2.
 def dejar_bloques_matriz3(robot, distancia_entrada=0):
@@ -362,7 +361,7 @@ def dejar_bloques_matriz3(robot, distancia_entrada=0):
     )
 
     wait(200)
-    robot.girar_corto(-11.5)
+    robot.girar_corto(-11.6)
 
     robot.avanzar_recto(
         distancia_cm=distancia_entrada,
