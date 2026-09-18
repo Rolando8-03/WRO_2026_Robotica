@@ -31,9 +31,9 @@ def ejecutar_matriz_3(robot):
     wait(400)
     robot.avanzar_cruzando_lineas(cruces_objetivo=3, velocidad=700, distancia_extra_cm=11.5)
     robot.mover_garra_principal(velocidad=900, grados=180, esperar=False)
-    wait(50)
+    wait(100)
     robot.girar(
-        -91,
+        -90,
         potencia_max=80,
         potencia_min=45,
         kp_base=6.2,
@@ -104,7 +104,7 @@ def ejecutar_matriz_3(robot):
     #Secuencia para ir por los cementos amarillos ==========
     robot.girar_corto(-10, potencia_max=50, potencia_min=34)
     robot.mover_garra_principal(velocidad=1000, grados=160, esperar=True)
-    robot.girar_corto(7.5, potencia_max=50, potencia_min=34)
+    robot.girar_corto(8.5, potencia_max=50, potencia_min=34)
     robot.avanzar_recto(15, 600)
 
     robot.mover_garra_principal(velocidad=1000, grados=0, esperar=True)
@@ -213,10 +213,10 @@ def ejecutar_matriz_3(robot):
         perfil="encadenado"
     )
     robot.mover_garra_delantera(265, simultaneo=True)
-    robot.avanzar_recto(16.5)
+    robot.avanzar_recto(12.5)
     robot.mover_garra_principal(800, grados=0) #Aqui toma los amarillos
 
-    robot.avanzar_recto(-17)
+    robot.avanzar_cruzando_lineas(cruces_objetivo=1, velocidad=-500, distancia_extra_cm=12)
     robot.girar(
         100,
         potencia_max=80,
@@ -232,9 +232,34 @@ def ejecutar_matriz_3(robot):
     robot.girar_corto(-15)
 
     robot.mover_garra_delantera(240, simultaneo=True)
-    robot.avanzar_recto(24.5) #Ir por los cmentos verdes
+    robot.seguir_linea(
+        sensor_color=robot.seguidor,
+        distancia_cm=27,           
+        velocidad_max=100,         
+        lado="izquierda0",            
+        
+        tiempo_acomodo_ms=80,      
+        tiempo_aceleracion_ms=80,  
+        
+        #CEREBRO PREDICTIVO (PID):
+        kp=1.15,                   
+        kd=3.8,                    
+        k_freno=0.05,              
+        
+        correccion_max=100,
+        objetivo_reflexion=27,     
+        
+        captura_inicial=True,
+        tiempo_captura_ms=280,
+        potencia_captura=60,
+        kp_captura=2.5,
+        perfil_salida="encadenado",
+        zona_desaceleracion_cm=10,
+        velocidad_fin_rampa=60
+    )
+    #robot.avanzar_recto(24.5) #Ir por los cmentos verdes
     robot.mover_garra_principal(velocidad=900, grados=200, esperar= True)
-    wait(50)
+    wait(100)
     robot.girar(
         -90,
         potencia_max=80,
@@ -249,7 +274,7 @@ def ejecutar_matriz_3(robot):
 
     robot.avanzar_recto(20, 600) #Avanzar para meter en los compartimentos los verdes
     robot.mover_garra_delantera(260, simultaneo=False)
-    robot.avanzar_recto(-20.5)
+    robot.avanzar_recto(-21)
     robot.girar(
         90,
         potencia_max=80,
@@ -320,17 +345,17 @@ def ejecutar_matriz_3(robot):
     wait(200)
     robot.girar(
         -180,
-        potencia_max=90,
+        potencia_max=80,
         potencia_min=50,
         kp_base=6.2,
         kd_base=3.5,
         tiempo_curva_s_ms=90,
         tolerancia_fin=1.0,
-        perfil="encadenado"
+        perfil="seguro"
     )
     wait(100)
 
-    robot.avanzar_recto(distancia_cm=-32, velocidad_max=600, perfil="seguro")
+    robot.avanzar_recto(distancia_cm=-34, velocidad_max=600, perfil="seguro")
 
     robot.mover_torque(
         grados_torque=-170,
