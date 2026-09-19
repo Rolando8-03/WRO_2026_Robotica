@@ -25,7 +25,7 @@ def ejecutar_matriz_2(robot):
     robot.motor_garra_delantera.reset_angle(0)
 
     # Retroceso inicial para quedar en la distancia correcta antes del giro.
-    robot.avanzar_recto(distancia_cm=-4, velocidad_max=800)
+    robot.avanzar_recto(distancia_cm=-3, velocidad_max=500)
 
     # Giro hacia el carril que entra a la zona de los bloques azules
     robot.girar(90, potencia_max=65, potencia_min=45, kp_base=5.0, tolerancia_fin=1.0, perfil="encadenado")
@@ -39,7 +39,7 @@ def ejecutar_matriz_2(robot):
     # Deja que el chasis se asiente.
     wait(200)
 
-    robot.girar(-90, potencia_max=75, potencia_min=35, kp_base=5.0, tolerancia_fin=1.0, perfil="encadenado")
+    robot.girar(-90, potencia_max=65, potencia_min=35, kp_base=5.0, tolerancia_fin=1.0, perfil="encadenado")
     
     # El chasis debe asentarse antes de girar usando la línea negra como referencia.
     wait(200)
@@ -68,7 +68,7 @@ def ejecutar_matriz_2(robot):
     robot.mover_garra_delantera(290)
 
     # Sale del grupo azul y vuelve al pasillo central.
-    robot.avanzar_recto(distancia_cm=-21, velocidad_max=900, perfil="seguro")
+    robot.avanzar_recto(distancia_cm=-20.5, velocidad_max=900, perfil="seguro")
 
     # Se conserva antes del giro para evitar que el chasis arranque inclinado.
     wait(200)
@@ -156,7 +156,7 @@ def ejecutar_matriz_2(robot):
     robot.mover_garra_principal(900, 250, apretar=False, duty_cierre=100)
 
     # Retroceso hacia el corredor principal con la segunda tanda.
-    robot.avanzar_recto(distancia_cm=-27.5, velocidad_max=600, perfil="seguro")
+    robot.avanzar_recto(distancia_cm=-28.4, velocidad_max=600, perfil="seguro")
 
     # Giro y seguidor hacia la fila final de bloques.
     robot.girar(-90, potencia_max=90, potencia_min=35, kp_base=5.0, tolerancia_fin=1.0, perfil="encadenado")
@@ -202,13 +202,12 @@ def ejecutar_matriz_2(robot):
     # Se orienta hacia el carril que lleva a la segunda entrega.
     robot.girar(89.9, potencia_max=70, potencia_min=35, kp_base=5.0, tolerancia_fin=1.0, perfil="encadenado")
 
-    robot.mover_torque(grados_torque=-160, velocidad_torque=900, esperar=False)
 
     # Último retroceso antes de la rutina de descarga final.
     robot.avanzar_recto(distancia_cm=-17, velocidad_max=600, perfil="seguro")
 
     # Prepara el torque sin bloquear: el motor puede terminar de acomodarse al entrar a dejar bloques.
-    robot.mover_torque(grados_torque=-10, velocidad_torque=900, esperar=False)
+    robot.mover_torque(grados_torque=-170, velocidad_torque=900, esperar=False)
 
     # Segunda descarga y final de Matriz 2.
     dejar_bloques_matriz2(robot)
