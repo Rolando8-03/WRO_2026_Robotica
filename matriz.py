@@ -203,8 +203,8 @@ def dejar_bloques_matriz2(robot):
     robot.avanzar_cruzando_lineas(
     cruces_objetivo=1,
     velocidad=900,
-    escape_inicial_cm=8,
-    retraso_freno_ms=95
+    escape_inicial_cm=11,
+    retraso_freno_ms=90
     )  
     robot.girar(
         90,
@@ -217,7 +217,7 @@ def dejar_bloques_matriz2(robot):
     robot.seguir_linea(
         sensor_color=robot.seguidor,
         velocidad_max=50,
-        distancia_cm=9,
+        distancia_cm=10,
         lado="derecha",
         tiempo_acomodo_ms=140,
         tiempo_aceleracion_ms=140,
@@ -234,12 +234,12 @@ def dejar_bloques_matriz2(robot):
     )
     robot.mover_garra_principal(900, 230, apretar=False, duty_cierre=60)
     robot.mover_garra_delantera(220)
-    robot.avanzar_recto(distancia_cm=-19, velocidad_max=400, perfil="seguro")
+    robot.avanzar_recto(distancia_cm=-20, velocidad_max=400, perfil="seguro")
     robot.mover_garra_delantera(270)
     robot.seguir_linea(
         sensor_color=robot.seguidor,
         velocidad_max=100,
-        distancia_cm=18,
+        distancia_cm=19,
         lado="derecha",
         tiempo_acomodo_ms=140,
         tiempo_aceleracion_ms=140,
@@ -263,19 +263,19 @@ def dejar_bloques_matriz2(robot):
     robot.mover_garra_delantera(100)
     robot.seguir_linea_hasta_color(
         color_objetivo=Color.BLUE,
-        velocidad_max=100,
+        velocidad_max=70,
         lado="derecha"
     )
 
     wait(200)
-    robot.girar_corto(-11.5)
+    robot.girar_corto(-11, potencia_max=50, potencia_min=40)
     robot.avanzar_recto(
-        distancia_cm=2.5,
+        distancia_cm=3,
         velocidad_max=650,
         zona_rampa_cm=0.1,
         perfil="encadenado"
     )
-    robot.mover_garra_delantera(220)
+    robot.mover_garra_delantera(230)
     robot.mover_garra_rapida(130)
     robot.avanzar_recto(
         distancia_cm=-0.6,
