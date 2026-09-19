@@ -45,7 +45,8 @@ def mover_garra_principal(
     tiempo_apriete_ms=120,
     apretar=False,
     modo_soltar=None,
-    duty_cierre=100
+    duty_cierre=100,
+    simultaneo=False
 ):
     # ==========================================
     # 1. CONTROL MANUAL
@@ -105,7 +106,7 @@ def mover_garra_principal(
             velocidad,
             posicion_motor,
             then=Stop.HOLD,
-            wait=esperar
+            wait=False if simultaneo else esperar
         )
 
 def mover_torque_seguro(
