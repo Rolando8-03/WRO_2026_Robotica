@@ -445,9 +445,9 @@ def girar(
 
         wait(2)
 
-    # Frenado final.
-    self.motor_izquierdo.hold()
-    self.motor_derecho.hold()
+    # Frenar sin corregir la posición después del giro.
+    self.motor_izquierdo.brake()
+    self.motor_derecho.brake()
     wait(20)
 
 def girar_hasta_negro(
@@ -907,7 +907,7 @@ def giro_izquierda(
 def girar_corto(
     self,
     angulo_deg,
-    potencia_max=45,
+    potencia_max=50,
     potencia_min=24,
     kp=4.0,
     tolerancia=1.8,
@@ -985,14 +985,13 @@ def avanzar_hasta_salir_negro(
     zona_rampa_cm=8,
     perfil="encadenado",
     rumbo_esperado=None,
-
     sensor_color=None,
     objetivo_reflexion=15,
     lecturas_salida=5,
-
     torque_grados=None,
     torque_velocidad=180,
-    torque_retraso_ms=0
+    torque_retraso_ms=0,
+    distancia_extra_cm=0
 ):
     if sensor_color is None:
         sensor_color = self.seguidor
@@ -1014,70 +1013,61 @@ def avanzar_hasta_salir_negro(
     else:
         heading_objetivo = self.Hub.imu.heading()
 
-    grados_por_cm = (
-        360 / (self.circunferencia / 10)
-    )
-
-    grados_rampa = (
-        zona_rampa_cm * grados_por_cm
-    )
+    grados_por_cm = 360 / (self.circunferencia / 10)
+    grados_rampa = max(0, zona_rampa_cm) * grados_por_cm
 
     cronometro = StopWatch()
     cronometro.reset()
 
     torque_iniciado = False
-
-    # Contador para confirmar que realmente salió del negro.
     contador_salida = 0
 
+    distancia_salida_mm = None
+    distancia_extra_mm = max(0, distancia_extra_cm) * 10
+
     while True:
+        # Hasta confirmar la salida, continúa leyendo el sensor.
+        if distancia_salida_mm is None:
+            reflexion = sensor_color.reflection()
 
-        reflexion = sensor_color.reflection()
+            if reflexion > objetivo_reflexion:
+                contador_salida += 1
+            else:
+                contador_salida = 0
 
-        # =====================================================
-        # CONFIRMACIÓN DE SALIDA DEL NEGRO
-        # =====================================================
-        if reflexion > objetivo_reflexion:
-            contador_salida += 1
-        else:
-            contador_salida = 0
+            if contador_salida >= lecturas_salida:
+                # Marca dónde salió del negro, sin frenar
+                # ni reiniciar la distancia o la aceleración.
+                distancia_salida_mm = self.drive_base.distance()
 
-        if contador_salida >= lecturas_salida:
-            break
+        # Después de salir, sigue avanzando la distancia extra.
+        if distancia_salida_mm is not None:
+            avance_extra_mm = (
+                self.drive_base.distance() - distancia_salida_mm
+            )
 
-        # =====================================================
-        # DISTANCIA RECORRIDA
-        # =====================================================
+            if avance_extra_mm >= distancia_extra_mm:
+                break
+
         recorrido = (
             abs(self.drive_base.distance())
             * self.grados_por_mm
         )
 
-        # =====================================================
-        # RAMPA DE ACELERACIÓN
-        # =====================================================
-        if recorrido < grados_rampa:
-
-            proporcion = (
-                recorrido / grados_rampa
-            )
+        # Rampa de aceleración por distancia.
+        if grados_rampa > 0 and recorrido < grados_rampa:
+            proporcion = recorrido / grados_rampa
 
             vel_base = (
                 velocidad_min
-                + (
-                    velocidad_max
-                    - velocidad_min
-                ) * proporcion
+                + (velocidad_max - velocidad_min) * proporcion
             )
-
         else:
             vel_base = velocidad_max
 
         tiempo_ms = cronometro.time()
 
-        # =====================================================
-        # TORQUE
-        # =====================================================
+        # Torque opcional sin bloquear el avance.
         if (
             torque_grados is not None
             and not torque_iniciado
@@ -1091,14 +1081,9 @@ def avanzar_hasta_salir_negro(
 
             torque_iniciado = True
 
-        # =====================================================
-        # RAMPA TEMPORAL
-        # =====================================================
+        # Esta rampa se aplica solo al inicio del movimiento.
         if tiempo_ms < 150:
-            vel = (
-                vel_base
-                * (tiempo_ms / 150)
-            )
+            vel = vel_base * (tiempo_ms / 150)
         else:
             vel = vel_base
 
@@ -1108,9 +1093,7 @@ def avanzar_hasta_salir_negro(
             velocidad_max
         )
 
-        # =====================================================
-        # GIROSCOPIO
-        # =====================================================
+        # Mantiene el mismo rumbo durante todo el recorrido.
         actual_heading = self.Hub.imu.heading()
 
         error_gyro = self._error_angular(
@@ -1118,21 +1101,14 @@ def avanzar_hasta_salir_negro(
             actual_heading
         )
 
-        correccion_giro = (
-            error_gyro * kp_gyro
-        )
+        correccion_giro = error_gyro * kp_gyro
 
-        # =====================================================
-        # AVANCE
-        # =====================================================
         self.drive_base.drive(
             vel,
             correccion_giro
         )
 
-    # =========================================================
-    # FRENADO
-    # =========================================================
+    # Frena únicamente al completar la salida y la distancia extra.
     self.drive_base.stop()
 
     self.motor_izquierdo.brake()
